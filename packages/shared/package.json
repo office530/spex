@@ -12,7 +12,11 @@
   "scripts": {
     "lint": "echo '[shared] lint not yet scaffolded' && exit 0",
     "typecheck": "tsc --noEmit",
-    "test": "echo '[shared] tests not yet scaffolded' && exit 0",
-    "clean": "rm -rf dist .turbo"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist .turbo coverage"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.4"
   }
 }
