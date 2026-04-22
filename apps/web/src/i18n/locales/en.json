@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "Spex",
+    "tagline": "Renovation contractor project management"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "login": "Log in",
+    "logout": "Log out"
+  },
+  "login": {
+    "title": "Sign in",
+    "description": "Enter your credentials",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "submit": "Sign in",
+    "notReady": "Authentication goes live in Phase 0 step 4"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Spex",
+    "scaffoldNotice": "Shell only — features land in subsequent phases"
+  }
+}

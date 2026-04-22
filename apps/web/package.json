@@ -5,11 +5,31 @@
   "type": "module",
   "description": "Spex frontend — React 18 + Vite + TypeScript (RTL Hebrew-first)",
   "scripts": {
-    "dev": "echo '[web] dev not yet scaffolded — Phase 0 step 5' && exit 0",
-    "build": "echo '[web] build not yet scaffolded — Phase 0 step 5' && exit 0",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
     "lint": "echo '[web] lint not yet scaffolded' && exit 0",
     "typecheck": "tsc --noEmit",
     "test": "echo '[web] tests not yet scaffolded' && exit 0",
     "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@spex/ui": "workspace:*",
+    "i18next": "^23.16.4",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.1.1",
+    "react-router-dom": "^6.27.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tailwindcss-animate": "^1.0.7",
+    "vite": "^5.4.10"
   }
 }

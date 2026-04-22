@@ -2,9 +2,16 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "noEmit": true
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": ".",
+    "noEmit": true,
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"]
 }
