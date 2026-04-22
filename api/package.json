@@ -1,0 +1,15 @@
+{
+  "name": "@spex/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Spex backend — Fastify + BullMQ workers",
+  "scripts": {
+    "dev": "echo '[api] dev not yet scaffolded — Phase 3' && exit 0",
+    "build": "echo '[api] build not yet scaffolded' && exit 0",
+    "lint": "echo '[api] lint not yet scaffolded' && exit 0",
+    "typecheck": "tsc --noEmit",
+    "test": "echo '[api] tests not yet scaffolded' && exit 0",
+    "clean": "rm -rf dist .turbo"
+  }
+}
