@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "Spex",
+    "tagline": "מערכת ניהול פרויקטים לקבלני שיפוצים"
+  },
+  "nav": {
+    "dashboard": "לוח בקרה",
+    "login": "התחברות",
+    "logout": "התנתקות"
+  },
+  "login": {
+    "title": "התחברות למערכת",
+    "description": "הזן את פרטי ההתחברות שלך",
+    "email": "אימייל",
+    "emailPlaceholder": "name@example.com",
+    "password": "סיסמה",
+    "submit": "התחבר",
+    "notReady": "ההתחברות תופעל בשלב 4 של שלב האיפוס"
+  },
+  "dashboard": {
+    "title": "לוח בקרה",
+    "welcome": "ברוך הבא ל-Spex",
+    "scaffoldNotice": "שלד בלבד — הפונקציונליות נוספת בשלבים הבאים"
+  }
+}
