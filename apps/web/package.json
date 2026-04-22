@@ -1,0 +1,15 @@
+{
+  "name": "@spex/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Spex frontend — React 18 + Vite + TypeScript (RTL Hebrew-first)",
+  "scripts": {
+    "dev": "echo '[web] dev not yet scaffolded — Phase 0 step 5' && exit 0",
+    "build": "echo '[web] build not yet scaffolded — Phase 0 step 5' && exit 0",
+    "lint": "echo '[web] lint not yet scaffolded' && exit 0",
+    "typecheck": "tsc --noEmit",
+    "test": "echo '[web] tests not yet scaffolded' && exit 0",
+    "clean": "rm -rf dist .turbo"
+  }
+}
