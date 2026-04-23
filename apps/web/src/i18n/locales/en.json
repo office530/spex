@@ -15,11 +15,20 @@
     "emailPlaceholder": "name@example.com",
     "password": "Password",
     "submit": "Sign in",
-    "notReady": "Authentication goes live in Phase 0 step 4"
+    "submitting": "Signing in…"
   },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome to Spex",
     "scaffoldNotice": "Shell only — features land in subsequent phases"
+  },
+  "roles": {
+    "ceo": "CEO",
+    "vp": "VP",
+    "cfo": "CFO",
+    "office_manager": "Office Manager",
+    "pm": "Project Manager",
+    "foreman": "Foreman",
+    "unknown": "Role pending"
   }
 }
