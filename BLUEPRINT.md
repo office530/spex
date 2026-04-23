@@ -371,7 +371,7 @@ All phases build on the previous. Each phase ships usable functionality.
 
 ### 10.1 Phase 0 checklist (first sprint)
 1. `pnpm create turbo@latest spex` scaffold.
-2. Create Supabase project (eu-west-1 Frankfurt). Enable `uuid-ossp`, `pgcrypto`.
+2. Create Supabase project (ap-southeast-1 Singapore). Enable `uuid-ossp`, `pgcrypto`.
 3. `packages/db`: Drizzle config + initial migration with `user_profiles`, `leads`, `projects` stubs.
 4. Supabase Auth: email+password; add `role` custom claim in JWT via DB trigger.
 5. `apps/web`: Vite + React 18 + TS; Tailwind RTL; shadcn/ui; i18next Hebrew.
@@ -385,7 +385,7 @@ All phases build on the previous. Each phase ships usable functionality.
 
 | # | Question | Who resolves | By when |
 |---|---|---|---|
-| 1 | Supabase region — is existing project eu-west-1 Frankfurt? If not, new project. | Dev + Vision | Phase 0 |
+| 1 | ✅ Supabase region — ap-southeast-1 Singapore, project `vxzflohvtfrkwycpaxiy`, created 2026-04-23. | Dev + Vision | Phase 0 |
 | 2 | Domain: `renobuild.co.il` → `spex.*`? Subdomain convention `app.` / `ticket.`? | Vision | Phase 0 |
 | 3 | Data residency — any Israel-only legal requirement that blocks Frankfurt hosting? | Legal / Vision | Phase 0 |
 | 4 | Chashbashvat API: which objects? Webhooks in or polling? Rate limits? Auth? Sandbox? | Dev + Chashbashvat team | Phase 3 kickoff |

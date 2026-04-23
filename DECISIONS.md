@@ -54,7 +54,7 @@ Paired with `BLUEPRINT.md` (design) and `MIRO_READOUT.md` (requirements source).
 |---|---|
 | Frontend | React 18 + Vite + **TypeScript** |
 | UI | Radix + Tailwind + shadcn/ui (RTL-first for Hebrew) |
-| Data | Postgres via **Supabase** (eu-west-1 Frankfurt) — auth + RLS + realtime + storage |
+| Data | Postgres via **Supabase** (ap-southeast-1 Singapore) — auth + RLS + realtime + storage |
 | Backend | Thin Node.js (Fastify) on Railway (Phase 3+ only) |
 | Queue | BullMQ on Upstash Redis |
 | File storage | Google Drive (project docs) + Supabase Storage (in-app attachments, tickets) |
@@ -73,7 +73,7 @@ Paired with `BLUEPRINT.md` (design) and `MIRO_READOUT.md` (requirements source).
 
 ## Open items (needed before / during build)
 
-- **Supabase region** — confirm existing project is `eu-west-1` Frankfurt. If not, new project there.
+- **Supabase region** — ✅ Resolved: `ap-southeast-1` Singapore. New project `vxzflohvtfrkwycpaxiy` created 2026-04-23.
 - **Domain** — `renobuild.co.il` vs. new `spex.*` domain. Subdomain convention `app.` / `ticket.` proposed.
 - **Data residency** — confirm no Israel-only legal requirement.
 - **Chashbashvat API discovery** — 1-hour call with their integration team before Phase 3. Confirm which objects expose via API and whether inbound webhooks exist.
