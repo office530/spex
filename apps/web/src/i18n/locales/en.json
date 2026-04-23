@@ -6,7 +6,8 @@
   "nav": {
     "dashboard": "Dashboard",
     "login": "Log in",
-    "logout": "Log out"
+    "logout": "Log out",
+    "users": "Users"
   },
   "login": {
     "title": "Sign in",
@@ -30,5 +31,25 @@
     "pm": "Project Manager",
     "foreman": "Foreman",
     "unknown": "Role pending"
+  },
+  "users": {
+    "title": "Users",
+    "listTitle": "User list",
+    "empty": "No users found",
+    "inactive": "Inactive",
+    "notFound": "User not found",
+    "editTitle": "Edit profile",
+    "editSubtitle": "Update user details",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "role": "Role",
+    "isActive": "Active"
+  },
+  "common": {
+    "loading": "Loading…",
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel"
   }
 }
