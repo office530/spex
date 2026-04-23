@@ -15,11 +15,20 @@
     "emailPlaceholder": "name@example.com",
     "password": "סיסמה",
     "submit": "התחבר",
-    "notReady": "ההתחברות תופעל בשלב 4 של שלב האיפוס"
+    "submitting": "מתחבר…"
   },
   "dashboard": {
     "title": "לוח בקרה",
     "welcome": "ברוך הבא ל-Spex",
     "scaffoldNotice": "שלד בלבד — הפונקציונליות נוספת בשלבים הבאים"
+  },
+  "roles": {
+    "ceo": "מנכ\"ל",
+    "vp": "סמנכ\"ל",
+    "cfo": "סמנכ\"ל כספים",
+    "office_manager": "מנהל/ת משרד",
+    "pm": "מנהל פרויקט",
+    "foreman": "מנהל עבודה",
+    "unknown": "תפקיד בהמתנה"
   }
 }
