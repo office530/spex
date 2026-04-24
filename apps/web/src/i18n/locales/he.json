@@ -13,6 +13,7 @@
     "projects": "פרויקטים",
     "leads": "לידים",
     "tickets": "פניות",
+    "settings": "הגדרות",
     "sections": {
       "workspace": "עבודה שוטפת",
       "directory": "ספרייה"
@@ -82,6 +83,22 @@
     "email": "אימייל",
     "address": "כתובת",
     "notes": "הערות"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "milestoneTemplates": {
+      "title": "תבניות אבני דרך",
+      "description": "אבני הדרך שכאן משוכפלות אוטומטית לכל פרויקט חדש.",
+      "add": "תבנית חדשה",
+      "empty": "אין תבניות כרגע",
+      "confirmDelete": "למחוק את התבנית?",
+      "name": "שם",
+      "billingPct": "% חיוב",
+      "sortOrder": "סדר",
+      "sumLabel": "סך אחוזי החיוב: {{sum}}%",
+      "sumOk": "100% — תקין",
+      "sumWarning": "הסכום לא מסתכם ל-100%"
+    }
   },
   "customerInvoices": {
     "title": "חשבוניות לקוח",

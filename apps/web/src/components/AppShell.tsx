@@ -4,6 +4,7 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
+  Settings as SettingsIcon,
   Target,
   Truck,
   FolderKanban,
@@ -36,6 +37,7 @@ const DIRECTORY: NavItem[] = [
   { to: '/clients', icon: Building2, key: 'nav.clients' },
   { to: '/suppliers', icon: Truck, key: 'nav.suppliers' },
   { to: '/users', icon: Users, key: 'nav.users' },
+  { to: '/settings/milestones', icon: SettingsIcon, key: 'nav.settings' },
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
