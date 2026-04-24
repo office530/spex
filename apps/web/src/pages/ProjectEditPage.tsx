@@ -7,6 +7,7 @@ import {
   CardTitle,
   Input,
   Label,
+  StatusBadge,
   Tabs,
   TabsContent,
   TabsList,
@@ -229,23 +230,63 @@ export function ProjectEditPage() {
     );
   }
 
+  const clientName = clients.find((c) => c.id === form.client_id)?.company_name;
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {isCreate ? t('projects.newTitle') : t('projects.editTitle')}
-        </h1>
-        <div className="flex items-center gap-2">
-          {!isCreate && id && (
-            <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${id}/boq`)}>
-              {t('boq.manage')}
-            </Button>
-          )}
+    <div className={`${isCreate ? 'max-w-3xl mx-auto' : ''} space-y-6`}>
+      {isCreate ? (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t('projects.newTitle')}</h1>
           <Button variant="ghost" onClick={() => navigate('/projects')} disabled={saving}>
             {t('common.back')}
           </Button>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-2 min-w-0">
+              <div className="text-xs font-medium text-primary-foreground/70">
+                {t('projects.title')}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                {form.name || t('projects.editTitle')}
+              </h1>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/80 flex-wrap">
+                {clientName && <span>{clientName}</span>}
+                {clientName && <span>·</span>}
+                <span>{t(`projects.types.${form.type}`)}</span>
+                <StatusBadge
+                  family="project"
+                  value={form.status}
+                  label={t(`projects.status.${form.status}`)}
+                  className="bg-white/15 text-white"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {id && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/10 text-primary-foreground border-white/20 hover:bg-white/20 hover:text-primary-foreground"
+                  onClick={() => navigate(`/projects/${id}/boq`)}
+                >
+                  {t('boq.manage')}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground"
+                onClick={() => navigate('/projects')}
+                disabled={saving}
+              >
+                {t('common.back')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {!isCreate && id && (
         <ProjectOverviewCard

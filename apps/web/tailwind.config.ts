@@ -54,6 +54,17 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          'muted-foreground': 'hsl(var(--sidebar-muted-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          active: 'hsl(var(--sidebar-active))',
+        },
+        hero: {
+          from: 'hsl(var(--hero-from))',
+          to: 'hsl(var(--hero-to))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
