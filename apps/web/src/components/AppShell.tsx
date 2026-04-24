@@ -2,6 +2,7 @@ import { Button } from '@spex/ui';
 import {
   BarChart3,
   Building2,
+  CalendarDays,
   History,
   Inbox,
   LayoutDashboard,
@@ -33,6 +34,7 @@ const WORKSPACE: NavItem[] = [
   { to: '/', end: true, icon: LayoutDashboard, key: 'nav.dashboard' },
   { to: '/projects', icon: FolderKanban, key: 'nav.projects' },
   { to: '/leads', icon: Target, key: 'nav.leads' },
+  { to: '/calendar', icon: CalendarDays, key: 'nav.calendar' },
   { to: '/tickets', icon: Inbox, key: 'nav.tickets' },
 ];
 

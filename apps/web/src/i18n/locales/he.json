@@ -15,6 +15,7 @@
     "tickets": "פניות",
     "settings": "הגדרות",
     "activity": "יומן פעילות",
+    "calendar": "יומן אירועים",
     "sections": {
       "workspace": "עבודה שוטפת",
       "directory": "ספרייה"
@@ -109,6 +110,13 @@
       "task_assigned": "משימה הוקצתה לך",
       "ticket_assigned": "פנייה הוקצתה לך"
     }
+  },
+  "calendar": {
+    "title": "יומן אירועים",
+    "today": "היום",
+    "prev": "חודש קודם",
+    "next": "חודש הבא",
+    "noEvents": "אין אירועים"
   },
   "activityLog": {
     "title": "יומן פעילות",

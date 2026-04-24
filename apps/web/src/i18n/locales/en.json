@@ -15,6 +15,7 @@
     "tickets": "Tickets",
     "settings": "Settings",
     "activity": "Activity log",
+    "calendar": "Calendar",
     "sections": {
       "workspace": "Workspace",
       "directory": "Directory"
@@ -109,6 +110,13 @@
       "task_assigned": "Task assigned to you",
       "ticket_assigned": "Ticket assigned to you"
     }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "prev": "Prev month",
+    "next": "Next month",
+    "noEvents": "No events"
   },
   "activityLog": {
     "title": "Activity log",
