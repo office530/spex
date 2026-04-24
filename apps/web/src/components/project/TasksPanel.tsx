@@ -48,6 +48,7 @@ interface TaskRow {
   assignee_id: string | null;
   due_date: string | null;
   sort_order: number;
+  parent_task_id: string | null;
   assignee: { full_name: string } | null;
 }
 
@@ -66,6 +67,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
     priority: 'medium' as TaskPriority,
     assignee_id: '',
     due_date: '',
+    parent_task_id: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +76,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
       supabase
         .from('tasks')
         .select(
-          'id, title, description, status, priority, assignee_id, due_date, sort_order, assignee:user_profiles(full_name)',
+          'id, title, description, status, priority, assignee_id, due_date, sort_order, parent_task_id, assignee:user_profiles(full_name)',
         )
         .eq('project_id', projectId)
         .order('sort_order'),
@@ -97,7 +99,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
-  function startAdd() {
+  function startAdd(parentTaskId: string | null = null) {
     setEditingId(null);
     setForm({
       title: '',
@@ -106,6 +108,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
       priority: 'medium',
       assignee_id: '',
       due_date: '',
+      parent_task_id: parentTaskId ?? '',
     });
     setError(null);
     setAdding(true);
@@ -121,6 +124,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
       priority: r.priority,
       assignee_id: r.assignee_id ?? '',
       due_date: toDatetimeInput(r.due_date),
+      parent_task_id: r.parent_task_id ?? '',
     });
     setError(null);
   }
@@ -142,6 +146,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
       priority: form.priority,
       assignee_id: form.assignee_id || null,
       due_date: fromDatetimeInput(form.due_date),
+      parent_task_id: form.parent_task_id || null,
     };
     const nextOrder = rows.length ? Math.max(...rows.map((r) => r.sort_order)) + 1 : 0;
     const { error } = adding
@@ -232,6 +237,25 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
             />
           </div>
           <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor="task_parent">{t('tasks.parentTask')}</Label>
+            <select
+              id="task_parent"
+              value={form.parent_task_id}
+              onChange={(e) => setForm((f) => ({ ...f, parent_task_id: e.target.value }))}
+              disabled={saving}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            >
+              <option value="">{t('tasks.noParent')}</option>
+              {rows
+                .filter((r) => r.id !== editingId && r.parent_task_id == null)
+                .map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.title}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="space-y-1 sm:col-span-2">
             <Label htmlFor="task_desc">{t('tasks.description')}</Label>
             <textarea
               id="task_desc"
@@ -261,7 +285,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
       <CardHeader className="flex-row items-center justify-between gap-2">
         <CardTitle className="text-base">{t('tasks.title')}</CardTitle>
         {canWrite && !adding && !editingId && (
-          <Button size="sm" variant="outline" onClick={startAdd}>
+          <Button size="sm" variant="outline" onClick={() => startAdd()}>
             {t('tasks.add')}
           </Button>
         )}
@@ -276,61 +300,87 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
               <EmptyState
                 icon={ListChecks}
                 title={t('tasks.empty')}
-                cta={canWrite ? { label: t('tasks.add'), onClick: startAdd } : undefined}
+                cta={canWrite ? { label: t('tasks.add'), onClick: () => startAdd() } : undefined}
               />
             ) : (
-              rows.map((r) =>
-                editingId === r.id ? (
-                  <div key={r.id}>{renderForm()}</div>
-                ) : (
-                  <div key={r.id} className="px-6 py-3 space-y-2">
-                    <div className="flex items-start gap-2 flex-wrap">
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium text-sm">{r.title}</div>
-                        {r.description && (
-                          <p className="text-sm text-muted-foreground whitespace-pre-line mt-0.5">
-                            {r.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mt-1">
-                          <span>{r.assignee?.full_name ?? t('tasks.noAssignee')}</span>
-                          {r.due_date && (
-                            <span>· {dateFormat.format(new Date(r.due_date))}</span>
+              (() => {
+                const byParent = new Map<string, TaskRow[]>();
+                rows.forEach((r) => {
+                  if (r.parent_task_id) {
+                    const arr = byParent.get(r.parent_task_id) ?? [];
+                    arr.push(r);
+                    byParent.set(r.parent_task_id, arr);
+                  }
+                });
+                const topLevel = rows.filter((r) => !r.parent_task_id);
+                const renderTaskRow = (r: TaskRow, depth = 0) =>
+                  editingId === r.id ? (
+                    <div key={r.id}>{renderForm()}</div>
+                  ) : (
+                    <div
+                      key={r.id}
+                      className="px-6 py-3 space-y-2"
+                      style={depth > 0 ? { paddingInlineStart: `${24 + depth * 24}px` } : undefined}
+                    >
+                      <div className="flex items-start gap-2 flex-wrap">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm">
+                            {depth > 0 && <span className="text-muted-foreground me-1">↳</span>}
+                            {r.title}
+                          </div>
+                          {r.description && (
+                            <p className="text-sm text-muted-foreground whitespace-pre-line mt-0.5">
+                              {r.description}
+                            </p>
                           )}
+                          <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mt-1">
+                            <span>{r.assignee?.full_name ?? t('tasks.noAssignee')}</span>
+                            {r.due_date && (
+                              <span>· {dateFormat.format(new Date(r.due_date))}</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="shrink-0 flex items-center gap-1 flex-wrap">
-                        <StatusBadge
-                          family="task_priority"
-                          value={r.priority}
-                          label={t(`tasks.priority.${r.priority}`)}
-                        />
-                        <StatusBadge
-                          family="task"
-                          value={r.status}
-                          label={t(`tasks.status.${r.status}`)}
-                        />
-                      </div>
-                      {canWrite && (
-                        <div className="shrink-0 flex items-center gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>
-                            {t('common.edit')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => void remove(r)}
-                          >
-                            {t('common.delete')}
-                          </Button>
+                        <div className="shrink-0 flex items-center gap-1 flex-wrap">
+                          <StatusBadge
+                            family="task_priority"
+                            value={r.priority}
+                            label={t(`tasks.priority.${r.priority}`)}
+                          />
+                          <StatusBadge
+                            family="task"
+                            value={r.status}
+                            label={t(`tasks.status.${r.status}`)}
+                          />
                         </div>
-                      )}
+                        {canWrite && (
+                          <div className="shrink-0 flex items-center gap-1">
+                            {depth === 0 && (
+                              <Button size="sm" variant="ghost" onClick={() => startAdd(r.id)}>
+                                +
+                              </Button>
+                            )}
+                            <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>
+                              {t('common.edit')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => void remove(r)}
+                            >
+                              {t('common.delete')}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <TaskChecklist taskId={r.id} canWrite={canWrite} />
                     </div>
-                    <TaskChecklist taskId={r.id} canWrite={canWrite} />
-                  </div>
-                ),
-              )
+                  );
+                return topLevel.flatMap((parent) => [
+                  renderTaskRow(parent, 0),
+                  ...(byParent.get(parent.id) ?? []).map((child) => renderTaskRow(child, 1)),
+                ]);
+              })()
             )}
           </div>
         )}

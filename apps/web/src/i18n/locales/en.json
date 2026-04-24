@@ -414,6 +414,8 @@
     "checklistProgress": "{{done}}/{{total}}",
     "addChecklistItem": "New item…",
     "confirmDeleteChecklistItem": "Delete this item?",
+    "parentTask": "Parent task",
+    "noParent": "None",
     "empty": "No tasks yet",
     "confirmDelete": "Delete this task?",
     "titleLabel": "Title",
