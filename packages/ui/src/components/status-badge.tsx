@@ -44,7 +44,8 @@ type StatusFamily =
   | 'ticket'
   | 'customer_invoice'
   | 'chashbashvat_sync'
-  | 'purchase_order';
+  | 'purchase_order'
+  | 'rfq';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -166,6 +167,11 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     issued: 'info',
     partially_received: 'warning',
     received: 'success',
+    cancelled: 'muted',
+  },
+  rfq: {
+    open: 'warning',
+    closed: 'success',
     cancelled: 'muted',
   },
 };

@@ -542,6 +542,17 @@
       "processed": "Processed"
     }
   },
+  "rfq_grouper": {
+    "label": "RFQ",
+    "openButton": "Open RFQ",
+    "closeButton": "Close RFQ",
+    "reopenButton": "Reopen",
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "cancelled": "Cancelled"
+    }
+  },
   "supplierQuotes": {
     "title": "Supplier quotes",
     "empty": "No quotes for this item yet",
