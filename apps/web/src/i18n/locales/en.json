@@ -9,6 +9,7 @@
     "logout": "Log out",
     "users": "Users",
     "clients": "Clients",
+    "suppliers": "Suppliers",
     "projects": "Projects",
     "leads": "Leads"
   },
@@ -65,6 +66,30 @@
     "email": "Email",
     "address": "Address",
     "notes": "Notes"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "listTitle": "Supplier list",
+    "new": "New supplier",
+    "newTitle": "New supplier",
+    "editTitle": "Edit supplier",
+    "details": "Supplier details",
+    "empty": "No suppliers yet",
+    "noMatches": "No suppliers match your search",
+    "notFound": "Supplier not found",
+    "searchPlaceholder": "Search by name, category, phone, email…",
+    "name": "Name",
+    "category": "Category",
+    "phone": "Phone",
+    "email": "Email",
+    "taxId": "Tax ID",
+    "statusLabel": "Status",
+    "notes": "Notes",
+    "status": {
+      "pending_approval": "Pending approval",
+      "active": "Active",
+      "blocked": "Blocked"
+    }
   },
   "contacts": {
     "title": "Contacts",
@@ -172,6 +197,60 @@
       "won": "Won",
       "lost": "Lost",
       "not_relevant": "Not relevant"
+    }
+  },
+  "boq": {
+    "title": "Bill of Quantities",
+    "manage": "Manage BoQ",
+    "empty": "No chapters yet",
+    "emptyLineItems": "No items in this chapter",
+    "projectTotal": "Project total",
+    "chapterTotal": "Chapter total",
+    "addChapter": "Add chapter",
+    "chapterName": "Chapter name",
+    "confirmDeleteChapter": "Delete this chapter and all its items?",
+    "confirmDeleteLineItem": "Delete this line item?",
+    "addLineItem": "Add item",
+    "description": "Description",
+    "unit": "Unit",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "estimatedTotal": "Estimated total"
+  },
+  "customerQuotes": {
+    "title": "Customer quotes",
+    "add": "New quote",
+    "empty": "No quotes yet",
+    "confirmDelete": "Delete this quote?",
+    "totalAmount": "Total amount",
+    "statusLabel": "Status",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
+  },
+  "milestones": {
+    "title": "Milestones",
+    "add": "Add milestone",
+    "empty": "No milestones yet",
+    "confirmDelete": "Delete this milestone?",
+    "name": "Name",
+    "billingPct": "Billing %",
+    "executionStatus": "Execution status",
+    "billingStatus": "Billing status",
+    "execution": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "billing": {
+      "not_yet_due": "Not yet due",
+      "ready_to_bill": "Ready to bill",
+      "invoiced": "Invoiced",
+      "paid": "Paid"
     }
   },
   "events": {

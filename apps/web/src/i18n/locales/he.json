@@ -9,6 +9,7 @@
     "logout": "התנתקות",
     "users": "משתמשים",
     "clients": "לקוחות",
+    "suppliers": "ספקים",
     "projects": "פרויקטים",
     "leads": "לידים"
   },
@@ -65,6 +66,30 @@
     "email": "אימייל",
     "address": "כתובת",
     "notes": "הערות"
+  },
+  "suppliers": {
+    "title": "ספקים",
+    "listTitle": "רשימת ספקים",
+    "new": "ספק חדש",
+    "newTitle": "ספק חדש",
+    "editTitle": "עריכת ספק",
+    "details": "פרטי ספק",
+    "empty": "עדיין אין ספקים",
+    "noMatches": "לא נמצאו ספקים התואמים לחיפוש",
+    "notFound": "הספק לא נמצא",
+    "searchPlaceholder": "חיפוש לפי שם, קטגוריה, טלפון, אימייל…",
+    "name": "שם",
+    "category": "קטגוריה",
+    "phone": "טלפון",
+    "email": "אימייל",
+    "taxId": "ח.פ / ע.מ",
+    "statusLabel": "סטטוס",
+    "notes": "הערות",
+    "status": {
+      "pending_approval": "ממתין לאישור",
+      "active": "פעיל",
+      "blocked": "חסום"
+    }
   },
   "contacts": {
     "title": "אנשי קשר",
@@ -172,6 +197,60 @@
       "won": "נסגר",
       "lost": "אבד",
       "not_relevant": "לא רלוונטי"
+    }
+  },
+  "boq": {
+    "title": "כתב כמויות",
+    "manage": "ניהול כתב כמויות",
+    "empty": "עדיין אין פרקים",
+    "emptyLineItems": "אין פריטים בפרק",
+    "projectTotal": "סה\"כ פרויקט",
+    "chapterTotal": "סה\"כ פרק",
+    "addChapter": "הוסף פרק",
+    "chapterName": "שם פרק",
+    "confirmDeleteChapter": "למחוק את הפרק וכל הפריטים?",
+    "confirmDeleteLineItem": "למחוק את הפריט?",
+    "addLineItem": "הוסף פריט",
+    "description": "תיאור",
+    "unit": "יחידה",
+    "quantity": "כמות",
+    "unitPrice": "מחיר יחידה",
+    "estimatedTotal": "סה\"כ משוער"
+  },
+  "customerQuotes": {
+    "title": "הצעות מחיר",
+    "add": "הצעת מחיר חדשה",
+    "empty": "עדיין אין הצעות מחיר",
+    "confirmDelete": "למחוק את הצעת המחיר?",
+    "totalAmount": "סכום כולל",
+    "statusLabel": "סטטוס",
+    "status": {
+      "draft": "טיוטה",
+      "sent": "נשלחה",
+      "approved": "אושרה",
+      "rejected": "נדחתה",
+      "cancelled": "בוטלה"
+    }
+  },
+  "milestones": {
+    "title": "אבני דרך",
+    "add": "הוסף אבן דרך",
+    "empty": "עדיין אין אבני דרך",
+    "confirmDelete": "למחוק את אבן הדרך?",
+    "name": "שם",
+    "billingPct": "% חיוב",
+    "executionStatus": "סטטוס ביצוע",
+    "billingStatus": "סטטוס חיוב",
+    "execution": {
+      "pending": "ממתין",
+      "in_progress": "בביצוע",
+      "done": "הושלם"
+    },
+    "billing": {
+      "not_yet_due": "טרם הגיע המועד",
+      "ready_to_bill": "מוכן לחיוב",
+      "invoiced": "חויב",
+      "paid": "שולם"
     }
   },
   "events": {

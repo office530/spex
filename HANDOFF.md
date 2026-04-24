@@ -81,7 +81,7 @@ Start by setting up the pnpm + Turborepo monorepo scaffold. Create the directory
 - **Supplier procurement**: BoQ → RFQ → compare SupplierQuotes side-by-side → approve → PO → Chashbashvat.
 - **Notifications**: All WA/email alerts are event-driven via BullMQ workers. No `NotificationService.send()` in business logic.
 - **Permissions**: RLS-enforced. PM sees only their projects. Foreman sees operational tabs only. CEO/VP/CFO/Office Manager see everything.
-- **Hebrew RTL**: Primary language. All UI must be `dir="rtl"`. i18next with Hebrew namespace.
+- **Hebrew RTL**: The **only** user-facing language. All UI copy ships in Hebrew. `dir="rtl"` on `<html>` always. Every string goes through i18next (`he.json`); English (`en.json`) is a developer fallback only — it must never surface to end users. Do not add a language switcher; do not render English strings in the UI; do not hard-code English text in components.
 
 ## Open questions to resolve before/during build
 

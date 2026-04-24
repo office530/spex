@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
+import { BoqPage } from './pages/BoqPage';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
@@ -11,6 +12,8 @@ import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { SupplierEditPage } from './pages/SupplierEditPage';
+import { SuppliersPage } from './pages/SuppliersPage';
 import { UserEditPage } from './pages/UserEditPage';
 import { UsersPage } from './pages/UsersPage';
 
@@ -86,6 +89,30 @@ export function App() {
           }
         />
         <Route
+          path="/suppliers"
+          element={
+            <BackOfficeRoute>
+              <SuppliersPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/suppliers/new"
+          element={
+            <BackOfficeRoute>
+              <SupplierEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id"
+          element={
+            <BackOfficeRoute>
+              <SupplierEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
           path="/projects"
           element={
             <AuthenticatedRoute>
@@ -106,6 +133,14 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <ProjectEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id/boq"
+          element={
+            <AuthenticatedRoute>
+              <BoqPage />
             </AuthenticatedRoute>
           }
         />

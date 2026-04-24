@@ -415,6 +415,7 @@ export function LeadEditPage() {
         </form>
       </Card>
 
+      {!isCreate && id && <CustomerQuotesPanel leadId={id} />}
       {!isCreate && id && <EventsPanel leadId={id} />}
       {!isCreate && id && <InteractionsPanel leadId={id} />}
     </div>
@@ -442,6 +443,240 @@ function SelectField({ id, value, onChange, children, required, disabled }: Sele
     >
       {children}
     </select>
+  );
+}
+
+type QuoteStatus = 'draft' | 'sent' | 'approved' | 'rejected' | 'cancelled';
+
+const QUOTE_STATUSES: QuoteStatus[] = ['draft', 'sent', 'approved', 'rejected', 'cancelled'];
+
+const QUOTE_STATUS_COLORS: Record<QuoteStatus, string> = {
+  draft: 'bg-gray-100 text-gray-700',
+  sent: 'bg-blue-100 text-blue-800',
+  approved: 'bg-emerald-100 text-emerald-800',
+  rejected: 'bg-rose-100 text-rose-800',
+  cancelled: 'bg-slate-100 text-slate-700',
+};
+
+interface QuoteRow {
+  id: string;
+  total_amount: number | null;
+  status: QuoteStatus;
+  notes: string | null;
+  created_at: string;
+}
+
+function formatCurrency(value: number | null | undefined): string {
+  if (value == null) return '—';
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function CustomerQuotesPanel({ leadId }: { leadId: string }) {
+  const { t, i18n } = useTranslation();
+  const [quotes, setQuotes] = useState<QuoteRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<{ total_amount: string; status: QuoteStatus; notes: string }>({
+    total_amount: '',
+    status: 'draft',
+    notes: '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function refresh() {
+    const { data, error } = await supabase
+      .from('customer_quotes')
+      .select('id, total_amount, status, notes, created_at')
+      .eq('lead_id', leadId)
+      .eq('kind', 'pre_deal')
+      .order('created_at', { ascending: false });
+    if (error) setError(error.message);
+    else setQuotes((data as QuoteRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadId]);
+
+  function startAdd() {
+    setEditingId(null);
+    setForm({ total_amount: '', status: 'draft', notes: '' });
+    setError(null);
+    setAdding(true);
+  }
+
+  function startEdit(q: QuoteRow) {
+    setAdding(false);
+    setEditingId(q.id);
+    setForm({
+      total_amount: q.total_amount != null ? String(q.total_amount) : '',
+      status: q.status,
+      notes: q.notes ?? '',
+    });
+    setError(null);
+  }
+
+  function cancelForm() {
+    setAdding(false);
+    setEditingId(null);
+    setError(null);
+  }
+
+  async function saveForm(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const payload = {
+      total_amount: form.total_amount ? Number(form.total_amount) : null,
+      status: form.status,
+      notes: form.notes || null,
+    };
+    const { error } = adding
+      ? await supabase.from('customer_quotes').insert({
+          ...payload,
+          lead_id: leadId,
+          kind: 'pre_deal',
+        })
+      : await supabase.from('customer_quotes').update(payload).eq('id', editingId!);
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    cancelForm();
+    await refresh();
+  }
+
+  async function removeQuote(q: QuoteRow) {
+    if (!confirm(t('customerQuotes.confirmDelete'))) return;
+    const { error } = await supabase.from('customer_quotes').delete().eq('id', q.id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' });
+
+  function renderForm() {
+    return (
+      <form onSubmit={saveForm} className="px-6 py-4 space-y-3 bg-muted/40">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label htmlFor="q_amount">{t('customerQuotes.totalAmount')}</Label>
+            <Input
+              id="q_amount"
+              type="number"
+              min="0"
+              value={form.total_amount}
+              onChange={(e) => setForm((f) => ({ ...f, total_amount: e.target.value }))}
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="q_status">{t('customerQuotes.statusLabel')}</Label>
+            <SelectField
+              id="q_status"
+              value={form.status}
+              onChange={(v) => setForm((f) => ({ ...f, status: v as QuoteStatus }))}
+              disabled={saving}
+            >
+              {QUOTE_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`customerQuotes.status.${s}`)}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor="q_notes">{t('common.notes')}</Label>
+            <textarea
+              id="q_notes"
+              value={form.notes}
+              onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+              rows={3}
+              disabled={saving}
+              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            />
+          </div>
+        </div>
+        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={cancelForm} disabled={saving}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" size="sm" disabled={saving}>
+            {saving ? t('common.saving') : t('common.save')}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base">{t('customerQuotes.title')}</CardTitle>
+        {!adding && !editingId && (
+          <Button size="sm" variant="outline" onClick={startAdd}>
+            {t('customerQuotes.add')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : (
+          <div className="divide-y">
+            {adding && renderForm()}
+            {quotes.length === 0 && !adding ? (
+              <p className="text-sm text-muted-foreground p-6">{t('customerQuotes.empty')}</p>
+            ) : (
+              quotes.map((q) =>
+                editingId === q.id ? (
+                  <div key={q.id}>{renderForm()}</div>
+                ) : (
+                  <div key={q.id} className="px-6 py-3 flex items-center gap-3 flex-wrap">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-sm">{formatCurrency(q.total_amount)}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {dateFormat.format(new Date(q.created_at))}
+                      </div>
+                      {q.notes && (
+                        <p className="text-sm text-muted-foreground whitespace-pre-line mt-1">
+                          {q.notes}
+                        </p>
+                      )}
+                    </div>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${QUOTE_STATUS_COLORS[q.status]}`}
+                    >
+                      {t(`customerQuotes.status.${q.status}`)}
+                    </span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button size="sm" variant="ghost" onClick={() => startEdit(q)}>
+                        {t('common.edit')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => void removeQuote(q)}
+                      >
+                        {t('common.delete')}
+                      </Button>
+                    </div>
+                  </div>
+                ),
+              )
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
