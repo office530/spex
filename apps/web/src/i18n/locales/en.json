@@ -232,6 +232,24 @@
       "cancelled": "Cancelled"
     }
   },
+  "variations": {
+    "title": "Variations",
+    "add": "Add variation",
+    "empty": "No variations yet",
+    "confirmDelete": "Delete this variation?",
+    "total": "Variations total",
+    "titleLabel": "Title",
+    "description": "Description",
+    "amount": "Amount",
+    "statusLabel": "Status",
+    "status": {
+      "draft": "Draft",
+      "pending_approval": "Pending approval",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "billed": "Billed"
+    }
+  },
   "milestones": {
     "title": "Milestones",
     "add": "Add milestone",

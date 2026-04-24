@@ -49,7 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (activeProfileUserId.current !== userId) return;
 
     if (error) {
-      console.error('[auth] failed to load user_profiles row', error);
+      if (import.meta.env.DEV) {
+        console.error('[auth] failed to load user_profiles row', error);
+      }
       setProfile(null);
       return;
     }
