@@ -849,33 +849,52 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
       ) : quotes.length === 0 && !adding ? (
         <p className="text-xs text-muted-foreground">{t('supplierQuotes.empty')}</p>
       ) : (
-        <div className="space-y-2">
-          {quotes.map((q) => (
-            <div key={q.id} className="bg-background rounded overflow-hidden">
-              <div className="flex items-center gap-2 text-sm px-3 py-2">
-                <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
-                <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
-                <StatusBadge
-                  family="supplier_quote"
-                  value={q.status}
-                  label={t(`supplierQuotes.status.${q.status}`)}
-                  className="shrink-0"
-                />
-                {canWrite && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive shrink-0 h-auto px-2 py-1"
-                    onClick={() => void removeQuote(q)}
-                  >
-                    {t('common.delete')}
-                  </Button>
-                )}
-              </div>
-              <SupplierQuoteComments quoteId={q.id} canWrite={canWrite} />
+        (() => {
+          const quotesWithAmount = quotes.filter((q) => q.amount != null);
+          const cheapestId =
+            quotesWithAmount.length >= 2
+              ? ([...quotesWithAmount].sort((a, b) => (a.amount ?? 0) - (b.amount ?? 0))[0]?.id ?? null)
+              : null;
+          const sorted = [...quotes].sort((a, b) => {
+            if (a.amount == null) return 1;
+            if (b.amount == null) return -1;
+            return a.amount - b.amount;
+          });
+          return (
+            <div className="space-y-2">
+              {sorted.map((q) => (
+                <div key={q.id} className="bg-background rounded overflow-hidden">
+                  <div className="flex items-center gap-2 text-sm px-3 py-2">
+                    <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
+                    <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
+                    {q.id === cheapestId && (
+                      <span className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800">
+                        🏆 {t('supplierQuotes.cheapest')}
+                      </span>
+                    )}
+                    <StatusBadge
+                      family="supplier_quote"
+                      value={q.status}
+                      label={t(`supplierQuotes.status.${q.status}`)}
+                      className="shrink-0"
+                    />
+                    {canWrite && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive shrink-0 h-auto px-2 py-1"
+                        onClick={() => void removeQuote(q)}
+                      >
+                        {t('common.delete')}
+                      </Button>
+                    )}
+                  </div>
+                  <SupplierQuoteComments quoteId={q.id} canWrite={canWrite} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()
       )}
       {adding && (
         <form onSubmit={saveQuote} className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto] items-end bg-background rounded p-3">

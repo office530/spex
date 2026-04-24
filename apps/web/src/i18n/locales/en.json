@@ -576,6 +576,7 @@
     "commentPlaceholder": "Write a reply…",
     "emptyComments": "No comments yet",
     "confirmDeleteComment": "Delete this comment?",
+    "cheapest": "Cheapest",
     "status": {
       "draft": "Draft",
       "submitted": "Submitted",
