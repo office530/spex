@@ -123,6 +123,12 @@
     "targetEndDate": "Target end date",
     "contractValue": "Contract value",
     "notes": "Notes",
+    "overview": {
+      "boqTotal": "BoQ",
+      "variationsTotal": "Variations",
+      "milestones": "Milestones",
+      "billedShort": "billed"
+    },
     "types": {
       "execution": "Execution only",
       "planning_execution": "Planning + execution"
