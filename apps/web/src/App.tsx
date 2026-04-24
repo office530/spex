@@ -10,6 +10,7 @@ import { DashboardPage } from './pages/Dashboard';
 import { LeadEditPage } from './pages/LeadEditPage';
 import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
+import { MilestoneTemplatesPage } from './pages/MilestoneTemplatesPage';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { PublicTicketPage } from './pages/PublicTicketPage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -194,6 +195,14 @@ export function App() {
             <AuthenticatedRoute>
               <TicketEditPage />
             </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/settings/milestones"
+          element={
+            <BackOfficeRoute>
+              <MilestoneTemplatesPage />
+            </BackOfficeRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />

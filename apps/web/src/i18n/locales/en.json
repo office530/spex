@@ -13,6 +13,7 @@
     "projects": "Projects",
     "leads": "Leads",
     "tickets": "Tickets",
+    "settings": "Settings",
     "sections": {
       "workspace": "Workspace",
       "directory": "Directory"
@@ -82,6 +83,22 @@
     "email": "Email",
     "address": "Address",
     "notes": "Notes"
+  },
+  "settings": {
+    "title": "Settings",
+    "milestoneTemplates": {
+      "title": "Milestone templates",
+      "description": "These milestones are auto-seeded into every new project.",
+      "add": "New template",
+      "empty": "No templates yet",
+      "confirmDelete": "Delete this template?",
+      "name": "Name",
+      "billingPct": "Billing %",
+      "sortOrder": "Order",
+      "sumLabel": "Billing % sum: {{sum}}%",
+      "sumOk": "100% — all good",
+      "sumWarning": "Sum doesn't total 100%"
+    }
   },
   "customerInvoices": {
     "title": "Customer invoices",
