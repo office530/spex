@@ -275,6 +275,27 @@
       "closed": "סגורה"
     }
   },
+  "handover": {
+    "title": "פרוטוקול מסירה",
+    "empty": "טרם נוצר פרוטוקול מסירה",
+    "create": "צור פרוטוקול מסירה",
+    "checklist": "רשימת בדיקה",
+    "addItem": "הוסף פריט",
+    "itemPlaceholder": "פריט חדש…",
+    "signedAt": "נחתם ב-{{date}}",
+    "markSigned": "סמן כחתום",
+    "markUnsigned": "בטל חתימה",
+    "progress": "{{done}}/{{total}} בוצעו",
+    "confirmDeleteItem": "למחוק את הפריט?",
+    "confirmDelete": "למחוק את פרוטוקול המסירה?",
+    "defaults": {
+      "electrical": "בדיקת חשמל ותאורה",
+      "plumbing": "בדיקת אינסטלציה",
+      "finishes": "בדיקת גימורים וצביעה",
+      "cleaning": "ניקיון כללי",
+      "keys": "מסירת מפתחות ומסמכים"
+    }
+  },
   "meetings": {
     "title": "פגישות",
     "add": "פגישה חדשה",
