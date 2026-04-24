@@ -230,6 +230,13 @@ export function ProjectEditPage() {
         </div>
       </div>
 
+      {!isCreate && id && (
+        <ProjectOverviewCard
+          projectId={id}
+          contractValue={form.contract_value ? Number(form.contract_value) : null}
+        />
+      )}
+
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
@@ -1083,5 +1090,99 @@ function VariationsPanel({ projectId, canWrite }: { projectId: string; canWrite:
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface ProjectOverviewCardProps {
+  projectId: string;
+  contractValue: number | null;
+}
+
+interface OverviewData {
+  boqTotal: number;
+  variationsTotal: number;
+  milestonesTotal: number;
+  milestonesDone: number;
+  milestonesBilledPct: number;
+}
+
+function ProjectOverviewCard({ projectId, contractValue }: ProjectOverviewCardProps) {
+  const { t } = useTranslation();
+  const [data, setData] = useState<OverviewData | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const [boqRes, varsRes, msRes] = await Promise.all([
+        supabase.from('boq_line_items').select('estimated_total').eq('project_id', projectId),
+        supabase.from('variations').select('amount, status').eq('project_id', projectId),
+        supabase
+          .from('milestones')
+          .select('execution_status, billing_status, billing_pct')
+          .eq('project_id', projectId),
+      ]);
+      if (cancelled) return;
+      const boqRows = (boqRes.data as Array<{ estimated_total: number | null }> | null) ?? [];
+      const varRows =
+        (varsRes.data as Array<{ amount: number | null; status: string }> | null) ?? [];
+      const msRows =
+        (msRes.data as Array<{
+          execution_status: string;
+          billing_status: string;
+          billing_pct: number;
+        }> | null) ?? [];
+      setData({
+        boqTotal: boqRows.reduce((s, r) => s + (r.estimated_total ?? 0), 0),
+        variationsTotal: varRows
+          .filter((v) => v.status === 'approved' || v.status === 'billed')
+          .reduce((s, v) => s + (v.amount ?? 0), 0),
+        milestonesTotal: msRows.length,
+        milestonesDone: msRows.filter((m) => m.execution_status === 'done').length,
+        milestonesBilledPct: msRows
+          .filter((m) => m.billing_status === 'invoiced' || m.billing_status === 'paid')
+          .reduce((s, m) => s + (m.billing_pct ?? 0), 0),
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  const tiles: Array<{ label: string; value: string; secondary?: string }> = [
+    {
+      label: t('projects.contractValue'),
+      value: formatCurrencyILS(contractValue),
+    },
+    {
+      label: t('projects.overview.boqTotal'),
+      value: data ? formatCurrencyILS(data.boqTotal) : '—',
+    },
+    {
+      label: t('projects.overview.variationsTotal'),
+      value: data ? formatCurrencyILS(data.variationsTotal) : '—',
+    },
+    {
+      label: t('projects.overview.milestones'),
+      value: data ? `${data.milestonesDone}/${data.milestonesTotal}` : '—',
+      secondary: data
+        ? `${data.milestonesBilledPct}% ${t('projects.overview.billedShort')}`
+        : undefined,
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {tiles.map((tile) => (
+        <Card key={tile.label}>
+          <CardContent className="p-4">
+            <div className="text-xs text-muted-foreground">{tile.label}</div>
+            <div className="text-lg font-semibold mt-1">{tile.value}</div>
+            {tile.secondary && (
+              <div className="text-xs text-muted-foreground mt-0.5">{tile.secondary}</div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 }

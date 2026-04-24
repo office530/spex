@@ -123,6 +123,12 @@
     "targetEndDate": "תאריך סיום יעד",
     "contractValue": "ערך חוזה",
     "notes": "הערות",
+    "overview": {
+      "boqTotal": "כתב כמויות",
+      "variationsTotal": "בלתמים",
+      "milestones": "אבני דרך",
+      "billedShort": "חויב"
+    },
     "types": {
       "execution": "ביצוע בלבד",
       "planning_execution": "תכנון + ביצוע"
