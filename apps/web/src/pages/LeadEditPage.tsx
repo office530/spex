@@ -228,31 +228,76 @@ export function LeadEditPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {isCreate ? t('leads.newTitle') : t('leads.editTitle')}
-        </h1>
-        <div className="flex items-center gap-2">
-          {!isCreate && isAdmin && (
-            convertedProjectId
-              ? (
-                <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${convertedProjectId}`)}>
-                  {t('leads.viewProject')}
-                </Button>
-              )
-              : form.status === 'won' && (
-                <Button variant="outline" size="sm" onClick={() => navigate(`/projects/new?from_lead=${id!}`)}>
-                  {t('leads.convertToProject')}
-                </Button>
-              )
-          )}
+    <div className={`${isCreate ? 'max-w-3xl mx-auto' : ''} space-y-6`}>
+      {isCreate ? (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t('leads.newTitle')}</h1>
           <Button variant="ghost" onClick={() => navigate('/leads')} disabled={saving}>
             {t('common.back')}
           </Button>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-2 min-w-0">
+              <div className="text-xs font-medium text-primary-foreground/70">
+                {t('leads.title')}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                {form.full_name || t('leads.editTitle')}
+              </h1>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/80 flex-wrap">
+                {form.phone && <span>{form.phone}</span>}
+                {form.phone && <span>·</span>}
+                <span>{t(`leads.source.${form.source}`)}</span>
+                <span>·</span>
+                <span>{t(`leads.type.${form.type}`)}</span>
+                <StatusBadge
+                  family="lead"
+                  value={form.status}
+                  label={t(`leads.status.${form.status}`)}
+                  className="bg-white/15 text-white"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {isAdmin &&
+                (convertedProjectId ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white/10 text-primary-foreground border-white/20 hover:bg-white/20 hover:text-primary-foreground"
+                    onClick={() => navigate(`/projects/${convertedProjectId}`)}
+                  >
+                    {t('leads.viewProject')}
+                  </Button>
+                ) : (
+                  form.status === 'won' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/10 text-primary-foreground border-white/20 hover:bg-white/20 hover:text-primary-foreground"
+                      onClick={() => navigate(`/projects/new?from_lead=${id!}`)}
+                    >
+                      {t('leads.convertToProject')}
+                    </Button>
+                  )
+                ))}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground"
+                onClick={() => navigate('/leads')}
+                disabled={saving}
+              >
+                {t('common.back')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
+      <div className="max-w-3xl mx-auto space-y-6">
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
@@ -421,6 +466,7 @@ export function LeadEditPage() {
       {!isCreate && id && <CustomerQuotesPanel leadId={id} />}
       {!isCreate && id && <EventsPanel leadId={id} />}
       {!isCreate && id && <InteractionsPanel leadId={id} />}
+      </div>
     </div>
   );
 }

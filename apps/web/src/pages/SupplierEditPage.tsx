@@ -7,6 +7,7 @@ import {
   CardTitle,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -118,16 +119,50 @@ export function SupplierEditPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {isCreate ? t('suppliers.newTitle') : t('suppliers.editTitle')}
-        </h1>
-        <Button variant="ghost" onClick={() => navigate('/suppliers')} disabled={saving}>
-          {t('common.back')}
-        </Button>
-      </div>
+    <div className={`${isCreate ? 'max-w-3xl mx-auto' : ''} space-y-6`}>
+      {isCreate ? (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t('suppliers.newTitle')}</h1>
+          <Button variant="ghost" onClick={() => navigate('/suppliers')} disabled={saving}>
+            {t('common.back')}
+          </Button>
+        </div>
+      ) : (
+        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-2 min-w-0">
+              <div className="text-xs font-medium text-primary-foreground/70">
+                {t('suppliers.title')}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                {form.name || t('suppliers.editTitle')}
+              </h1>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/80 flex-wrap">
+                {form.category && <span>{form.category}</span>}
+                {form.phone && <span>· {form.phone}</span>}
+                {form.tax_id && <span>· {form.tax_id}</span>}
+                <StatusBadge
+                  family="supplier"
+                  value={form.status}
+                  label={t(`suppliers.status.${form.status}`)}
+                  className="bg-white/15 text-white"
+                />
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground shrink-0"
+              onClick={() => navigate('/suppliers')}
+              disabled={saving}
+            >
+              {t('common.back')}
+            </Button>
+          </div>
+        </div>
+      )}
 
+      <div className={isCreate ? '' : 'max-w-3xl mx-auto space-y-6'}>
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
@@ -224,6 +259,7 @@ export function SupplierEditPage() {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 }
