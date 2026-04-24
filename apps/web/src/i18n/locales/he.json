@@ -132,6 +132,8 @@
     "details": "פרטי הליד",
     "empty": "עדיין אין לידים",
     "noMatches": "לא נמצאו לידים התואמים לסינון",
+    "convertToProject": "המר לפרויקט",
+    "viewProject": "עבור לפרויקט",
     "notFound": "הליד לא נמצא",
     "searchPlaceholder": "חיפוש לפי שם, טלפון או בעלים…",
     "allStatuses": "כל הסטטוסים",
@@ -172,6 +174,19 @@
       "not_relevant": "לא רלוונטי"
     }
   },
+  "events": {
+    "title": "אירועים",
+    "add": "קבע פגישה",
+    "empty": "אין פגישות מתוזמנות",
+    "titleLabel": "כותרת",
+    "scheduledAt": "מועד",
+    "duration": "משך (דקות)",
+    "status": {
+      "scheduled": "מתוזמן",
+      "cancelled": "בוטל",
+      "no_show": "לא הגיע"
+    }
+  },
   "interactions": {
     "title": "ציר זמן",
     "add": "רישום אינטראקציה",
@@ -196,6 +211,7 @@
     "delete": "מחק",
     "back": "חזרה",
     "add": "הוסף",
-    "remove": "הסר"
+    "remove": "הסר",
+    "notes": "הערות"
   }
 }
