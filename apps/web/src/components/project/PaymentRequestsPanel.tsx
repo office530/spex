@@ -4,13 +4,16 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  formatCurrencyILS,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
+import { Wallet } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
-import { formatCurrencyILS } from './format';
 
 type PrStatus =
   | 'awaiting_payment_request'
@@ -26,14 +29,6 @@ const STATUSES: PrStatus[] = [
   'paid',
   'rejected',
 ];
-
-const STATUS_COLORS: Record<PrStatus, string> = {
-  awaiting_payment_request: 'bg-gray-100 text-gray-700',
-  awaiting_pm_approval: 'bg-amber-100 text-amber-800',
-  pm_approved_awaiting_back_office: 'bg-blue-100 text-blue-800',
-  paid: 'bg-emerald-100 text-emerald-800',
-  rejected: 'bg-rose-100 text-rose-800',
-};
 
 interface InvoiceOption {
   id: string;
@@ -283,7 +278,11 @@ export function PaymentRequestsPanel({
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('paymentRequests.empty')}</p>
+              <EmptyState
+                icon={Wallet}
+                title={t('paymentRequests.empty')}
+                cta={canWrite ? { label: t('paymentRequests.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((r) =>
                 editingId === r.id ? (
@@ -308,11 +307,12 @@ export function PaymentRequestsPanel({
                     <div className="shrink-0 text-sm font-medium">
                       {formatCurrencyILS(r.amount)}
                     </div>
-                    <span
-                      className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[r.status]}`}
-                    >
-                      {t(`paymentRequests.status.${r.status}`)}
-                    </span>
+                    <StatusBadge
+                      family="payment_request"
+                      value={r.status}
+                      label={t(`paymentRequests.status.${r.status}`)}
+                      className="shrink-0"
+                    />
                     {canWrite && (
                       <div className="shrink-0 flex items-center gap-1">
                         <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>

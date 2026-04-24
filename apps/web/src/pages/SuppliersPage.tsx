@@ -1,4 +1,12 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  StatusBadge,
+} from '@spex/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -14,12 +22,6 @@ interface SupplierRow {
   email: string | null;
   status: SupplierStatus;
 }
-
-const STATUS_COLORS: Record<SupplierStatus, string> = {
-  pending_approval: 'bg-amber-100 text-amber-800',
-  active: 'bg-emerald-100 text-emerald-800',
-  blocked: 'bg-rose-100 text-rose-800',
-};
 
 export function SuppliersPage() {
   const { t } = useTranslation();
@@ -94,11 +96,12 @@ export function SuppliersPage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-medium truncate">{s.name}</span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${STATUS_COLORS[s.status]}`}
-                      >
-                        {t(`suppliers.status.${s.status}`)}
-                      </span>
+                      <StatusBadge
+                        family="supplier"
+                        value={s.status}
+                        label={t(`suppliers.status.${s.status}`)}
+                        className="shrink-0"
+                      />
                     </div>
                     {s.category && (
                       <div className="text-xs text-muted-foreground truncate">

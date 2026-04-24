@@ -4,8 +4,10 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
 } from '@spex/ui';
+import { Signature } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
@@ -171,19 +173,11 @@ export function HandoverPanel({ projectId, canWrite }: { projectId: string; canW
         {loading ? (
           <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
         ) : !handover ? (
-          <div className="p-6 flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-sm text-muted-foreground">{t('handover.empty')}</p>
-            {canWrite && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void createHandover()}
-                disabled={creating}
-              >
-                {creating ? t('common.saving') : t('handover.create')}
-              </Button>
-            )}
-          </div>
+          <EmptyState
+            icon={Signature}
+            title={t('handover.empty')}
+            cta={canWrite ? { label: t('handover.create'), onClick: () => void createHandover() } : undefined}
+          />
         ) : (
           <div className="divide-y">
             <div className="px-6 py-3 space-y-1">

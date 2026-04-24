@@ -6,6 +6,7 @@ import {
   CardTitle,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -679,15 +680,6 @@ const SUPPLIER_QUOTE_STATUSES: SupplierQuoteStatus[] = [
   'revised',
 ];
 
-const SUPPLIER_QUOTE_STATUS_COLORS: Record<SupplierQuoteStatus, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  submitted: 'bg-blue-100 text-blue-800',
-  under_review: 'bg-amber-100 text-amber-800',
-  approved: 'bg-emerald-100 text-emerald-800',
-  rejected: 'bg-rose-100 text-rose-800',
-  revised: 'bg-violet-100 text-violet-800',
-};
-
 interface SupplierQuoteRow {
   id: string;
   supplier_id: string;
@@ -788,11 +780,12 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
             >
               <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
               <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${SUPPLIER_QUOTE_STATUS_COLORS[q.status]}`}
-              >
-                {t(`supplierQuotes.status.${q.status}`)}
-              </span>
+              <StatusBadge
+                family="supplier_quote"
+                value={q.status}
+                label={t(`supplierQuotes.status.${q.status}`)}
+                className="shrink-0"
+              />
               {canWrite && (
                 <Button
                   size="sm"

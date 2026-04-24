@@ -5,9 +5,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   Label,
 } from '@spex/ui';
+import { UserRound } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -298,7 +300,11 @@ function ContactsPanel({ clientId }: { clientId: string }) {
         {loading ? (
           <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
         ) : contacts.length === 0 && !isFormOpen ? (
-          <p className="text-sm text-muted-foreground p-6">{t('contacts.empty')}</p>
+          <EmptyState
+            icon={UserRound}
+            title={t('contacts.empty')}
+            cta={{ label: t('contacts.add'), onClick: startAdd }}
+          />
         ) : (
           <div className="divide-y">
             {contacts.map((c) =>

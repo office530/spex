@@ -1,6 +1,6 @@
 # Spex — UI patterns
 
-Concrete reference for the rules in `CLAUDE.md`. When in doubt, cite a section here in the PR description.
+Concrete code recipes. The authoritative design language (tokens, typography, layout, behavior) is in **`DESIGN.md`** — read that first; this file is the copy-paste companion. When in doubt, cite a section of either here in the PR description.
 
 ## 1. Status badges
 

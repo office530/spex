@@ -4,24 +4,20 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  formatCurrencyILS,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
+import { Receipt } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
-import { formatCurrencyILS } from './format';
 
 type InvoiceStatus = 'received' | 'matched' | 'disputed' | 'processed';
 
 const STATUSES: InvoiceStatus[] = ['received', 'matched', 'disputed', 'processed'];
-
-const STATUS_COLORS: Record<InvoiceStatus, string> = {
-  received: 'bg-blue-100 text-blue-800',
-  matched: 'bg-violet-100 text-violet-800',
-  disputed: 'bg-rose-100 text-rose-800',
-  processed: 'bg-emerald-100 text-emerald-800',
-};
 
 interface SupplierOption {
   id: string;
@@ -293,7 +289,11 @@ export function SupplierInvoicesPanel({
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('supplierInvoices.empty')}</p>
+              <EmptyState
+                icon={Receipt}
+                title={t('supplierInvoices.empty')}
+                cta={canWrite ? { label: t('supplierInvoices.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((r) =>
                 editingId === r.id ? (
@@ -332,11 +332,12 @@ export function SupplierInvoicesPanel({
                     <div className="shrink-0 text-sm font-medium">
                       {formatCurrencyILS(r.amount)}
                     </div>
-                    <span
-                      className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[r.status]}`}
-                    >
-                      {t(`supplierInvoices.status.${r.status}`)}
-                    </span>
+                    <StatusBadge
+                      family="supplier_invoice"
+                      value={r.status}
+                      label={t(`supplierInvoices.status.${r.status}`)}
+                      className="shrink-0"
+                    />
                     {canWrite && (
                       <div className="shrink-0 flex items-center gap-1">
                         <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>
