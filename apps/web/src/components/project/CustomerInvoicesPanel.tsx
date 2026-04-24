@@ -178,12 +178,21 @@ export function CustomerInvoicesPanel({
     if (!form.amount) return;
     setSaving(true);
     setError(null);
+    // Miro §5: when an invoice goes 'issued', default payment date = 5 days
+    // from issuance. Only auto-fills when due_date is left blank.
+    let effectiveDueDate = form.due_date;
+    if (form.status === 'issued' && !form.due_date) {
+      const base = form.issued_at ? new Date(form.issued_at) : new Date();
+      const due = new Date(base);
+      due.setDate(due.getDate() + 5);
+      effectiveDueDate = due.toISOString().slice(0, 10);
+    }
     const payload = {
       milestone_id: form.milestone_id || null,
       kind: form.kind,
       status: form.status,
       amount: Number(form.amount),
-      due_date: fromDateInput(form.due_date),
+      due_date: fromDateInput(effectiveDueDate),
       issued_at: fromDateInput(form.issued_at),
       paid_at: fromDateInput(form.paid_at),
       notes: form.notes || null,
