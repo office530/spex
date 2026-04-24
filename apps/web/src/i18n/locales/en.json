@@ -110,6 +110,13 @@
       "manager": "Manager",
       "anonymous": "Anonymous"
     },
+    "publicTitle": "Open a ticket",
+    "publicDescription": "Fill in the details and we'll get back to you shortly.",
+    "publicSubmit": "Submit",
+    "publicSubmitting": "Submitting…",
+    "publicSuccess": "Ticket received",
+    "publicSuccessDescription": "Thanks — we'll be in touch.",
+    "publicSubmitAnother": "Submit another",
     "status": {
       "new": "New",
       "in_progress": "In progress",
