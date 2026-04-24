@@ -6,7 +6,8 @@
   "nav": {
     "dashboard": "לוח בקרה",
     "login": "התחברות",
-    "logout": "התנתקות"
+    "logout": "התנתקות",
+    "users": "משתמשים"
   },
   "login": {
     "title": "התחברות למערכת",
@@ -30,5 +31,25 @@
     "pm": "מנהל פרויקט",
     "foreman": "מנהל עבודה",
     "unknown": "תפקיד בהמתנה"
+  },
+  "users": {
+    "title": "משתמשים",
+    "listTitle": "רשימת משתמשים",
+    "empty": "לא נמצאו משתמשים",
+    "inactive": "לא פעיל",
+    "notFound": "משתמש לא נמצא",
+    "editTitle": "עריכת פרופיל",
+    "editSubtitle": "עדכון פרטי המשתמש",
+    "fullName": "שם מלא",
+    "phone": "טלפון",
+    "role": "תפקיד",
+    "isActive": "פעיל"
+  },
+  "common": {
+    "loading": "טוען…",
+    "edit": "עריכה",
+    "save": "שמור",
+    "saving": "שומר…",
+    "cancel": "ביטול"
   }
 }
