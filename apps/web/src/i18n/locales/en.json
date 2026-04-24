@@ -7,7 +7,8 @@
     "dashboard": "Dashboard",
     "login": "Log in",
     "logout": "Log out",
-    "users": "Users"
+    "users": "Users",
+    "clients": "Clients"
   },
   "login": {
     "title": "Sign in",
@@ -45,11 +46,41 @@
     "role": "Role",
     "isActive": "Active"
   },
+  "clients": {
+    "title": "Clients",
+    "listTitle": "Client list",
+    "new": "New client",
+    "newTitle": "New client",
+    "editTitle": "Edit client",
+    "details": "Client details",
+    "empty": "No clients yet",
+    "noMatches": "No clients match your search",
+    "notFound": "Client not found",
+    "searchPlaceholder": "Search by company, contact, phone, email…",
+    "companyName": "Company name",
+    "primaryContactName": "Primary contact",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "notes": "Notes"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "add": "Add contact",
+    "empty": "No contacts yet",
+    "confirmDelete": "Delete this contact?",
+    "fullName": "Full name",
+    "role": "Role",
+    "phone": "Phone",
+    "email": "Email"
+  },
   "common": {
     "loading": "Loading…",
     "edit": "Edit",
     "save": "Save",
     "saving": "Saving…",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "back": "Back"
   }
 }

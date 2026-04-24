@@ -7,7 +7,8 @@
     "dashboard": "לוח בקרה",
     "login": "התחברות",
     "logout": "התנתקות",
-    "users": "משתמשים"
+    "users": "משתמשים",
+    "clients": "לקוחות"
   },
   "login": {
     "title": "התחברות למערכת",
@@ -45,11 +46,41 @@
     "role": "תפקיד",
     "isActive": "פעיל"
   },
+  "clients": {
+    "title": "לקוחות",
+    "listTitle": "רשימת לקוחות",
+    "new": "לקוח חדש",
+    "newTitle": "לקוח חדש",
+    "editTitle": "עריכת לקוח",
+    "details": "פרטי לקוח",
+    "empty": "עדיין אין לקוחות",
+    "noMatches": "לא נמצאו לקוחות התואמים לחיפוש",
+    "notFound": "הלקוח לא נמצא",
+    "searchPlaceholder": "חיפוש לפי חברה, איש קשר, טלפון, אימייל…",
+    "companyName": "שם חברה",
+    "primaryContactName": "איש קשר ראשי",
+    "phone": "טלפון",
+    "email": "אימייל",
+    "address": "כתובת",
+    "notes": "הערות"
+  },
+  "contacts": {
+    "title": "אנשי קשר",
+    "add": "הוסף איש קשר",
+    "empty": "עדיין אין אנשי קשר",
+    "confirmDelete": "למחוק את איש הקשר?",
+    "fullName": "שם מלא",
+    "role": "תפקיד",
+    "phone": "טלפון",
+    "email": "אימייל"
+  },
   "common": {
     "loading": "טוען…",
     "edit": "עריכה",
     "save": "שמור",
     "saving": "שומר…",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "back": "חזרה"
   }
 }
