@@ -132,6 +132,8 @@
     "details": "Lead details",
     "empty": "No leads yet",
     "noMatches": "No leads match your filters",
+    "convertToProject": "Convert to project",
+    "viewProject": "View project",
     "notFound": "Lead not found",
     "searchPlaceholder": "Search by name, phone, or owner…",
     "allStatuses": "All statuses",
@@ -172,6 +174,19 @@
       "not_relevant": "Not relevant"
     }
   },
+  "events": {
+    "title": "Events",
+    "add": "Schedule event",
+    "empty": "No events scheduled",
+    "titleLabel": "Title",
+    "scheduledAt": "Scheduled at",
+    "duration": "Duration (min)",
+    "status": {
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "no_show": "No show"
+    }
+  },
   "interactions": {
     "title": "Timeline",
     "add": "Log interaction",
@@ -196,6 +211,7 @@
     "delete": "Delete",
     "back": "Back",
     "add": "Add",
-    "remove": "Remove"
+    "remove": "Remove",
+    "notes": "Notes"
   }
 }

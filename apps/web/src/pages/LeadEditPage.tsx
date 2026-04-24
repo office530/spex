@@ -119,10 +119,11 @@ export function LeadEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [convertedProjectId, setConvertedProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
-      const [usersRes, leadRes] = await Promise.all([
+      const [usersRes, leadRes, convRes] = await Promise.all([
         isAdmin
           ? supabase
               .from('user_profiles')
@@ -139,10 +140,15 @@ export function LeadEditPage() {
               )
               .eq('id', id)
               .maybeSingle(),
+        !isCreate
+          ? supabase.from('projects').select('id').eq('created_from_lead_id', id).maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
       if (usersRes.error) setError(usersRes.error.message);
       else setUsers((usersRes.data as UserOption[]) ?? []);
+
+      if (convRes.data) setConvertedProjectId((convRes.data as { id: string }).id);
 
       if (!isCreate) {
         if (leadRes.error || !leadRes.data) {
@@ -224,9 +230,24 @@ export function LeadEditPage() {
         <h1 className="text-2xl font-bold">
           {isCreate ? t('leads.newTitle') : t('leads.editTitle')}
         </h1>
-        <Button variant="ghost" onClick={() => navigate('/leads')} disabled={saving}>
-          {t('common.back')}
-        </Button>
+        <div className="flex items-center gap-2">
+          {!isCreate && isAdmin && (
+            convertedProjectId
+              ? (
+                <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${convertedProjectId}`)}>
+                  {t('leads.viewProject')}
+                </Button>
+              )
+              : form.status === 'won' && (
+                <Button variant="outline" size="sm" onClick={() => navigate(`/projects/new?from_lead=${id!}`)}>
+                  {t('leads.convertToProject')}
+                </Button>
+              )
+          )}
+          <Button variant="ghost" onClick={() => navigate('/leads')} disabled={saving}>
+            {t('common.back')}
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -394,6 +415,7 @@ export function LeadEditPage() {
         </form>
       </Card>
 
+      {!isCreate && id && <EventsPanel leadId={id} />}
       {!isCreate && id && <InteractionsPanel leadId={id} />}
     </div>
   );
@@ -420,6 +442,211 @@ function SelectField({ id, value, onChange, children, required, disabled }: Sele
     >
       {children}
     </select>
+  );
+}
+
+type EventStatus = 'scheduled' | 'cancelled' | 'no_show';
+
+const EVENT_STATUSES: EventStatus[] = ['scheduled', 'cancelled', 'no_show'];
+
+interface EventRow {
+  id: string;
+  title: string;
+  status: EventStatus;
+  scheduled_at: string;
+  duration_minutes: number | null;
+  notes: string | null;
+}
+
+const EVENT_STATUS_COLORS: Record<EventStatus, string> = {
+  scheduled: 'bg-blue-100 text-blue-800',
+  cancelled: 'bg-gray-100 text-gray-600',
+  no_show: 'bg-amber-100 text-amber-800',
+};
+
+function EventsPanel({ leadId }: { leadId: string }) {
+  const { t, i18n } = useTranslation();
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [title, setTitle] = useState('');
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [durationMin, setDurationMin] = useState('60');
+  const [evNotes, setEvNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, title, status, scheduled_at, duration_minutes, notes')
+      .eq('lead_id', leadId)
+      .order('scheduled_at');
+    if (error) setError(error.message);
+    else setEvents((data as EventRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadId]);
+
+  function startAdd() {
+    setAdding(true);
+    setTitle('');
+    setScheduledAt(toDatetimeInput(new Date().toISOString()));
+    setDurationMin('60');
+    setEvNotes('');
+    setError(null);
+  }
+
+  function cancelAdd() {
+    setAdding(false);
+    setError(null);
+  }
+
+  async function addEvent(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const { error } = await supabase.from('events').insert({
+      lead_id: leadId,
+      title,
+      scheduled_at: fromDatetimeInput(scheduledAt),
+      duration_minutes: durationMin ? Number(durationMin) : 60,
+      notes: evNotes || null,
+    });
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    cancelAdd();
+    await refresh();
+  }
+
+  async function updateEventStatus(eventId: string, status: EventStatus) {
+    const { error } = await supabase.from('events').update({ status }).eq('id', eventId);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  const dateFormat = new Intl.DateTimeFormat(i18n.language, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base">{t('events.title')}</CardTitle>
+        {!adding && (
+          <Button size="sm" variant="outline" onClick={startAdd}>
+            {t('events.add')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : (
+          <div className="divide-y">
+            {adding && (
+              <form onSubmit={addEvent} className="px-6 py-4 space-y-3 bg-muted/40">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="ev_title">{t('events.titleLabel')} *</Label>
+                    <Input
+                      id="ev_title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      required
+                      disabled={saving}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="ev_at">{t('events.scheduledAt')} *</Label>
+                    <Input
+                      id="ev_at"
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => setScheduledAt(e.target.value)}
+                      required
+                      disabled={saving}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="ev_dur">{t('events.duration')}</Label>
+                    <Input
+                      id="ev_dur"
+                      type="number"
+                      min="1"
+                      value={durationMin}
+                      onChange={(e) => setDurationMin(e.target.value)}
+                      disabled={saving}
+                    />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="ev_notes">{t('common.notes')}</Label>
+                    <textarea
+                      id="ev_notes"
+                      value={evNotes}
+                      onChange={(e) => setEvNotes(e.target.value)}
+                      rows={2}
+                      disabled={saving}
+                      className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+                {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="ghost" size="sm" onClick={cancelAdd} disabled={saving}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button type="submit" size="sm" disabled={saving}>
+                    {saving ? t('common.saving') : t('common.add')}
+                  </Button>
+                </div>
+              </form>
+            )}
+            {events.length === 0 && !adding ? (
+              <p className="text-sm text-muted-foreground p-6">{t('events.empty')}</p>
+            ) : (
+              events.map((ev) => (
+                <div key={ev.id} className="px-6 py-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-0.5">
+                      <div className="font-medium text-sm truncate">{ev.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {dateFormat.format(new Date(ev.scheduled_at))}
+                        {ev.duration_minutes && <span> · {ev.duration_minutes} min</span>}
+                      </div>
+                      {ev.notes && (
+                        <p className="text-sm text-muted-foreground whitespace-pre-line">{ev.notes}</p>
+                      )}
+                    </div>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
+                        {t(`events.status.${ev.status}`)}
+                      </span>
+                      {ev.status === 'scheduled' && (
+                        <SelectField
+                          id={`ev_status_${ev.id}`}
+                          value=""
+                          onChange={(v) => void updateEventStatus(ev.id, v as EventStatus)}
+                        >
+                          <option value="" disabled>···</option>
+                          <option value="cancelled">{t('events.status.cancelled')}</option>
+                          <option value="no_show">{t('events.status.no_show')}</option>
+                        </SelectField>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

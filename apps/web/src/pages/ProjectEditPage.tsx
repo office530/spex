@@ -10,7 +10,7 @@ import {
 } from '@spex/ui';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -80,9 +80,11 @@ export function ProjectEditPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { profile } = useAuth();
   const isAdmin = profile ? BACK_OFFICE.includes(profile.role) : false;
   const isCreate = !id;
+  const fromLeadId = isCreate ? (searchParams.get('from_lead') ?? null) : null;
 
   const [form, setForm] = useState<ProjectForm>(emptyForm);
   const [clients, setClients] = useState<ClientOption[]>([]);
@@ -94,7 +96,7 @@ export function ProjectEditPage() {
 
   useEffect(() => {
     void (async () => {
-      const [clientsRes, usersRes, projectRes] = await Promise.all([
+      const [clientsRes, usersRes, projectRes, leadRes] = await Promise.all([
         isAdmin
           ? supabase.from('clients').select('id, company_name').order('company_name')
           : Promise.resolve({ data: [], error: null }),
@@ -112,6 +114,13 @@ export function ProjectEditPage() {
               )
               .eq('id', id)
               .maybeSingle(),
+        fromLeadId
+          ? supabase
+              .from('leads')
+              .select('full_name, type, estimated_value, notes')
+              .eq('id', fromLeadId)
+              .maybeSingle()
+          : Promise.resolve({ data: null, error: null }),
       ]);
 
       if (clientsRes.error) setError(clientsRes.error.message);
@@ -147,10 +156,24 @@ export function ProjectEditPage() {
             notes: p.notes ?? '',
           });
         }
+      } else if (fromLeadId && leadRes.data) {
+        const l = leadRes.data as {
+          full_name: string;
+          type: string;
+          estimated_value: number | null;
+          notes: string | null;
+        };
+        setForm((f) => ({
+          ...f,
+          name: l.full_name,
+          type: l.type === 'planning' ? 'planning_execution' : 'execution',
+          contract_value: l.estimated_value != null ? String(l.estimated_value) : '',
+          notes: l.notes ?? '',
+        }));
       }
       setLoading(false);
     })();
-  }, [id, isCreate, isAdmin, t]);
+  }, [id, isCreate, isAdmin, fromLeadId, t]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -170,7 +193,7 @@ export function ProjectEditPage() {
     if (isCreate) {
       const { data, error } = await supabase
         .from('projects')
-        .insert(payload)
+        .insert({ ...payload, ...(fromLeadId ? { created_from_lead_id: fromLeadId } : {}) })
         .select('id')
         .single();
       setSaving(false);
