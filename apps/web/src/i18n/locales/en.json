@@ -100,6 +100,23 @@
       "sumWarning": "Sum doesn't total 100%"
     }
   },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Organization-wide financial + operational overview",
+    "activeContractValue": "Active contract value",
+    "invoicedThisMonth": "Invoiced this month",
+    "receivedThisMonth": "Received this month",
+    "outstanding": "Outstanding",
+    "activeProjects": "Active projects",
+    "activeLeads": "Active leads",
+    "wonLast30": "Won (last 30 days)",
+    "openTickets": "Open tickets",
+    "projectsByStatus": "Projects by status",
+    "leadsByStatus": "Leads by status",
+    "topProjects": "Top projects",
+    "recentReceipts": "Recent receipts",
+    "noData": "No data"
+  },
   "chashbashvat": {
     "queueSync": "Sync to Chashbashvat",
     "queuedToast": "Queued for sync",
