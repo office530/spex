@@ -124,16 +124,44 @@ export function ClientEditPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          {isCreate ? t('clients.newTitle') : t('clients.editTitle')}
-        </h1>
-        <Button variant="ghost" onClick={() => navigate('/clients')} disabled={saving}>
-          {t('common.back')}
-        </Button>
-      </div>
+    <div className={`${isCreate ? 'max-w-3xl mx-auto' : ''} space-y-6`}>
+      {isCreate ? (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t('clients.newTitle')}</h1>
+          <Button variant="ghost" onClick={() => navigate('/clients')} disabled={saving}>
+            {t('common.back')}
+          </Button>
+        </div>
+      ) : (
+        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-2 min-w-0">
+              <div className="text-xs font-medium text-primary-foreground/70">
+                {t('clients.title')}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">
+                {form.company_name || t('clients.editTitle')}
+              </h1>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/80 flex-wrap">
+                {form.primary_contact_name && <span>{form.primary_contact_name}</span>}
+                {form.phone && <span>· {form.phone}</span>}
+                {form.email && <span className="hidden sm:inline">· {form.email}</span>}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary-foreground hover:bg-white/10 hover:text-primary-foreground shrink-0"
+              onClick={() => navigate('/clients')}
+              disabled={saving}
+            >
+              {t('common.back')}
+            </Button>
+          </div>
+        </div>
+      )}
 
+      <div className={isCreate ? '' : 'max-w-3xl mx-auto space-y-6'}>
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
@@ -185,6 +213,7 @@ export function ClientEditPage() {
       </Card>
 
       {!isCreate && id && <ContactsPanel clientId={id} />}
+      </div>
     </div>
   );
 }
