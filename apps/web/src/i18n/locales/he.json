@@ -128,6 +128,25 @@
       "failed": "שגיאה"
     }
   },
+  "purchaseOrders": {
+    "title": "הזמנות רכש",
+    "add": "הזמנה חדשה",
+    "empty": "עדיין אין הזמנות רכש",
+    "confirmDelete": "למחוק את ההזמנה?",
+    "supplier": "ספק",
+    "selectSupplier": "בחר ספק…",
+    "totalAmount": "סכום כולל",
+    "issuedAt": "מועד הנפקה",
+    "statusLabel": "סטטוס",
+    "total": "סה\"כ הזמנות",
+    "status": {
+      "draft": "טיוטה",
+      "issued": "הונפקה",
+      "partially_received": "התקבלה חלקית",
+      "received": "התקבלה במלואה",
+      "cancelled": "בוטלה"
+    }
+  },
   "customerInvoices": {
     "title": "חשבוניות לקוח",
     "add": "חשבונית חדשה",

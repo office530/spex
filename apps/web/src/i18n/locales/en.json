@@ -128,6 +128,25 @@
       "failed": "Failed"
     }
   },
+  "purchaseOrders": {
+    "title": "Purchase orders",
+    "add": "New PO",
+    "empty": "No purchase orders yet",
+    "confirmDelete": "Delete this PO?",
+    "supplier": "Supplier",
+    "selectSupplier": "Select a supplier…",
+    "totalAmount": "Total amount",
+    "issuedAt": "Issued at",
+    "statusLabel": "Status",
+    "total": "POs total",
+    "status": {
+      "draft": "Draft",
+      "issued": "Issued",
+      "partially_received": "Partially received",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    }
+  },
   "customerInvoices": {
     "title": "Customer invoices",
     "add": "New invoice",
