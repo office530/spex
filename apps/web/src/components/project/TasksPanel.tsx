@@ -374,6 +374,11 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                         )}
                       </div>
                       <TaskChecklist taskId={r.id} canWrite={canWrite} />
+                      <TaskDependencies
+                        taskId={r.id}
+                        allTasks={rows}
+                        canWrite={canWrite}
+                      />
                     </div>
                   );
                 return topLevel.flatMap((parent) => [
@@ -532,6 +537,163 @@ function TaskChecklist({ taskId, canWrite }: { taskId: string; canWrite: boolean
               {error}
             </p>
           )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface DependencyRow {
+  id: string;
+  depends_on_task_id: string;
+}
+
+function TaskDependencies({
+  taskId,
+  allTasks,
+  canWrite,
+}: {
+  taskId: string;
+  allTasks: TaskRow[];
+  canWrite: boolean;
+}) {
+  const { t } = useTranslation();
+  const [deps, setDeps] = useState<DependencyRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newDepId, setNewDepId] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error: dbErr } = await supabase
+      .from('task_dependencies')
+      .select('id, depends_on_task_id')
+      .eq('task_id', taskId);
+    if (dbErr) setError(dbErr.message);
+    else setDeps((data as DependencyRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]);
+
+  const existingIds = new Set(deps.map((d) => d.depends_on_task_id));
+  const selectable = allTasks.filter((tk) => tk.id !== taskId && !existingIds.has(tk.id));
+
+  async function addDep(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newDepId) return;
+    setSaving(true);
+    setError(null);
+    const { error: dbErr } = await supabase.from('task_dependencies').insert({
+      task_id: taskId,
+      depends_on_task_id: newDepId,
+    });
+    setSaving(false);
+    if (dbErr) { setError(dbErr.message); return; }
+    setNewDepId('');
+    setAdding(false);
+    await refresh();
+  }
+
+  async function removeDep(d: DependencyRow) {
+    if (!confirm(t('tasks.confirmDeleteDependency'))) return;
+    const { error: dbErr } = await supabase.from('task_dependencies').delete().eq('id', d.id);
+    if (dbErr) setError(dbErr.message);
+    else await refresh();
+  }
+
+  if (loading) return null;
+  if (deps.length === 0 && !canWrite) return null;
+
+  const notDone = deps.filter((d) => {
+    const t2 = allTasks.find((x) => x.id === d.depends_on_task_id);
+    return t2 && t2.status !== 'done' && t2.status !== 'cancelled';
+  }).length;
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
+      >
+        <span>{expanded ? '▾' : '▸'}</span>
+        <span>{t('tasks.dependencies')}</span>
+        {deps.length > 0 && <span>({deps.length})</span>}
+        {notDone > 0 && (
+          <span className="text-amber-700 font-medium">· {t('tasks.waitingPrereqs')}</span>
+        )}
+      </button>
+      {expanded && (
+        <div className="mt-2 rounded-md border bg-muted/30 p-3 space-y-2">
+          {deps.length === 0 ? (
+            <p className="text-xs text-muted-foreground">{t('tasks.emptyDependencies')}</p>
+          ) : (
+            <div className="space-y-1">
+              {deps.map((d) => {
+                const t2 = allTasks.find((x) => x.id === d.depends_on_task_id);
+                if (!t2) return null;
+                return (
+                  <div
+                    key={d.id}
+                    className="flex items-center gap-2 text-sm bg-background rounded px-3 py-1.5"
+                  >
+                    <div className="flex-1 min-w-0 truncate">{t2.title}</div>
+                    <StatusBadge
+                      family="task"
+                      value={t2.status}
+                      label={t(`tasks.status.${t2.status}`)}
+                      className="shrink-0"
+                    />
+                    {canWrite && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive h-auto px-2 py-0.5"
+                        onClick={() => void removeDep(d)}
+                      >
+                        ×
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {canWrite && selectable.length > 0 && (
+            adding ? (
+              <form onSubmit={addDep} className="flex items-center gap-2">
+                <select
+                  value={newDepId}
+                  onChange={(e) => setNewDepId(e.target.value)}
+                  required
+                  disabled={saving}
+                  className="flex h-8 flex-1 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                >
+                  <option value="">{t('tasks.selectDependency')}</option>
+                  {selectable.map((tk) => (
+                    <option key={tk.id} value={tk.id}>{tk.title}</option>
+                  ))}
+                </select>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setAdding(false)} disabled={saving}>
+                  {t('common.cancel')}
+                </Button>
+                <Button type="submit" size="sm" disabled={saving || !newDepId}>
+                  {t('common.add')}
+                </Button>
+              </form>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setAdding(true)}>
+                {t('tasks.addDependency')}
+              </Button>
+            )
+          )}
+          {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
         </div>
       )}
     </div>
