@@ -33,7 +33,8 @@
     "activeProjects": "פרויקטים פעילים",
     "activeLeads": "לידים פעילים",
     "openTasks": "משימות פתוחות שלי",
-    "openRfis": "בקשות מידע פתוחות"
+    "openRfis": "בקשות מידע פתוחות",
+    "thisWeek": "השבוע"
   },
   "roles": {
     "ceo": "מנכ\"ל",

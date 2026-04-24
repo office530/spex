@@ -21,6 +21,13 @@ export {
 export { StatusBadge, type StatusBadgeProps, type StatusTone } from './components/status-badge';
 export { EmptyState, type EmptyStateProps } from './components/empty-state';
 export {
+  KpiTile,
+  KpiDelta,
+  type KpiTileProps,
+  type KpiDeltaProps,
+  type IconTone,
+} from './components/kpi-tile';
+export {
   formatCurrencyILS,
   toDatetimeInput,
   fromDatetimeInput,
