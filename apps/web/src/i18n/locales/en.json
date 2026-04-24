@@ -33,7 +33,8 @@
     "activeProjects": "Active projects",
     "activeLeads": "Active leads",
     "openTasks": "My open tasks",
-    "openRfis": "Open RFIs"
+    "openRfis": "Open RFIs",
+    "thisWeek": "this week"
   },
   "roles": {
     "ceo": "CEO",

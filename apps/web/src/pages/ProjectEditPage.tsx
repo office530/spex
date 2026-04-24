@@ -1,3 +1,4 @@
+import type { IconTone } from '@spex/ui';
 import {
   Button,
   Card,
@@ -6,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  KpiTile,
   Label,
   StatusBadge,
   Tabs,
@@ -16,9 +18,12 @@ import {
 import {
   CalendarDays,
   ClipboardList,
+  Milestone,
   Receipt,
   SlidersHorizontal,
   Users,
+  Wallet,
+  type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -1296,23 +1301,37 @@ function ProjectOverviewCard({ projectId, contractValue }: ProjectOverviewCardPr
     };
   }, [projectId]);
 
-  const tiles: Array<{ label: string; value: string; secondary?: string }> = [
+  const tiles: Array<{
+    label: string;
+    icon: LucideIcon;
+    iconTone: IconTone;
+    value: string;
+    footer?: string;
+  }> = [
     {
       label: t('projects.contractValue'),
+      icon: Wallet,
+      iconTone: 'success',
       value: formatCurrencyILS(contractValue),
     },
     {
       label: t('projects.overview.boqTotal'),
+      icon: ClipboardList,
+      iconTone: 'info',
       value: data ? formatCurrencyILS(data.boqTotal) : '—',
     },
     {
       label: t('projects.overview.variationsTotal'),
+      icon: SlidersHorizontal,
+      iconTone: 'warning',
       value: data ? formatCurrencyILS(data.variationsTotal) : '—',
     },
     {
       label: t('projects.overview.milestones'),
+      icon: Milestone,
+      iconTone: 'accent',
       value: data ? `${data.milestonesDone}/${data.milestonesTotal}` : '—',
-      secondary: data
+      footer: data
         ? `${data.milestonesBilledPct}% ${t('projects.overview.billedShort')}`
         : undefined,
     },
@@ -1321,15 +1340,14 @@ function ProjectOverviewCard({ projectId, contractValue }: ProjectOverviewCardPr
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {tiles.map((tile) => (
-        <Card key={tile.label}>
-          <CardContent className="p-4">
-            <div className="text-xs text-muted-foreground">{tile.label}</div>
-            <div className="text-lg font-semibold mt-1">{tile.value}</div>
-            {tile.secondary && (
-              <div className="text-xs text-muted-foreground mt-0.5">{tile.secondary}</div>
-            )}
-          </CardContent>
-        </Card>
+        <KpiTile
+          key={tile.label}
+          icon={tile.icon}
+          iconTone={tile.iconTone}
+          label={tile.label}
+          value={tile.value}
+          footer={tile.footer}
+        />
       ))}
     </div>
   );
