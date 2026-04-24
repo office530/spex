@@ -133,6 +133,13 @@
       "milestones": "אבני דרך",
       "billedShort": "חויב"
     },
+    "tabs": {
+      "general": "כללי",
+      "team": "צוות",
+      "milestones": "אבני דרך",
+      "financials": "כספים",
+      "operations": "תפעול"
+    },
     "types": {
       "execution": "ביצוע בלבד",
       "planning_execution": "תכנון + ביצוע"

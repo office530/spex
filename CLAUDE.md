@@ -13,6 +13,26 @@
 - Dates and numbers: use `Intl.DateTimeFormat(i18n.language, …)` / `Intl.NumberFormat` — no manual English-locale formatting.
 - When unsure of a Hebrew translation, ask Shay rather than inventing English-language placeholders.
 
+## UI & design (non-negotiable)
+
+This project failed an early design review because features shipped faster than patterns solidified. Follow the rules below **before** adding any new UI. Full examples in `PATTERNS.md`.
+
+- **Shared primitives live in `packages/ui`** — not in page files, not in `apps/web/src/components`. If a pattern is used more than once, extract it.
+- **Status colors** come from a single source: `packages/ui/src/components/status-badge.tsx`. Do not define per-module `STATUS_COLORS` records; extend the central map.
+- **Icons from `lucide-react` only.** Every nav item, every primary action button, and every empty state has an icon. No emoji.
+- **Lists with >3 columns** use `<Table>` (from `@spex/ui`), not divided flex rows. Row-divided lists are for timelines and card-like items only.
+- **Empty states** use `<EmptyState>` with icon + title + optional CTA. Bare "no X yet" text is banned.
+- **Information architecture**: a page with more than 4 distinct content sections must use the shared `<Tabs>` primitive, not vertical stacking.
+- **Visual hierarchy** (do not deviate without explicit reason):
+  - page `<h1>`: `text-2xl font-bold`
+  - section / card title: `text-base font-semibold`
+  - row title: `text-sm font-medium`
+  - meta / secondary: `text-xs text-muted-foreground`
+- **Forms**: group fields into sections via `<FieldGroup>` when a form has >5 fields. Money inputs use the `<MoneyInput>` component (ILS-formatted). Dates displayed via `Intl.DateTimeFormat(i18n.language, …)`.
+- **Density defaults**: card `p-4`; list row `py-3 px-6`; form field gap `gap-4`; KPI tile `p-4`.
+
+If you think you need a new pattern not covered here, add it to `PATTERNS.md` in the same PR that introduces it.
+
 ## Other durable rules
 
 See `HANDOFF.md` for phase history, `BLUEPRINT.md` for architecture, `DECISIONS.md` for the tech stack, `SCHEMA.md` for the DB schema.

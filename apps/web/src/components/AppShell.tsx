@@ -1,4 +1,14 @@
 import { Button } from '@spex/ui';
+import {
+  Building2,
+  LayoutDashboard,
+  LogOut,
+  Target,
+  Truck,
+  FolderKanban,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
@@ -8,11 +18,28 @@ import { useAuth } from '../auth/AuthContext';
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `px-3 py-1.5 rounded-md text-sm transition-colors ${
+  `inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors [&>svg]:h-4 [&>svg]:w-4 ${
     isActive
-      ? 'bg-muted font-medium'
+      ? 'bg-muted font-medium text-foreground'
       : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
   }`;
+
+interface NavItem {
+  to: string;
+  end?: boolean;
+  icon: LucideIcon;
+  key: string;
+  adminOnly?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { to: '/', end: true, icon: LayoutDashboard, key: 'nav.dashboard' },
+  { to: '/projects', icon: FolderKanban, key: 'nav.projects' },
+  { to: '/leads', icon: Target, key: 'nav.leads' },
+  { to: '/clients', icon: Building2, key: 'nav.clients', adminOnly: true },
+  { to: '/suppliers', icon: Truck, key: 'nav.suppliers', adminOnly: true },
+  { to: '/users', icon: Users, key: 'nav.users', adminOnly: true },
+];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
@@ -28,31 +55,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <NavLink to="/" className="text-lg font-bold shrink-0">
             {t('app.name')}
           </NavLink>
-          <div className="flex items-center gap-1 flex-1">
-            <NavLink to="/" end className={navLinkClass}>
-              {t('nav.dashboard')}
-            </NavLink>
-            <NavLink to="/projects" className={navLinkClass}>
-              {t('nav.projects')}
-            </NavLink>
-            <NavLink to="/leads" className={navLinkClass}>
-              {t('nav.leads')}
-            </NavLink>
-            {isAdmin && (
-              <NavLink to="/clients" className={navLinkClass}>
-                {t('nav.clients')}
+          <div className="flex items-center gap-1 flex-1 overflow-x-auto">
+            {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
+                <item.icon />
+                {t(item.key)}
               </NavLink>
-            )}
-            {isAdmin && (
-              <NavLink to="/suppliers" className={navLinkClass}>
-                {t('nav.suppliers')}
-              </NavLink>
-            )}
-            {isAdmin && (
-              <NavLink to="/users" className={navLinkClass}>
-                {t('nav.users')}
-              </NavLink>
-            )}
+            ))}
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <div className="text-sm text-end hidden sm:block">
@@ -60,6 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="text-xs text-muted-foreground">{roleLabel}</div>
             </div>
             <Button variant="outline" size="sm" onClick={() => void signOut()}>
+              <LogOut className="h-4 w-4 me-1.5" />
               {t('nav.logout')}
             </Button>
           </div>
