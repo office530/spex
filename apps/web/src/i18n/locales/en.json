@@ -34,7 +34,13 @@
     "activeLeads": "Active leads",
     "openTasks": "My open tasks",
     "openRfis": "Open RFIs",
-    "thisWeek": "this week"
+    "thisWeek": "this week",
+    "recentProjects": "Recent projects",
+    "noRecentProjects": "No projects yet",
+    "myUpcomingTasks": "My upcoming tasks",
+    "noUpcomingTasks": "No upcoming tasks",
+    "viewAll": "View all",
+    "noDueDate": "No due date"
   },
   "roles": {
     "ceo": "CEO",
