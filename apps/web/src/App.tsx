@@ -3,16 +3,28 @@ import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
+import { ClientEditPage } from './pages/ClientEditPage';
+import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
 import { LoginPage } from './pages/Login';
 import { UserEditPage } from './pages/UserEditPage';
 import { UsersPage } from './pages/UsersPage';
+
+const BACK_OFFICE = ['ceo', 'vp', 'cfo', 'office_manager'] as const;
 
 function AuthenticatedRoute({ children }: { children: React.ReactNode }) {
   return (
     <RequireAuth>
       <AppShell>{children}</AppShell>
     </RequireAuth>
+  );
+}
+
+function BackOfficeRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthenticatedRoute>
+      <RequireRole roles={[...BACK_OFFICE]}>{children}</RequireRole>
+    </AuthenticatedRoute>
   );
 }
 
@@ -32,11 +44,9 @@ export function App() {
         <Route
           path="/users"
           element={
-            <AuthenticatedRoute>
-              <RequireRole roles={['ceo', 'vp', 'cfo', 'office_manager']}>
-                <UsersPage />
-              </RequireRole>
-            </AuthenticatedRoute>
+            <BackOfficeRoute>
+              <UsersPage />
+            </BackOfficeRoute>
           }
         />
         <Route
@@ -45,6 +55,30 @@ export function App() {
             <AuthenticatedRoute>
               <UserEditPage />
             </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/clients"
+          element={
+            <BackOfficeRoute>
+              <ClientsPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/clients/new"
+          element={
+            <BackOfficeRoute>
+              <ClientEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/clients/:id"
+          element={
+            <BackOfficeRoute>
+              <ClientEditPage />
+            </BackOfficeRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
