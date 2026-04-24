@@ -41,7 +41,8 @@ type StatusFamily =
   | 'rfi'
   | 'supplier_invoice'
   | 'payment_request'
-  | 'ticket';
+  | 'ticket'
+  | 'customer_invoice';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -143,6 +144,13 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     in_progress: 'warning',
     awaiting_manager: 'accent',
     resolved: 'success',
+    cancelled: 'muted',
+  },
+  customer_invoice: {
+    awaiting_issuance: 'neutral',
+    issued: 'info',
+    paid: 'success',
+    overdue: 'warning',
     cancelled: 'muted',
   },
 };
