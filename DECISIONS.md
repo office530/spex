@@ -60,7 +60,7 @@ Paired with `BLUEPRINT.md` (design) and `MIRO_READOUT.md` (requirements source).
 | File storage | Google Drive (project docs) + Supabase Storage (in-app attachments, tickets) |
 | State | TanStack Query + Zustand |
 | Forms | React Hook Form + Zod |
-| i18n | i18next (Hebrew primary, English secondary) |
+| i18n | i18next — **Hebrew is the only user-facing language.** `en.json` exists as a developer-side fallback and must never surface in the UI. No language switcher. |
 | PDF | `@react-pdf/renderer` server-side |
 | Hosting | Vercel (web) + Railway (backend + Redis) + Supabase (DB + auth + storage) |
 | Observability | Sentry + Betterstack |
