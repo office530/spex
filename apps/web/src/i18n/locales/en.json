@@ -223,6 +223,27 @@
     "unitPrice": "Unit price",
     "estimatedTotal": "Estimated total"
   },
+  "supplierQuotes": {
+    "title": "Supplier quotes",
+    "empty": "No quotes for this item yet",
+    "add": "Add quote",
+    "confirmDelete": "Delete this quote?",
+    "supplier": "Supplier",
+    "selectSupplier": "Select a supplier…",
+    "amount": "Amount",
+    "statusLabel": "Status",
+    "countShort": "{{count}} quotes",
+    "countOne": "1 quote",
+    "countZero": "No quotes",
+    "status": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "under_review": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "revised": "Revised"
+    }
+  },
   "customerQuotes": {
     "title": "Customer quotes",
     "add": "New quote",

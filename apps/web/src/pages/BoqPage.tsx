@@ -367,7 +367,13 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
         ) : (
           <div className="divide-y">
             {chapter.items.map((item) => (
-              <LineItemRow key={item.id} item={item} canWrite={canWrite} onChange={onChange} />
+              <LineItemRow
+                key={item.id}
+                item={item}
+                projectId={projectId}
+                canWrite={canWrite}
+                onChange={onChange}
+              />
             ))}
           </div>
         )}
@@ -459,13 +465,15 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
 
 interface LineItemRowProps {
   item: LineItem;
+  projectId: string;
   canWrite: boolean;
   onChange: () => void;
 }
 
-function LineItemRow({ item, canWrite, onChange }: LineItemRowProps) {
+function LineItemRow({ item, projectId, canWrite, onChange }: LineItemRowProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [form, setForm] = useState({
     description: item.description,
     unit: item.unit ?? '',
@@ -595,36 +603,277 @@ function LineItemRow({ item, canWrite, onChange }: LineItemRowProps) {
   }
 
   return (
-    <div className="px-6 py-3 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-center">
-      <div className="min-w-0">
-        <div className="font-medium text-sm truncate">{item.description}</div>
-        {item.notes && (
-          <p className="text-xs text-muted-foreground whitespace-pre-line">{item.notes}</p>
+    <div className="px-6 py-3 space-y-2">
+      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-center">
+        <div className="min-w-0">
+          <div className="font-medium text-sm truncate">{item.description}</div>
+          {item.notes && (
+            <p className="text-xs text-muted-foreground whitespace-pre-line">{item.notes}</p>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {item.quantity ?? '—'} {item.unit ?? ''}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {formatCurrency(item.unit_price)}
+        </div>
+        <div className="text-sm font-medium">
+          {formatCurrency(item.estimated_total)}
+        </div>
+        {canWrite && (
+          <div className="flex items-center gap-1">
+            <Button size="sm" variant="ghost" onClick={startEdit}>
+              {t('common.edit')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={() => void removeItem()}
+            >
+              {t('common.delete')}
+            </Button>
+          </div>
         )}
       </div>
-      <div className="text-xs text-muted-foreground">
-        {item.quantity ?? '—'} {item.unit ?? ''}
+      <div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-auto px-2 py-1 text-xs text-muted-foreground"
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? '▾' : '▸'} {t('supplierQuotes.title')}
+        </Button>
       </div>
-      <div className="text-xs text-muted-foreground">
-        {formatCurrency(item.unit_price)}
-      </div>
-      <div className="text-sm font-medium">
-        {formatCurrency(item.estimated_total)}
-      </div>
-      {canWrite && (
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="ghost" onClick={startEdit}>
-            {t('common.edit')}
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            onClick={() => void removeItem()}
-          >
-            {t('common.delete')}
-          </Button>
+      {expanded && (
+        <SupplierQuotesList
+          lineItemId={item.id}
+          projectId={projectId}
+          canWrite={canWrite}
+        />
+      )}
+    </div>
+  );
+}
+
+interface SupplierOption {
+  id: string;
+  name: string;
+}
+
+type SupplierQuoteStatus =
+  | 'draft'
+  | 'submitted'
+  | 'under_review'
+  | 'approved'
+  | 'rejected'
+  | 'revised';
+
+const SUPPLIER_QUOTE_STATUSES: SupplierQuoteStatus[] = [
+  'draft',
+  'submitted',
+  'under_review',
+  'approved',
+  'rejected',
+  'revised',
+];
+
+const SUPPLIER_QUOTE_STATUS_COLORS: Record<SupplierQuoteStatus, string> = {
+  draft: 'bg-gray-100 text-gray-700',
+  submitted: 'bg-blue-100 text-blue-800',
+  under_review: 'bg-amber-100 text-amber-800',
+  approved: 'bg-emerald-100 text-emerald-800',
+  rejected: 'bg-rose-100 text-rose-800',
+  revised: 'bg-violet-100 text-violet-800',
+};
+
+interface SupplierQuoteRow {
+  id: string;
+  supplier_id: string;
+  amount: number | null;
+  status: SupplierQuoteStatus;
+  supplier: { name: string } | null;
+}
+
+interface SupplierQuotesListProps {
+  lineItemId: string;
+  projectId: string;
+  canWrite: boolean;
+}
+
+function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesListProps) {
+  const { t } = useTranslation();
+  const [quotes, setQuotes] = useState<SupplierQuoteRow[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState<{
+    supplier_id: string;
+    amount: string;
+    status: SupplierQuoteStatus;
+  }>({ supplier_id: '', amount: '', status: 'draft' });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const [qRes, sRes] = await Promise.all([
+      supabase
+        .from('supplier_quotes')
+        .select('id, supplier_id, amount, status, supplier:suppliers(name)')
+        .eq('boq_line_item_id', lineItemId)
+        .order('created_at', { ascending: false }),
+      canWrite && suppliers.length === 0
+        ? supabase.from('suppliers').select('id, name').eq('status', 'active').order('name')
+        : Promise.resolve({ data: null, error: null }),
+    ]);
+    if (qRes.error) setError(qRes.error.message);
+    else setQuotes((qRes.data as unknown as SupplierQuoteRow[]) ?? []);
+    if (sRes.data) setSuppliers(sRes.data as SupplierOption[]);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lineItemId]);
+
+  function startAdd() {
+    setForm({
+      supplier_id: suppliers[0]?.id ?? '',
+      amount: '',
+      status: 'draft',
+    });
+    setError(null);
+    setAdding(true);
+  }
+
+  async function saveQuote(e: FormEvent) {
+    e.preventDefault();
+    if (!form.supplier_id) return;
+    setSaving(true);
+    setError(null);
+    const { error } = await supabase.from('supplier_quotes').insert({
+      project_id: projectId,
+      boq_line_item_id: lineItemId,
+      supplier_id: form.supplier_id,
+      amount: form.amount ? Number(form.amount) : null,
+      status: form.status,
+    });
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    setAdding(false);
+    await refresh();
+  }
+
+  async function removeQuote(q: SupplierQuoteRow) {
+    if (!confirm(t('supplierQuotes.confirmDelete'))) return;
+    const { error } = await supabase.from('supplier_quotes').delete().eq('id', q.id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  return (
+    <div className="rounded-md border bg-muted/30 p-3 space-y-2">
+      {loading ? (
+        <p className="text-xs text-muted-foreground">{t('common.loading')}</p>
+      ) : quotes.length === 0 && !adding ? (
+        <p className="text-xs text-muted-foreground">{t('supplierQuotes.empty')}</p>
+      ) : (
+        <div className="space-y-1">
+          {quotes.map((q) => (
+            <div
+              key={q.id}
+              className="flex items-center gap-2 text-sm bg-background rounded px-3 py-2"
+            >
+              <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
+              <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
+              <span
+                className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${SUPPLIER_QUOTE_STATUS_COLORS[q.status]}`}
+              >
+                {t(`supplierQuotes.status.${q.status}`)}
+              </span>
+              {canWrite && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive shrink-0 h-auto px-2 py-1"
+                  onClick={() => void removeQuote(q)}
+                >
+                  {t('common.delete')}
+                </Button>
+              )}
+            </div>
+          ))}
         </div>
+      )}
+      {adding && (
+        <form onSubmit={saveQuote} className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto] items-end bg-background rounded p-3">
+          <div className="space-y-1">
+            <Label htmlFor={`sq_sup_${lineItemId}`} className="text-xs">
+              {t('supplierQuotes.supplier')} *
+            </Label>
+            <select
+              id={`sq_sup_${lineItemId}`}
+              value={form.supplier_id}
+              onChange={(e) => setForm((f) => ({ ...f, supplier_id: e.target.value }))}
+              required
+              disabled={saving}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            >
+              <option value="">{t('supplierQuotes.selectSupplier')}</option>
+              {suppliers.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`sq_amt_${lineItemId}`} className="text-xs">
+              {t('supplierQuotes.amount')}
+            </Label>
+            <Input
+              id={`sq_amt_${lineItemId}`}
+              type="number"
+              min="0"
+              value={form.amount}
+              onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
+              disabled={saving}
+              className="sm:w-32"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`sq_st_${lineItemId}`} className="text-xs">
+              {t('supplierQuotes.statusLabel')}
+            </Label>
+            <select
+              id={`sq_st_${lineItemId}`}
+              value={form.status}
+              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as SupplierQuoteStatus }))}
+              disabled={saving}
+              className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            >
+              {SUPPLIER_QUOTE_STATUSES.map((s) => (
+                <option key={s} value={s}>{t(`supplierQuotes.status.${s}`)}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-1">
+            <Button type="button" variant="ghost" size="sm" onClick={() => setAdding(false)} disabled={saving}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" size="sm" disabled={saving || !form.supplier_id}>
+              {saving ? t('common.saving') : t('common.save')}
+            </Button>
+          </div>
+          {error && (
+            <p className="sm:col-span-4 text-sm text-destructive" role="alert">{error}</p>
+          )}
+        </form>
+      )}
+      {canWrite && !adding && (
+        <Button size="sm" variant="outline" onClick={startAdd}>
+          {t('supplierQuotes.add')}
+        </Button>
       )}
     </div>
   );
