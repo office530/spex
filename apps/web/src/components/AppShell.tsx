@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { NotificationBell } from './NotificationBell';
 
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
 
@@ -88,6 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <div className="text-sm font-medium truncate">{displayName}</div>
               <div className="text-xs text-sidebar-muted-foreground truncate">{roleLabel}</div>
             </div>
+            <NotificationBell />
             <Button
               variant="ghost"
               size="sm"

@@ -101,6 +101,15 @@
       "sumWarning": "הסכום לא מסתכם ל-100%"
     }
   },
+  "notifications": {
+    "title": "התראות",
+    "empty": "אין התראות",
+    "markAllRead": "סמן הכל כנקרא",
+    "kind": {
+      "task_assigned": "משימה הוקצתה לך",
+      "ticket_assigned": "פנייה הוקצתה לך"
+    }
+  },
   "activityLog": {
     "title": "יומן פעילות",
     "subtitle": "תיעוד כל הפעולות במערכת (רק הנה\"ח)",
