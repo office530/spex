@@ -367,6 +367,19 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
           <p className="text-sm text-muted-foreground px-6 py-4">{t('boq.emptyLineItems')}</p>
         ) : (
           <div className="divide-y">
+            <div
+              className={`hidden sm:grid gap-2 px-6 py-2 bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground ${
+                canWrite
+                  ? 'sm:grid-cols-[1fr_100px_120px_140px_140px]'
+                  : 'sm:grid-cols-[1fr_100px_120px_140px]'
+              }`}
+            >
+              <div>{t('boq.description')}</div>
+              <div>{t('boq.quantity')}</div>
+              <div>{t('boq.unitPrice')}</div>
+              <div>{t('boq.estimatedTotal')}</div>
+              {canWrite && <div></div>}
+            </div>
             {chapter.items.map((item) => (
               <LineItemRow
                 key={item.id}
@@ -605,7 +618,13 @@ function LineItemRow({ item, projectId, canWrite, onChange }: LineItemRowProps) 
 
   return (
     <div className="px-6 py-3 space-y-2">
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-center">
+      <div
+        className={`grid gap-2 sm:items-center ${
+          canWrite
+            ? 'sm:grid-cols-[1fr_100px_120px_140px_140px]'
+            : 'sm:grid-cols-[1fr_100px_120px_140px]'
+        }`}
+      >
         <div className="min-w-0">
           <div className="font-medium text-sm truncate">{item.description}</div>
           {item.notes && (
