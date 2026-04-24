@@ -316,6 +316,46 @@
       "planning": "Planning"
     }
   },
+  "paymentRequests": {
+    "title": "Payment requests",
+    "add": "New request",
+    "empty": "No payment requests yet",
+    "confirmDelete": "Delete this payment request?",
+    "linkedInvoice": "Linked invoice",
+    "selectInvoice": "Select an invoice…",
+    "noInvoice": "No invoice",
+    "amount": "Amount",
+    "statusLabel": "Status",
+    "paidAt": "Paid {{date}}",
+    "total": "Payment requests total",
+    "status": {
+      "awaiting_payment_request": "Awaiting payment request",
+      "awaiting_pm_approval": "Awaiting PM approval",
+      "pm_approved_awaiting_back_office": "PM approved, awaiting back-office",
+      "paid": "Paid",
+      "rejected": "Rejected"
+    }
+  },
+  "supplierInvoices": {
+    "title": "Supplier invoices",
+    "add": "Add invoice",
+    "empty": "No invoices yet",
+    "confirmDelete": "Delete this invoice?",
+    "supplier": "Supplier",
+    "selectSupplier": "Select a supplier…",
+    "invoiceNumber": "Invoice number",
+    "invoiceDate": "Invoice date",
+    "amount": "Amount",
+    "fileUrl": "File link",
+    "statusLabel": "Status",
+    "total": "Invoices total",
+    "status": {
+      "received": "Received",
+      "matched": "Matched",
+      "disputed": "Disputed",
+      "processed": "Processed"
+    }
+  },
   "supplierQuotes": {
     "title": "Supplier quotes",
     "empty": "No quotes for this item yet",
