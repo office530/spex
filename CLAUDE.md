@@ -41,3 +41,4 @@ See `DESIGN.md` for the full design language, `HANDOFF.md` for phase history, `B
 - Back-office roles (full access): `ceo`, `vp`, `cfo`, `office_manager`. PM / Foreman are project-scoped via RLS.
 - Supabase project: `vxzflohvtfrkwycpaxiy` (ap-southeast-1 Singapore).
 - Each phase: write code → `pnpm --filter web build` → commit → push → open a **draft** PR.
+- **Auto-merge approved by Shay** for PRs you author on `claude/*` branches: after push, wait for CI (`lint · typecheck · test`) green AND no unresolved review comments, then merge the PR yourself (`mcp__github__merge_pull_request`). If CI fails, debug and fix before asking. If a review comment lands, address it first.

@@ -21,6 +21,13 @@ export {
 export { StatusBadge, type StatusBadgeProps, type StatusTone } from './components/status-badge';
 export { EmptyState, type EmptyStateProps } from './components/empty-state';
 export {
+  Avatar,
+  AvatarStack,
+  type AvatarProps,
+  type AvatarStackProps,
+  type AvatarSize,
+} from './components/avatar';
+export {
   KpiTile,
   KpiDelta,
   type KpiTileProps,

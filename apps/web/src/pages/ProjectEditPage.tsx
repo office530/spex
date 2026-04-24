@@ -1,5 +1,7 @@
 import type { IconTone } from '@spex/ui';
 import {
+  Avatar,
+  AvatarStack,
   Button,
   Card,
   CardContent,
@@ -116,7 +118,63 @@ export function ProjectEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [teamNames, setTeamNames] = useState<string[]>([]);
+  const [tabCounts, setTabCounts] = useState<{
+    team: number;
+    milestones: number;
+    operations: number;
+    financials: number;
+  } | null>(null);
   const readOnly = !isAdmin;
+
+  useEffect(() => {
+    if (isCreate || !id) return;
+    let cancelled = false;
+    void (async () => {
+      const [memRes, msRes, taskRes, rfiRes, varRes, invRes, prRes] = await Promise.all([
+        supabase
+          .from('project_members')
+          .select('user_id, profile:user_profiles(full_name)')
+          .eq('project_id', id),
+        supabase.from('milestones').select('id', { count: 'exact', head: true }).eq('project_id', id),
+        supabase
+          .from('tasks')
+          .select('id', { count: 'exact', head: true })
+          .eq('project_id', id)
+          .not('status', 'in', '(done,cancelled)'),
+        supabase
+          .from('rfis')
+          .select('id', { count: 'exact', head: true })
+          .eq('project_id', id)
+          .eq('status', 'open'),
+        supabase.from('variations').select('id', { count: 'exact', head: true }).eq('project_id', id),
+        supabase
+          .from('supplier_invoices')
+          .select('id', { count: 'exact', head: true })
+          .eq('project_id', id),
+        supabase
+          .from('payment_requests')
+          .select('id', { count: 'exact', head: true })
+          .eq('project_id', id),
+      ]);
+      if (cancelled) return;
+      const memData =
+        (memRes.data as unknown as Array<{
+          user_id: string;
+          profile: { full_name: string } | null;
+        }>) ?? [];
+      setTeamNames(memData.map((m) => m.profile?.full_name ?? '').filter(Boolean));
+      setTabCounts({
+        team: memData.length,
+        milestones: msRes.count ?? 0,
+        operations: (taskRes.count ?? 0) + (rfiRes.count ?? 0),
+        financials: (varRes.count ?? 0) + (invRes.count ?? 0) + (prRes.count ?? 0),
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isCreate]);
 
   useEffect(() => {
     void (async () => {
@@ -268,6 +326,14 @@ export function ProjectEditPage() {
                   className="bg-white/15 text-white"
                 />
               </div>
+              {teamNames.length > 0 && (
+                <AvatarStack
+                  names={teamNames}
+                  max={5}
+                  size="sm"
+                  className="[&_span]:ring-hero-to"
+                />
+              )}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {id && (
@@ -326,18 +392,22 @@ export function ProjectEditPage() {
                 <TabsTrigger value="team">
                   <Users />
                   {t('projects.tabs.team')}
+                  <TabCountBadge value={tabCounts?.team} />
                 </TabsTrigger>
                 <TabsTrigger value="milestones">
                   <ClipboardList />
                   {t('projects.tabs.milestones')}
+                  <TabCountBadge value={tabCounts?.milestones} />
                 </TabsTrigger>
                 <TabsTrigger value="financials">
                   <Receipt />
                   {t('projects.tabs.financials')}
+                  <TabCountBadge value={tabCounts?.financials} />
                 </TabsTrigger>
                 <TabsTrigger value="operations">
                   <CalendarDays />
                   {t('projects.tabs.operations')}
+                  <TabCountBadge value={tabCounts?.operations} />
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="general">
@@ -550,6 +620,15 @@ function ProjectForm({
   );
 }
 
+function TabCountBadge({ value }: { value: number | undefined }) {
+  if (value == null || value === 0) return null;
+  return (
+    <span className="ms-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
+      {value}
+    </span>
+  );
+}
+
 interface SelectFieldProps {
   id: string;
   value: string;
@@ -675,13 +754,16 @@ function MembersPanel({ projectId, isAdmin, users }: MembersPanelProps) {
             {members.map((m) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between px-6 py-3 gap-4"
+                className="flex items-center justify-between px-6 py-3 gap-3"
               >
-                <div className="min-w-0">
-                  <div className="font-medium truncate">{m.profile?.full_name ?? '—'}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {t(`members.role.${m.role}`)}
-                    {m.profile && <span> · {t(`roles.${m.profile.role}`)}</span>}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar name={m.profile?.full_name ?? '—'} size="md" />
+                  <div className="min-w-0">
+                    <div className="font-medium truncate">{m.profile?.full_name ?? '—'}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t(`members.role.${m.role}`)}
+                      {m.profile && <span> · {t(`roles.${m.profile.role}`)}</span>}
+                    </div>
                   </div>
                 </div>
                 {isAdmin && (
