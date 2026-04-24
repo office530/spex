@@ -2,6 +2,7 @@ import { Button } from '@spex/ui';
 import {
   BarChart3,
   Building2,
+  History,
   Inbox,
   LayoutDashboard,
   LogOut,
@@ -36,6 +37,7 @@ const WORKSPACE: NavItem[] = [
 
 const DIRECTORY: NavItem[] = [
   { to: '/reports', icon: BarChart3, key: 'nav.reports' },
+  { to: '/activity', icon: History, key: 'nav.activity' },
   { to: '/clients', icon: Building2, key: 'nav.clients' },
   { to: '/suppliers', icon: Truck, key: 'nav.suppliers' },
   { to: '/users', icon: Users, key: 'nav.users' },

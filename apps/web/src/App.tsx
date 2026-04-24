@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
+import { ActivityLogPage } from './pages/ActivityLogPage';
 import { BoqPage } from './pages/BoqPage';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
@@ -211,6 +212,14 @@ export function App() {
           element={
             <BackOfficeRoute>
               <ReportsPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/activity"
+          element={
+            <BackOfficeRoute>
+              <ActivityLogPage />
             </BackOfficeRoute>
           }
         />

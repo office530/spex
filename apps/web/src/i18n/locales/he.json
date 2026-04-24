@@ -14,6 +14,7 @@
     "leads": "לידים",
     "tickets": "פניות",
     "settings": "הגדרות",
+    "activity": "יומן פעילות",
     "sections": {
       "workspace": "עבודה שוטפת",
       "directory": "ספרייה"
@@ -98,6 +99,22 @@
       "sumLabel": "סך אחוזי החיוב: {{sum}}%",
       "sumOk": "100% — תקין",
       "sumWarning": "הסכום לא מסתכם ל-100%"
+    }
+  },
+  "activityLog": {
+    "title": "יומן פעילות",
+    "subtitle": "תיעוד כל הפעולות במערכת (רק הנה\"ח)",
+    "empty": "עדיין אין פעילות",
+    "action": {
+      "insert": "יצירה",
+      "update": "עדכון",
+      "delete": "מחיקה"
+    },
+    "entity": {
+      "projects": "פרויקט",
+      "leads": "ליד",
+      "customer_invoices": "חשבונית",
+      "tasks": "משימה"
     }
   },
   "reports": {
