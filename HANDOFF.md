@@ -1,7 +1,17 @@
 # Spex — New Session Kickoff
 
 One-page handoff for a fresh Claude Code CLI session in the `office530/spex` repo.
-Paste **§ First message** verbatim as your opening prompt.
+
+**📍 Current state (§ Progress log below for the detailed phase-by-phase):**
+Phase 0–5 complete, Phase 6 mostly complete, Phase 3/4 Chashbashvat-runtime and all WA/email/Drive/Calendar integrations are blocked waiting on external setup. Design language (DESIGN.md) and sidebar layout + teal palette shipped; 34 feature / polish phases merged as of 2026-04-24.
+
+What's live: auth + roles, dashboard with KPIs + recent projects + my tasks, leads (interactions, events, pre-deal quotes, convert-to-project), clients, suppliers, users, projects with 6 tabs (General / Team / Milestones / Financials / Operations / Documents), BoQ with chapters + line items + supplier quotes + RFQ grouper + comments + cheapest highlight, milestones auto-seed, customer invoices + receipts (with milestone auto-trigger), supplier invoices + payment requests + POs, Chashbashvat sync queue infrastructure, variations, tasks with parent/child + checklists + dependencies, RFI, meetings + action items, handover protocol, documents via Supabase Storage, tickets (public + internal), reports, settings/milestones.
+
+What's left (non-external): Task kanban (drag-drop lib), Schedule/Gantt (lib), PDF export (lib), in-app notifications (new schema), activity log (new schema), automation rules (new schema), consultants entity (new schema), E2E + unit tests.
+
+External-blocked: Chashbashvat API runtime (infra exists, worker pending), Google Drive mirror, Google Calendar sync, WhatsApp (Green API), email, Facebook Lead Ads webhook.
+
+For the first prompt in a brand-new session, see **§ First message**.
 
 ---
 
@@ -92,6 +102,44 @@ See BLUEPRINT.md §11 for the full list. Critical blockers for Phase 0:
 
 Critical blocker for Phase 3 (Procurement):
 4. Chashbashvat API discovery — schedule 1-hour call with their integration team.
+
+---
+
+## Progress log
+
+Chronological phase log so a future agent can pick up where we left off.
+
+| # | Branch | What | Status |
+|---|---|---|---|
+| 0 | — | Foundation: monorepo, Supabase, Drizzle, auth, roles, routing shell, CI, Vercel | ✅ |
+| 1 | — | Leads + interactions + events + pre-deal CustomerQuote + convert-to-project | ✅ (calendar, Google Calendar, FB Lead Ads, WA — blocked) |
+| 2 | — | Clients + Projects + BoQ + Milestones (auto-seed from templates) + ProjectMember + Documents tab (Supabase Storage instead of Drive) + Project Overview KPIs | ✅ (Gantt + Kanban — deferred) |
+| 3 | — | Suppliers + SupplierQuote + comments (§3 compare is partial — sort + cheapest chip) + RFQ grouper + SupplierInvoices + PaymentRequests + POs + Chashbashvat sync queue infra | ✅ (PO→Chashbashvat runtime, WA — blocked) |
+| 4 | — | CustomerInvoices + CustomerReceipts + Variations + milestone ready_to_bill → auto-invoice trigger | ✅ (Chashbashvat sync runtime, overdue cron — blocked) |
+| 5 | — | RFI + MeetingMinutes + action items + HandoverProtocol (checklist + signed_at) | ✅ (PDF export, signature upload, in-app notif center — deferred) |
+| 6 | — | Public /ticket + internal tickets queue + Reports + Settings/milestones | 🟡 (AutomationRule UI, NotificationPreference, ActivityLog viewer — deferred) |
+| 7 | — | Hardening: E2E, unit tests, Sentry, a11y | ❌ |
+| 8 | — | Supplier portal | Deferred per blueprint |
+
+Design:
+- DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
+- Sidebar layout + dark-teal palette + gradient hero on entity pages
+- Shared primitives in `@spex/ui`: StatusBadge, EmptyState, KpiTile, KpiDelta, Avatar, AvatarStack, Tabs, Table, formatCurrencyILS
+- System-wide rollout of StatusBadge across 14 status enum families
+- EmptyState in every inline panel
+- Login page with 2-panel hero layout
+- Project tabs with count badges
+- Avatar stacks on project hero + members panel
+
+Migrations (in `supabase/migrations/`):
+- `0001_auth_rls.sql` — Phase 0 auth + roles + RLS base
+- `0002_seed_milestone_templates.sql` — 11 default milestones (Hebrew) + project-INSERT auto-seed trigger
+- `0003_public_ticket_submission.sql` — anon role INSERT policy on tickets
+- `0004_project_documents_storage.sql` — storage bucket + 4 policies + documents columns
+- `0005_chashbashvat_sync_infrastructure.sql` — sync queue table + triggers to mirror status onto source entities
+- `0006_auto_invoice_on_milestone_ready.sql` — milestone `ready_to_bill` → customer_invoice trigger
+
+Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 
 ---
 
