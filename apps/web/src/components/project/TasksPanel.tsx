@@ -60,6 +60,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
   const [error, setError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [view, setView] = useState<'list' | 'kanban'>('list');
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -284,15 +285,101 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2">
         <CardTitle className="text-base">{t('tasks.title')}</CardTitle>
-        {canWrite && !adding && !editingId && (
-          <Button size="sm" variant="outline" onClick={() => startAdd()}>
-            {t('tasks.add')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex rounded-md border text-xs">
+            <button
+              type="button"
+              onClick={() => setView('list')}
+              className={`px-2 py-1 rounded-s-md ${view === 'list' ? 'bg-muted font-medium' : 'text-muted-foreground'}`}
+            >
+              {t('tasks.viewList')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setView('kanban')}
+              className={`px-2 py-1 rounded-e-md ${view === 'kanban' ? 'bg-muted font-medium' : 'text-muted-foreground'}`}
+            >
+              {t('tasks.viewKanban')}
+            </button>
+          </div>
+          {canWrite && !adding && !editingId && (
+            <Button size="sm" variant="outline" onClick={() => startAdd()}>
+              {t('tasks.add')}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         {loading ? (
           <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : view === 'kanban' && !adding && !editingId ? (
+          rows.length === 0 ? (
+            <EmptyState
+              icon={ListChecks}
+              title={t('tasks.empty')}
+              cta={canWrite ? { label: t('tasks.add'), onClick: () => startAdd() } : undefined}
+            />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-4">
+              {STATUSES.map((status) => {
+                const bucket = rows.filter((r) => r.status === status);
+                return (
+                  <div
+                    key={status}
+                    className="bg-muted/30 rounded-lg p-2 space-y-2 min-h-[160px]"
+                  >
+                    <div className="flex items-center justify-between text-xs font-medium px-1">
+                      <span>{t(`tasks.status.${status}`)}</span>
+                      <span className="text-muted-foreground">{bucket.length}</span>
+                    </div>
+                    {bucket.map((r) => {
+                      const isOverdue =
+                        r.due_date &&
+                        new Date(r.due_date).getTime() < Date.now() &&
+                        r.status !== 'done' &&
+                        r.status !== 'cancelled';
+                      return (
+                        <button
+                          key={r.id}
+                          type="button"
+                          onClick={() => startEdit(r)}
+                          className="w-full text-start bg-background rounded p-2 shadow-sm hover:shadow space-y-1 transition-shadow"
+                        >
+                          <div className="text-sm font-medium truncate">{r.title}</div>
+                          {r.assignee?.full_name && (
+                            <div className="text-xs text-muted-foreground truncate">
+                              {r.assignee.full_name}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1 flex-wrap">
+                            <StatusBadge
+                              family="task_priority"
+                              value={r.priority}
+                              label={t(`tasks.priority.${r.priority}`)}
+                            />
+                            {r.due_date && (
+                              <span
+                                className={`text-xs ${
+                                  isOverdue
+                                    ? 'text-rose-700 font-medium'
+                                    : 'text-muted-foreground'
+                                }`}
+                              >
+                                {dateFormat.format(new Date(r.due_date))}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                    {bucket.length === 0 && (
+                      <div className="text-xs text-muted-foreground text-center py-2">—</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )
         ) : (
           <div className="divide-y">
             {adding && renderForm()}
