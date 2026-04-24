@@ -116,10 +116,17 @@ Chronological phase log so a future agent can pick up where we left off.
 | 2 | — | Clients + Projects + BoQ + Milestones (auto-seed from templates) + ProjectMember + Documents tab (Supabase Storage instead of Drive) + Project Overview KPIs | ✅ (Gantt + Kanban — deferred) |
 | 3 | — | Suppliers + SupplierQuote + comments (§3 compare is partial — sort + cheapest chip) + RFQ grouper + SupplierInvoices + PaymentRequests + POs + Chashbashvat sync queue infra | ✅ (PO→Chashbashvat runtime, WA — blocked) |
 | 4 | — | CustomerInvoices + CustomerReceipts + Variations + milestone ready_to_bill → auto-invoice trigger | ✅ (Chashbashvat sync runtime, overdue cron — blocked) |
-| 5 | — | RFI + MeetingMinutes + action items + HandoverProtocol (checklist + signed_at) | ✅ (PDF export, signature upload, in-app notif center — deferred) |
-| 6 | — | Public /ticket + internal tickets queue + Reports + Settings/milestones | 🟡 (AutomationRule UI, NotificationPreference, ActivityLog viewer — deferred) |
+| 5 | — | RFI + MeetingMinutes + action items + HandoverProtocol (checklist + signed_at) + in-app notifications bell (Phase 38) | ✅ (PDF export + client-signature upload — deferred) |
+| 6 | — | Public /ticket + internal tickets queue + Reports + Settings/milestones + **ActivityLog viewer (Phase 37)** + **AutomationRule UI + 7 seeded WA rules (Phase 40)** + **Calendar grid (Phase 39)** | ✅ (captcha on /ticket — deferred; NotificationPreference UI — deferred) |
 | 7 | — | Hardening: E2E, unit tests, Sentry, a11y | ❌ |
 | 8 | — | Supplier portal | Deferred per blueprint |
+
+Post-Phase-6 polish sweep (Miro catch-up):
+
+| # | What | Status |
+|---|---|---|
+| 35 | Overdue tasks flagged red (Miro §7) | ✅ |
+| 36 | Default customer-invoice due date = issued_at + 5 days (Miro §5) | ✅ |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
@@ -135,6 +142,12 @@ Migrations (in `supabase/migrations/`):
 - `0001_auth_rls.sql` — Phase 0 auth + roles + RLS base
 - `0002_seed_milestone_templates.sql` — 11 default milestones (Hebrew) + project-INSERT auto-seed trigger
 - `0003_public_ticket_submission.sql` — anon role INSERT policy on tickets
+- `0004_project_documents_storage.sql` — storage bucket + policies + documents columns (size_bytes, uploaded_by_id)
+- `0005_chashbashvat_sync_infrastructure.sql` — sync queue table + triggers
+- `0006_auto_invoice_on_milestone_ready.sql` — milestone ready_to_bill → customer_invoice trigger
+- `0007_activity_log_triggers.sql` — generic audit trigger wired to projects / leads / customer_invoices / tasks
+- `0008_in_app_notifications.sql` — notifications table + task/ticket assignment triggers
+- `0009_automation_rules_rls_and_seed.sql` — RLS + 7 seeded inactive WA rules from BLUEPRINT §8.1
 - `0004_project_documents_storage.sql` — storage bucket + 4 policies + documents columns
 - `0005_chashbashvat_sync_infrastructure.sql` — sync queue table + triggers to mirror status onto source entities
 - `0006_auto_invoice_on_milestone_ready.sql` — milestone `ready_to_bill` → customer_invoice trigger
