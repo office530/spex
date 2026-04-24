@@ -56,11 +56,22 @@ interface LeadRow {
   phone: string;
   status: LeadStatus;
   source: LeadSource;
+  estimated_value: number | null;
+  last_contact_at: string | null;
   owner: { full_name: string } | null;
 }
 
+function formatCurrencyILS(value: number | null | undefined): string {
+  if (value == null) return '';
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export function LeadsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [leads, setLeads] = useState<LeadRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +82,9 @@ export function LeadsPage() {
     void (async () => {
       const { data, error } = await supabase
         .from('leads')
-        .select('id, full_name, phone, status, source, owner:user_profiles(full_name)')
+        .select(
+          'id, full_name, phone, status, source, estimated_value, last_contact_at, owner:user_profiles(full_name)',
+        )
         .order('created_at', { ascending: false });
       if (error) {
         setError(error.message);
@@ -139,27 +152,38 @@ export function LeadsPage() {
             </p>
           ) : (
             <div className="divide-y">
-              {filtered.map((l) => (
-                <Link
-                  key={l.id}
-                  to={`/leads/${l.id}`}
-                  className="flex items-center justify-between px-6 py-3 gap-4 hover:bg-muted/60 transition-colors"
-                >
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">{l.full_name}</div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {l.phone}
-                      <span> · {t(`leads.source.${l.source}`)}</span>
-                      {l.owner && <span> · {l.owner.full_name}</span>}
-                    </div>
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[l.status]}`}
+              {filtered.map((l) => {
+                const dateFmt = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' });
+                return (
+                  <Link
+                    key={l.id}
+                    to={`/leads/${l.id}`}
+                    className="flex items-center justify-between px-6 py-3 gap-4 hover:bg-muted/60 transition-colors"
                   >
-                    {t(`leads.status.${l.status}`)}
-                  </span>
-                </Link>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium truncate">{l.full_name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {l.phone}
+                        <span> · {t(`leads.source.${l.source}`)}</span>
+                        {l.owner && <span> · {l.owner.full_name}</span>}
+                        {l.last_contact_at && (
+                          <span> · {dateFmt.format(new Date(l.last_contact_at))}</span>
+                        )}
+                      </div>
+                    </div>
+                    {l.estimated_value != null && (
+                      <div className="shrink-0 text-sm font-medium hidden sm:block">
+                        {formatCurrencyILS(l.estimated_value)}
+                      </div>
+                    )}
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[l.status]}`}
+                    >
+                      {t(`leads.status.${l.status}`)}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </CardContent>
