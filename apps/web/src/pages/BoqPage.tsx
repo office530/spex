@@ -249,6 +249,9 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(chapter.name);
+  const [savingName, setSavingName] = useState(false);
 
   const chapterTotal = chapter.items.reduce((s, i) => s + (i.estimated_total ?? 0), 0);
 
@@ -285,31 +288,77 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
     onChange();
   }
 
-  async function removeItem(item: LineItem) {
-    if (!confirm(t('boq.confirmDeleteLineItem'))) return;
-    const { error } = await supabase.from('boq_line_items').delete().eq('id', item.id);
-    if (error) setError(error.message);
-    else onChange();
+  async function saveName(e: FormEvent) {
+    e.preventDefault();
+    if (!nameDraft.trim()) return;
+    setSavingName(true);
+    setError(null);
+    const { error } = await supabase
+      .from('boq_chapters')
+      .update({ name: nameDraft.trim() })
+      .eq('id', chapter.id);
+    setSavingName(false);
+    if (error) { setError(error.message); return; }
+    setEditingName(false);
+    onChange();
+  }
+
+  function cancelNameEdit() {
+    setNameDraft(chapter.name);
+    setEditingName(false);
+    setError(null);
   }
 
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-2">
-        <div className="min-w-0">
-          <CardTitle className="text-base truncate">{chapter.name}</CardTitle>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t('boq.chapterTotal')}: {formatCurrency(chapterTotal)}
-          </p>
+        <div className="min-w-0 flex-1">
+          {editingName ? (
+            <form onSubmit={saveName} className="flex items-center gap-2">
+              <Input
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                required
+                disabled={savingName}
+                autoFocus
+                className="h-8"
+              />
+              <Button type="submit" size="sm" disabled={savingName}>
+                {savingName ? t('common.saving') : t('common.save')}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={cancelNameEdit}
+                disabled={savingName}
+              >
+                {t('common.cancel')}
+              </Button>
+            </form>
+          ) : (
+            <>
+              <CardTitle className="text-base truncate">{chapter.name}</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t('boq.chapterTotal')}: {formatCurrency(chapterTotal)}
+              </p>
+            </>
+          )}
         </div>
-        {canWrite && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            onClick={onDelete}
-          >
-            {t('common.delete')}
-          </Button>
+        {canWrite && !editingName && (
+          <div className="flex items-center gap-1 shrink-0">
+            <Button size="sm" variant="ghost" onClick={() => { setNameDraft(chapter.name); setEditingName(true); }}>
+              {t('common.edit')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={onDelete}
+            >
+              {t('common.delete')}
+            </Button>
+          </div>
         )}
       </CardHeader>
       <CardContent className="p-0">
@@ -318,33 +367,7 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
         ) : (
           <div className="divide-y">
             {chapter.items.map((item) => (
-              <div key={item.id} className="px-6 py-3 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-center">
-                <div className="min-w-0">
-                  <div className="font-medium text-sm truncate">{item.description}</div>
-                  {item.notes && (
-                    <p className="text-xs text-muted-foreground whitespace-pre-line">{item.notes}</p>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {item.quantity ?? '—'} {item.unit ?? ''}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {formatCurrency(item.unit_price)}
-                </div>
-                <div className="text-sm font-medium">
-                  {formatCurrency(item.estimated_total)}
-                </div>
-                {canWrite && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    onClick={() => void removeItem(item)}
-                  >
-                    {t('common.delete')}
-                  </Button>
-                )}
-              </div>
+              <LineItemRow key={item.id} item={item} canWrite={canWrite} onChange={onChange} />
             ))}
           </div>
         )}
@@ -431,5 +454,178 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface LineItemRowProps {
+  item: LineItem;
+  canWrite: boolean;
+  onChange: () => void;
+}
+
+function LineItemRow({ item, canWrite, onChange }: LineItemRowProps) {
+  const { t } = useTranslation();
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    description: item.description,
+    unit: item.unit ?? '',
+    quantity: item.quantity != null ? String(item.quantity) : '',
+    unit_price: item.unit_price != null ? String(item.unit_price) : '',
+    notes: item.notes ?? '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function startEdit() {
+    setForm({
+      description: item.description,
+      unit: item.unit ?? '',
+      quantity: item.quantity != null ? String(item.quantity) : '',
+      unit_price: item.unit_price != null ? String(item.unit_price) : '',
+      notes: item.notes ?? '',
+    });
+    setError(null);
+    setEditing(true);
+  }
+
+  function cancelEdit() {
+    setEditing(false);
+    setError(null);
+  }
+
+  async function saveEdit(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const qty = form.quantity ? Number(form.quantity) : null;
+    const price = form.unit_price ? Number(form.unit_price) : null;
+    const total = qty != null && price != null ? qty * price : null;
+    const { error } = await supabase
+      .from('boq_line_items')
+      .update({
+        description: form.description,
+        unit: form.unit || null,
+        quantity: qty,
+        unit_price: price,
+        estimated_total: total,
+        notes: form.notes || null,
+      })
+      .eq('id', item.id);
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    setEditing(false);
+    onChange();
+  }
+
+  async function removeItem() {
+    if (!confirm(t('boq.confirmDeleteLineItem'))) return;
+    const { error } = await supabase.from('boq_line_items').delete().eq('id', item.id);
+    if (error) setError(error.message);
+    else onChange();
+  }
+
+  if (editing) {
+    return (
+      <form onSubmit={saveEdit} className="px-6 py-4 space-y-3 bg-muted/40">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor={`edit_desc_${item.id}`}>{t('boq.description')} *</Label>
+            <Input
+              id={`edit_desc_${item.id}`}
+              value={form.description}
+              onChange={(e) => setForm((x) => ({ ...x, description: e.target.value }))}
+              required
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`edit_unit_${item.id}`}>{t('boq.unit')}</Label>
+            <Input
+              id={`edit_unit_${item.id}`}
+              value={form.unit}
+              onChange={(e) => setForm((x) => ({ ...x, unit: e.target.value }))}
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`edit_qty_${item.id}`}>{t('boq.quantity')}</Label>
+            <Input
+              id={`edit_qty_${item.id}`}
+              type="number"
+              min="0"
+              value={form.quantity}
+              onChange={(e) => setForm((x) => ({ ...x, quantity: e.target.value }))}
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`edit_price_${item.id}`}>{t('boq.unitPrice')}</Label>
+            <Input
+              id={`edit_price_${item.id}`}
+              type="number"
+              min="0"
+              value={form.unit_price}
+              onChange={(e) => setForm((x) => ({ ...x, unit_price: e.target.value }))}
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor={`edit_notes_${item.id}`}>{t('common.notes')}</Label>
+            <textarea
+              id={`edit_notes_${item.id}`}
+              value={form.notes}
+              onChange={(e) => setForm((x) => ({ ...x, notes: e.target.value }))}
+              rows={2}
+              disabled={saving}
+              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            />
+          </div>
+        </div>
+        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={cancelEdit} disabled={saving}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" size="sm" disabled={saving}>
+            {saving ? t('common.saving') : t('common.save')}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <div className="px-6 py-3 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-center">
+      <div className="min-w-0">
+        <div className="font-medium text-sm truncate">{item.description}</div>
+        {item.notes && (
+          <p className="text-xs text-muted-foreground whitespace-pre-line">{item.notes}</p>
+        )}
+      </div>
+      <div className="text-xs text-muted-foreground">
+        {item.quantity ?? '—'} {item.unit ?? ''}
+      </div>
+      <div className="text-xs text-muted-foreground">
+        {formatCurrency(item.unit_price)}
+      </div>
+      <div className="text-sm font-medium">
+        {formatCurrency(item.estimated_total)}
+      </div>
+      {canWrite && (
+        <div className="flex items-center gap-1">
+          <Button size="sm" variant="ghost" onClick={startEdit}>
+            {t('common.edit')}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            onClick={() => void removeItem()}
+          >
+            {t('common.delete')}
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
