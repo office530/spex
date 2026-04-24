@@ -12,6 +12,7 @@
     "suppliers": "ספקים",
     "projects": "פרויקטים",
     "leads": "לידים",
+    "tickets": "פניות",
     "sections": {
       "workspace": "עבודה שוטפת",
       "directory": "ספרייה"
@@ -81,6 +82,41 @@
     "email": "אימייל",
     "address": "כתובת",
     "notes": "הערות"
+  },
+  "tickets": {
+    "title": "פניות",
+    "listTitle": "רשימת פניות",
+    "new": "פנייה חדשה",
+    "newTitle": "פנייה חדשה",
+    "editTitle": "עריכת פנייה",
+    "details": "פרטי פנייה",
+    "empty": "עדיין אין פניות",
+    "noMatches": "לא נמצאו פניות",
+    "notFound": "הפנייה לא נמצאה",
+    "searchPlaceholder": "חיפוש לפי נושא, תוכן או שם פונה…",
+    "allStatuses": "כל הסטטוסים",
+    "subject": "נושא",
+    "body": "תיאור",
+    "openerLabel": "מקור",
+    "openerName": "שם הפונה",
+    "openerContact": "פרטי התקשרות",
+    "statusLabel": "סטטוס",
+    "project": "פרויקט",
+    "noProject": "ללא פרויקט",
+    "assignedTo": "משויך ל",
+    "unassigned": "לא משויך",
+    "opener": {
+      "client": "לקוח",
+      "manager": "מנהל",
+      "anonymous": "אנונימי"
+    },
+    "status": {
+      "new": "חדשה",
+      "in_progress": "בטיפול",
+      "awaiting_manager": "בהמתנה למנהל",
+      "resolved": "נפתרה",
+      "cancelled": "בוטלה"
+    }
   },
   "suppliers": {
     "title": "ספקים",

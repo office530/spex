@@ -40,7 +40,8 @@ type StatusFamily =
   | 'variation'
   | 'rfi'
   | 'supplier_invoice'
-  | 'payment_request';
+  | 'payment_request'
+  | 'ticket';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -136,6 +137,13 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     pm_approved_awaiting_back_office: 'info',
     paid: 'success',
     rejected: 'danger',
+  },
+  ticket: {
+    new: 'info',
+    in_progress: 'warning',
+    awaiting_manager: 'accent',
+    resolved: 'success',
+    cancelled: 'muted',
   },
 };
 

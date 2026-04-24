@@ -14,6 +14,8 @@ import { ProjectEditPage } from './pages/ProjectEditPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { SupplierEditPage } from './pages/SupplierEditPage';
 import { SuppliersPage } from './pages/SuppliersPage';
+import { TicketEditPage } from './pages/TicketEditPage';
+import { TicketsPage } from './pages/TicketsPage';
 import { UserEditPage } from './pages/UserEditPage';
 import { UsersPage } from './pages/UsersPage';
 
@@ -165,6 +167,30 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <LeadEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/tickets"
+          element={
+            <AuthenticatedRoute>
+              <TicketsPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/tickets/new"
+          element={
+            <AuthenticatedRoute>
+              <TicketEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/tickets/:id"
+          element={
+            <AuthenticatedRoute>
+              <TicketEditPage />
             </AuthenticatedRoute>
           }
         />

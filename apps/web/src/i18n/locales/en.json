@@ -12,6 +12,7 @@
     "suppliers": "Suppliers",
     "projects": "Projects",
     "leads": "Leads",
+    "tickets": "Tickets",
     "sections": {
       "workspace": "Workspace",
       "directory": "Directory"
@@ -81,6 +82,41 @@
     "email": "Email",
     "address": "Address",
     "notes": "Notes"
+  },
+  "tickets": {
+    "title": "Tickets",
+    "listTitle": "Ticket list",
+    "new": "New ticket",
+    "newTitle": "New ticket",
+    "editTitle": "Edit ticket",
+    "details": "Ticket details",
+    "empty": "No tickets yet",
+    "noMatches": "No tickets match your filters",
+    "notFound": "Ticket not found",
+    "searchPlaceholder": "Search by subject, body, or opener name…",
+    "allStatuses": "All statuses",
+    "subject": "Subject",
+    "body": "Body",
+    "openerLabel": "Opener",
+    "openerName": "Opener name",
+    "openerContact": "Contact info",
+    "statusLabel": "Status",
+    "project": "Project",
+    "noProject": "No project",
+    "assignedTo": "Assigned to",
+    "unassigned": "Unassigned",
+    "opener": {
+      "client": "Client",
+      "manager": "Manager",
+      "anonymous": "Anonymous"
+    },
+    "status": {
+      "new": "New",
+      "in_progress": "In progress",
+      "awaiting_manager": "Awaiting manager",
+      "resolved": "Resolved",
+      "cancelled": "Cancelled"
+    }
   },
   "suppliers": {
     "title": "Suppliers",
