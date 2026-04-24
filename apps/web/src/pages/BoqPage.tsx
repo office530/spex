@@ -791,30 +791,30 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
       ) : quotes.length === 0 && !adding ? (
         <p className="text-xs text-muted-foreground">{t('supplierQuotes.empty')}</p>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {quotes.map((q) => (
-            <div
-              key={q.id}
-              className="flex items-center gap-2 text-sm bg-background rounded px-3 py-2"
-            >
-              <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
-              <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
-              <StatusBadge
-                family="supplier_quote"
-                value={q.status}
-                label={t(`supplierQuotes.status.${q.status}`)}
-                className="shrink-0"
-              />
-              {canWrite && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-destructive hover:text-destructive shrink-0 h-auto px-2 py-1"
-                  onClick={() => void removeQuote(q)}
-                >
-                  {t('common.delete')}
-                </Button>
-              )}
+            <div key={q.id} className="bg-background rounded overflow-hidden">
+              <div className="flex items-center gap-2 text-sm px-3 py-2">
+                <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
+                <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
+                <StatusBadge
+                  family="supplier_quote"
+                  value={q.status}
+                  label={t(`supplierQuotes.status.${q.status}`)}
+                  className="shrink-0"
+                />
+                {canWrite && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-destructive hover:text-destructive shrink-0 h-auto px-2 py-1"
+                    onClick={() => void removeQuote(q)}
+                  >
+                    {t('common.delete')}
+                  </Button>
+                )}
+              </div>
+              <SupplierQuoteComments quoteId={q.id} canWrite={canWrite} />
             </div>
           ))}
         </div>
@@ -886,6 +886,133 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
         <Button size="sm" variant="outline" onClick={startAdd}>
           {t('supplierQuotes.add')}
         </Button>
+      )}
+    </div>
+  );
+}
+
+interface SupplierQuoteCommentRow {
+  id: string;
+  body: string;
+  created_at: string;
+  user: { full_name: string } | null;
+}
+
+function SupplierQuoteComments({ quoteId, canWrite }: { quoteId: string; canWrite: boolean }) {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [expanded, setExpanded] = useState(false);
+  const [comments, setComments] = useState<SupplierQuoteCommentRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [body, setBody] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error: dbErr } = await supabase
+      .from('supplier_quote_comments')
+      .select('id, body, created_at, user:user_profiles(full_name)')
+      .eq('quote_id', quoteId)
+      .order('created_at');
+    if (dbErr) setError(dbErr.message);
+    else setComments((data as unknown as SupplierQuoteCommentRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quoteId]);
+
+  async function addComment(e: FormEvent) {
+    e.preventDefault();
+    if (!body.trim() || !user) return;
+    setSaving(true);
+    setError(null);
+    const { error: dbErr } = await supabase.from('supplier_quote_comments').insert({
+      quote_id: quoteId,
+      user_id: user.id,
+      body: body.trim(),
+    });
+    setSaving(false);
+    if (dbErr) { setError(dbErr.message); return; }
+    setBody('');
+    await refresh();
+  }
+
+  async function removeComment(c: SupplierQuoteCommentRow) {
+    if (!confirm(t('supplierQuotes.confirmDeleteComment'))) return;
+    const { error: dbErr } = await supabase.from('supplier_quote_comments').delete().eq('id', c.id);
+    if (dbErr) setError(dbErr.message);
+    else await refresh();
+  }
+
+  const dateFmt = new Intl.DateTimeFormat(i18n.language, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+
+  if (loading) return null;
+
+  return (
+    <div className="border-t">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full text-start text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 px-3 py-1.5"
+      >
+        <span>{expanded ? '▾' : '▸'}</span>
+        <span>{t('supplierQuotes.comments')}</span>
+        {comments.length > 0 && <span>({comments.length})</span>}
+      </button>
+      {expanded && (
+        <div className="px-3 pb-3 space-y-2 bg-muted/20">
+          {comments.length === 0 ? (
+            <p className="text-xs text-muted-foreground">{t('supplierQuotes.emptyComments')}</p>
+          ) : (
+            <div className="space-y-1.5">
+              {comments.map((c) => (
+                <div key={c.id} className="bg-background rounded p-2 space-y-0.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs font-medium">{c.user?.full_name ?? '—'}</div>
+                    <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                      {dateFmt.format(new Date(c.created_at))}
+                      {canWrite && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-auto px-1.5 py-0 text-xs text-destructive hover:text-destructive"
+                          onClick={() => void removeComment(c)}
+                        >
+                          ×
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm whitespace-pre-line">{c.body}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {canWrite && (
+            <form onSubmit={addComment} className="flex items-start gap-2">
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder={t('supplierQuotes.commentPlaceholder')}
+                rows={2}
+                disabled={saving}
+                className="flex-1 rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+              />
+              <Button type="submit" size="sm" disabled={saving || !body.trim()}>
+                {t('supplierQuotes.addComment')}
+              </Button>
+            </form>
+          )}
+          {error && (
+            <p className="text-xs text-destructive" role="alert">{error}</p>
+          )}
+        </div>
       )}
     </div>
   );

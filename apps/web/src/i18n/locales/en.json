@@ -554,6 +554,11 @@
     "countShort": "{{count}} quotes",
     "countOne": "1 quote",
     "countZero": "No quotes",
+    "comments": "Discussion",
+    "addComment": "Add comment",
+    "commentPlaceholder": "Write a reply…",
+    "emptyComments": "No comments yet",
+    "confirmDeleteComment": "Delete this comment?",
     "status": {
       "draft": "Draft",
       "submitted": "Submitted",

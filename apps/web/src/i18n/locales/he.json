@@ -554,6 +554,11 @@
     "countShort": "{{count}} הצעות",
     "countOne": "הצעה אחת",
     "countZero": "אין הצעות",
+    "comments": "דיון",
+    "addComment": "הוסף הערה",
+    "commentPlaceholder": "כתוב תגובה…",
+    "emptyComments": "אין עדיין הערות",
+    "confirmDeleteComment": "למחוק את ההערה?",
     "status": {
       "draft": "טיוטה",
       "submitted": "נשלחה",
