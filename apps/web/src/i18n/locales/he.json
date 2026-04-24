@@ -422,6 +422,7 @@
     "selectDependency": "בחר משימה…",
     "waitingPrereqs": "ממתין לתלויות",
     "confirmDeleteDependency": "למחוק את התלות?",
+    "overdue": "באיחור",
     "empty": "עדיין אין משימות",
     "confirmDelete": "למחוק את המשימה?",
     "titleLabel": "כותרת",
