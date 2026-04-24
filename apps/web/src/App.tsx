@@ -12,6 +12,8 @@ import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { SupplierEditPage } from './pages/SupplierEditPage';
+import { SuppliersPage } from './pages/SuppliersPage';
 import { UserEditPage } from './pages/UserEditPage';
 import { UsersPage } from './pages/UsersPage';
 
@@ -83,6 +85,30 @@ export function App() {
           element={
             <BackOfficeRoute>
               <ClientEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/suppliers"
+          element={
+            <BackOfficeRoute>
+              <SuppliersPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/suppliers/new"
+          element={
+            <BackOfficeRoute>
+              <SupplierEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/suppliers/:id"
+          element={
+            <BackOfficeRoute>
+              <SupplierEditPage />
             </BackOfficeRoute>
           }
         />

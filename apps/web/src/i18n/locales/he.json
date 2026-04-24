@@ -9,6 +9,7 @@
     "logout": "התנתקות",
     "users": "משתמשים",
     "clients": "לקוחות",
+    "suppliers": "ספקים",
     "projects": "פרויקטים",
     "leads": "לידים"
   },
@@ -65,6 +66,30 @@
     "email": "אימייל",
     "address": "כתובת",
     "notes": "הערות"
+  },
+  "suppliers": {
+    "title": "ספקים",
+    "listTitle": "רשימת ספקים",
+    "new": "ספק חדש",
+    "newTitle": "ספק חדש",
+    "editTitle": "עריכת ספק",
+    "details": "פרטי ספק",
+    "empty": "עדיין אין ספקים",
+    "noMatches": "לא נמצאו ספקים התואמים לחיפוש",
+    "notFound": "הספק לא נמצא",
+    "searchPlaceholder": "חיפוש לפי שם, קטגוריה, טלפון, אימייל…",
+    "name": "שם",
+    "category": "קטגוריה",
+    "phone": "טלפון",
+    "email": "אימייל",
+    "taxId": "ח.פ / ע.מ",
+    "statusLabel": "סטטוס",
+    "notes": "הערות",
+    "status": {
+      "pending_approval": "ממתין לאישור",
+      "active": "פעיל",
+      "blocked": "חסום"
+    }
   },
   "contacts": {
     "title": "אנשי קשר",

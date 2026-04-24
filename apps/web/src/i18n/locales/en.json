@@ -9,6 +9,7 @@
     "logout": "Log out",
     "users": "Users",
     "clients": "Clients",
+    "suppliers": "Suppliers",
     "projects": "Projects",
     "leads": "Leads"
   },
@@ -65,6 +66,30 @@
     "email": "Email",
     "address": "Address",
     "notes": "Notes"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "listTitle": "Supplier list",
+    "new": "New supplier",
+    "newTitle": "New supplier",
+    "editTitle": "Edit supplier",
+    "details": "Supplier details",
+    "empty": "No suppliers yet",
+    "noMatches": "No suppliers match your search",
+    "notFound": "Supplier not found",
+    "searchPlaceholder": "Search by name, category, phone, email…",
+    "name": "Name",
+    "category": "Category",
+    "phone": "Phone",
+    "email": "Email",
+    "taxId": "Tax ID",
+    "statusLabel": "Status",
+    "notes": "Notes",
+    "status": {
+      "pending_approval": "Pending approval",
+      "active": "Active",
+      "blocked": "Blocked"
+    }
   },
   "contacts": {
     "title": "Contacts",
