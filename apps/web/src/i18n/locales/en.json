@@ -475,6 +475,8 @@
     "confirmDeleteChecklistItem": "Delete this item?",
     "parentTask": "Parent task",
     "noParent": "None",
+    "viewList": "List",
+    "viewKanban": "Board",
     "dependencies": "Dependencies",
     "emptyDependencies": "No dependencies",
     "addDependency": "Add dependency",

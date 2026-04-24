@@ -475,6 +475,8 @@
     "confirmDeleteChecklistItem": "למחוק את הפריט?",
     "parentTask": "משימת אב",
     "noParent": "ללא אב",
+    "viewList": "רשימה",
+    "viewKanban": "לוח",
     "dependencies": "תלויות",
     "emptyDependencies": "אין תלויות",
     "addDependency": "הוסף תלות",
