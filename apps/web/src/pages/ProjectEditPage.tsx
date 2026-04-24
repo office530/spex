@@ -21,6 +21,7 @@ import {
 import {
   CalendarDays,
   ClipboardList,
+  FolderOpen,
   Milestone,
   Receipt,
   SlidersHorizontal,
@@ -33,6 +34,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { DocumentsPanel } from '../components/project/DocumentsPanel';
 import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
 import { PaymentRequestsPanel } from '../components/project/PaymentRequestsPanel';
@@ -409,6 +411,10 @@ export function ProjectEditPage() {
                   {t('projects.tabs.operations')}
                   <TabCountBadge value={tabCounts?.operations} />
                 </TabsTrigger>
+                <TabsTrigger value="documents">
+                  <FolderOpen />
+                  {t('projects.tabs.documents')}
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="general">
                 <ProjectForm
@@ -439,6 +445,9 @@ export function ProjectEditPage() {
                 <RfiPanel projectId={id} canWrite={canWrite} />
                 <MeetingsPanel projectId={id} canWrite={canWrite} />
                 <HandoverPanel projectId={id} canWrite={canWrite} />
+              </TabsContent>
+              <TabsContent value="documents">
+                <DocumentsPanel projectId={id} canWrite={canWrite} />
               </TabsContent>
             </Tabs>
           );
