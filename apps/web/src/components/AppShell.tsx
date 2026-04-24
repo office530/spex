@@ -12,6 +12,7 @@ import {
   Truck,
   FolderKanban,
   Users,
+  Zap,
   type LucideIcon,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -45,6 +46,7 @@ const DIRECTORY: NavItem[] = [
   { to: '/suppliers', icon: Truck, key: 'nav.suppliers' },
   { to: '/users', icon: Users, key: 'nav.users' },
   { to: '/settings/milestones', icon: SettingsIcon, key: 'nav.settings' },
+  { to: '/settings/automations', icon: Zap, key: 'nav.automations' },
 ];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>

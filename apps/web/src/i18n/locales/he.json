@@ -16,6 +16,7 @@
     "settings": "הגדרות",
     "activity": "יומן פעילות",
     "calendar": "יומן אירועים",
+    "automations": "אוטומציות",
     "sections": {
       "workspace": "עבודה שוטפת",
       "directory": "ספרייה"
@@ -88,6 +89,19 @@
   },
   "settings": {
     "title": "הגדרות",
+    "automations": {
+      "title": "אוטומציות",
+      "description": "כללים אוטומטיים המופעלים על אירועים במערכת. חלקם ממתינים לחיבור אינטגרציות חיצוניות.",
+      "empty": "אין כללי אוטומציה",
+      "triggerLabel": "טריגר",
+      "channelLabel": "ערוץ",
+      "templateLabel": "תבנית",
+      "recipientLabel": "נמען",
+      "active": "פעיל",
+      "inactive": "כבוי",
+      "toggleOn": "הפעל",
+      "toggleOff": "השבת"
+    },
     "milestoneTemplates": {
       "title": "תבניות אבני דרך",
       "description": "אבני הדרך שכאן משוכפלות אוטומטית לכל פרויקט חדש.",
