@@ -192,6 +192,21 @@
     "unitPrice": "Unit price",
     "estimatedTotal": "Estimated total"
   },
+  "customerQuotes": {
+    "title": "Customer quotes",
+    "add": "New quote",
+    "empty": "No quotes yet",
+    "confirmDelete": "Delete this quote?",
+    "totalAmount": "Total amount",
+    "statusLabel": "Status",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
+  },
   "milestones": {
     "title": "Milestones",
     "add": "Add milestone",

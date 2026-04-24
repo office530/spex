@@ -192,6 +192,21 @@
     "unitPrice": "מחיר יחידה",
     "estimatedTotal": "סה\"כ משוער"
   },
+  "customerQuotes": {
+    "title": "הצעות מחיר",
+    "add": "הצעת מחיר חדשה",
+    "empty": "עדיין אין הצעות מחיר",
+    "confirmDelete": "למחוק את הצעת המחיר?",
+    "totalAmount": "סכום כולל",
+    "statusLabel": "סטטוס",
+    "status": {
+      "draft": "טיוטה",
+      "sent": "נשלחה",
+      "approved": "אושרה",
+      "rejected": "נדחתה",
+      "cancelled": "בוטלה"
+    }
+  },
   "milestones": {
     "title": "אבני דרך",
     "add": "הוסף אבן דרך",
