@@ -83,6 +83,38 @@
     "address": "כתובת",
     "notes": "הערות"
   },
+  "customerInvoices": {
+    "title": "חשבוניות לקוח",
+    "add": "חשבונית חדשה",
+    "empty": "עדיין אין חשבוניות",
+    "confirmDelete": "למחוק את החשבונית?",
+    "milestone": "אבן דרך",
+    "noMilestone": "ללא אבן דרך",
+    "kindLabel": "סוג חשבונית",
+    "statusLabel": "סטטוס",
+    "amount": "סכום",
+    "dueDate": "תאריך פירעון",
+    "issuedAt": "הונפקה ב-",
+    "paidAt": "שולמה ב-",
+    "total": "סה\"כ חשבוניות",
+    "receipts": "קבלות",
+    "addReceipt": "הוסף קבלה",
+    "receiptAmount": "סכום קבלה",
+    "receivedAt": "מועד קבלה",
+    "emptyReceipts": "עדיין אין קבלות",
+    "confirmDeleteReceipt": "למחוק את הקבלה?",
+    "kind": {
+      "tax_invoice": "חשבונית מס",
+      "deal_invoice": "חשבונית עסקה"
+    },
+    "status": {
+      "awaiting_issuance": "ממתינה להנפקה",
+      "issued": "הונפקה",
+      "paid": "שולמה",
+      "overdue": "באיחור",
+      "cancelled": "בוטלה"
+    }
+  },
   "documents": {
     "title": "מסמכים",
     "empty": "עדיין אין מסמכים",

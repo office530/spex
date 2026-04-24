@@ -83,6 +83,38 @@
     "address": "Address",
     "notes": "Notes"
   },
+  "customerInvoices": {
+    "title": "Customer invoices",
+    "add": "New invoice",
+    "empty": "No invoices yet",
+    "confirmDelete": "Delete this invoice?",
+    "milestone": "Milestone",
+    "noMilestone": "No milestone",
+    "kindLabel": "Kind",
+    "statusLabel": "Status",
+    "amount": "Amount",
+    "dueDate": "Due date",
+    "issuedAt": "Issued at",
+    "paidAt": "Paid at",
+    "total": "Invoices total",
+    "receipts": "Receipts",
+    "addReceipt": "Add receipt",
+    "receiptAmount": "Receipt amount",
+    "receivedAt": "Received at",
+    "emptyReceipts": "No receipts yet",
+    "confirmDeleteReceipt": "Delete this receipt?",
+    "kind": {
+      "tax_invoice": "Tax invoice",
+      "deal_invoice": "Deal invoice"
+    },
+    "status": {
+      "awaiting_issuance": "Awaiting issuance",
+      "issued": "Issued",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    }
+  },
   "documents": {
     "title": "Documents",
     "empty": "No documents yet",

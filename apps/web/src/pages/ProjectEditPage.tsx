@@ -34,6 +34,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { CustomerInvoicesPanel } from '../components/project/CustomerInvoicesPanel';
 import { DocumentsPanel } from '../components/project/DocumentsPanel';
 import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
@@ -436,6 +437,7 @@ export function ProjectEditPage() {
                 <MilestonesPanel projectId={id} isAdmin={isAdmin} />
               </TabsContent>
               <TabsContent value="financials">
+                <CustomerInvoicesPanel projectId={id} canWrite={canWrite} />
                 <VariationsPanel projectId={id} canWrite={canWrite} />
                 <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
                 <PaymentRequestsPanel projectId={id} canWrite={canWrite} />
