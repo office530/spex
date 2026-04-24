@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
 import { RfiPanel } from '../components/project/RfiPanel';
 import { TasksPanel } from '../components/project/TasksPanel';
@@ -398,6 +399,7 @@ export function ProjectEditPage() {
             <TasksPanel projectId={id} canWrite={canWrite} />
             <RfiPanel projectId={id} canWrite={canWrite} />
             <MeetingsPanel projectId={id} canWrite={canWrite} />
+            <HandoverPanel projectId={id} canWrite={canWrite} />
           </>
         );
       })()}

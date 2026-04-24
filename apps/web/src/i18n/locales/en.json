@@ -275,6 +275,27 @@
       "closed": "Closed"
     }
   },
+  "handover": {
+    "title": "Handover protocol",
+    "empty": "No handover protocol yet",
+    "create": "Create handover protocol",
+    "checklist": "Checklist",
+    "addItem": "Add item",
+    "itemPlaceholder": "New item…",
+    "signedAt": "Signed {{date}}",
+    "markSigned": "Mark as signed",
+    "markUnsigned": "Revoke signature",
+    "progress": "{{done}}/{{total}} done",
+    "confirmDeleteItem": "Delete this item?",
+    "confirmDelete": "Delete this handover protocol?",
+    "defaults": {
+      "electrical": "Electrical + lighting check",
+      "plumbing": "Plumbing check",
+      "finishes": "Finishes + paintwork check",
+      "cleaning": "Cleaning",
+      "keys": "Keys + documents handover"
+    }
+  },
   "meetings": {
     "title": "Meetings",
     "add": "New meeting",
