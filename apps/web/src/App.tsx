@@ -4,6 +4,7 @@ import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
 import { ActivityLogPage } from './pages/ActivityLogPage';
+import { AutomationRulesPage } from './pages/AutomationRulesPage';
 import { BoqPage } from './pages/BoqPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ClientEditPage } from './pages/ClientEditPage';
@@ -205,6 +206,14 @@ export function App() {
           element={
             <BackOfficeRoute>
               <MilestoneTemplatesPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/settings/automations"
+          element={
+            <BackOfficeRoute>
+              <AutomationRulesPage />
             </BackOfficeRoute>
           }
         />

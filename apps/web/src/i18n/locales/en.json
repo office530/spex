@@ -16,6 +16,7 @@
     "settings": "Settings",
     "activity": "Activity log",
     "calendar": "Calendar",
+    "automations": "Automations",
     "sections": {
       "workspace": "Workspace",
       "directory": "Directory"
@@ -88,6 +89,19 @@
   },
   "settings": {
     "title": "Settings",
+    "automations": {
+      "title": "Automation rules",
+      "description": "Rules fired on system events. Some wait on external integrations.",
+      "empty": "No automation rules",
+      "triggerLabel": "Trigger",
+      "channelLabel": "Channel",
+      "templateLabel": "Template",
+      "recipientLabel": "Recipient",
+      "active": "On",
+      "inactive": "Off",
+      "toggleOn": "Enable",
+      "toggleOff": "Disable"
+    },
     "milestoneTemplates": {
       "title": "Milestone templates",
       "description": "These milestones are auto-seeded into every new project.",
