@@ -8,7 +8,8 @@
     "login": "Log in",
     "logout": "Log out",
     "users": "Users",
-    "clients": "Clients"
+    "clients": "Clients",
+    "projects": "Projects"
   },
   "login": {
     "title": "Sign in",
@@ -74,6 +75,53 @@
     "phone": "Phone",
     "email": "Email"
   },
+  "projects": {
+    "title": "Projects",
+    "listTitle": "Project list",
+    "new": "New project",
+    "newTitle": "New project",
+    "editTitle": "Edit project",
+    "details": "Project details",
+    "empty": "No projects yet",
+    "noMatches": "No projects match your search",
+    "notFound": "Project not found",
+    "searchPlaceholder": "Search by project, client, or PM…",
+    "name": "Project name",
+    "client": "Client",
+    "selectClient": "Select a client…",
+    "type": "Type",
+    "pm": "Project Manager",
+    "noPm": "Unassigned",
+    "statusLabel": "Status",
+    "startDate": "Start date",
+    "targetEndDate": "Target end date",
+    "contractValue": "Contract value",
+    "notes": "Notes",
+    "types": {
+      "execution": "Execution only",
+      "planning_execution": "Planning + execution"
+    },
+    "status": {
+      "active": "Active",
+      "on_hold": "On hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "members": {
+    "title": "Team members",
+    "add": "Add member",
+    "empty": "No members assigned yet",
+    "confirmRemove": "Remove this member from the project?",
+    "user": "User",
+    "selectUser": "Select a user…",
+    "roleLabel": "Role on project",
+    "role": {
+      "pm": "Project Manager",
+      "foreman": "Foreman",
+      "viewer": "Viewer"
+    }
+  },
   "common": {
     "loading": "Loading…",
     "edit": "Edit",
@@ -81,6 +129,8 @@
     "saving": "Saving…",
     "cancel": "Cancel",
     "delete": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "add": "Add",
+    "remove": "Remove"
   }
 }

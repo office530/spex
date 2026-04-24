@@ -8,7 +8,8 @@
     "login": "התחברות",
     "logout": "התנתקות",
     "users": "משתמשים",
-    "clients": "לקוחות"
+    "clients": "לקוחות",
+    "projects": "פרויקטים"
   },
   "login": {
     "title": "התחברות למערכת",
@@ -74,6 +75,53 @@
     "phone": "טלפון",
     "email": "אימייל"
   },
+  "projects": {
+    "title": "פרויקטים",
+    "listTitle": "רשימת פרויקטים",
+    "new": "פרויקט חדש",
+    "newTitle": "פרויקט חדש",
+    "editTitle": "עריכת פרויקט",
+    "details": "פרטי הפרויקט",
+    "empty": "עדיין אין פרויקטים",
+    "noMatches": "לא נמצאו פרויקטים התואמים לחיפוש",
+    "notFound": "הפרויקט לא נמצא",
+    "searchPlaceholder": "חיפוש לפי פרויקט, לקוח או מנהל פרויקט…",
+    "name": "שם הפרויקט",
+    "client": "לקוח",
+    "selectClient": "בחר לקוח…",
+    "type": "סוג",
+    "pm": "מנהל פרויקט",
+    "noPm": "לא משויך",
+    "statusLabel": "סטטוס",
+    "startDate": "תאריך התחלה",
+    "targetEndDate": "תאריך סיום יעד",
+    "contractValue": "ערך חוזה",
+    "notes": "הערות",
+    "types": {
+      "execution": "ביצוע בלבד",
+      "planning_execution": "תכנון + ביצוע"
+    },
+    "status": {
+      "active": "פעיל",
+      "on_hold": "בהמתנה",
+      "completed": "הושלם",
+      "cancelled": "בוטל"
+    }
+  },
+  "members": {
+    "title": "חברי צוות",
+    "add": "הוסף חבר",
+    "empty": "עדיין לא שויכו חברי צוות",
+    "confirmRemove": "להסיר את החבר מהפרויקט?",
+    "user": "משתמש",
+    "selectUser": "בחר משתמש…",
+    "roleLabel": "תפקיד בפרויקט",
+    "role": {
+      "pm": "מנהל פרויקט",
+      "foreman": "מנהל עבודה",
+      "viewer": "צופה"
+    }
+  },
   "common": {
     "loading": "טוען…",
     "edit": "עריכה",
@@ -81,6 +129,8 @@
     "saving": "שומר…",
     "cancel": "ביטול",
     "delete": "מחק",
-    "back": "חזרה"
+    "back": "חזרה",
+    "add": "הוסף",
+    "remove": "הסר"
   }
 }

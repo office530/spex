@@ -7,6 +7,8 @@ import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
 import { LoginPage } from './pages/Login';
+import { ProjectEditPage } from './pages/ProjectEditPage';
+import { ProjectsPage } from './pages/ProjectsPage';
 import { UserEditPage } from './pages/UserEditPage';
 import { UsersPage } from './pages/UsersPage';
 
@@ -79,6 +81,30 @@ export function App() {
             <BackOfficeRoute>
               <ClientEditPage />
             </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <AuthenticatedRoute>
+              <ProjectsPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/projects/new"
+          element={
+            <BackOfficeRoute>
+              <ProjectEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/projects/:id"
+          element={
+            <AuthenticatedRoute>
+              <ProjectEditPage />
+            </AuthenticatedRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
