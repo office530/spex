@@ -409,6 +409,11 @@
   "tasks": {
     "title": "Tasks",
     "add": "Add task",
+    "checklist": "Checklist",
+    "checklistEmpty": "No checklist items",
+    "checklistProgress": "{{done}}/{{total}}",
+    "addChecklistItem": "New item…",
+    "confirmDeleteChecklistItem": "Delete this item?",
     "empty": "No tasks yet",
     "confirmDelete": "Delete this task?",
     "titleLabel": "Title",

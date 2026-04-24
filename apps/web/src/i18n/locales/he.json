@@ -409,6 +409,11 @@
   "tasks": {
     "title": "משימות",
     "add": "הוסף משימה",
+    "checklist": "רשימת תיוג",
+    "checklistEmpty": "אין פריטים ברשימה",
+    "checklistProgress": "{{done}}/{{total}}",
+    "addChecklistItem": "פריט חדש…",
+    "confirmDeleteChecklistItem": "למחוק את הפריט?",
     "empty": "עדיין אין משימות",
     "confirmDelete": "למחוק את המשימה?",
     "titleLabel": "כותרת",

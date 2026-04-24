@@ -283,7 +283,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                 editingId === r.id ? (
                   <div key={r.id}>{renderForm()}</div>
                 ) : (
-                  <div key={r.id} className="px-6 py-3 space-y-1">
+                  <div key={r.id} className="px-6 py-3 space-y-2">
                     <div className="flex items-start gap-2 flex-wrap">
                       <div className="min-w-0 flex-1">
                         <div className="font-medium text-sm">{r.title}</div>
@@ -327,6 +327,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                         </div>
                       )}
                     </div>
+                    <TaskChecklist taskId={r.id} canWrite={canWrite} />
                   </div>
                 ),
               )
@@ -335,5 +336,154 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface ChecklistItemRow {
+  id: string;
+  text: string;
+  is_done: boolean;
+  sort_order: number;
+}
+
+function TaskChecklist({ taskId, canWrite }: { taskId: string; canWrite: boolean }) {
+  const { t } = useTranslation();
+  const [items, setItems] = useState<ChecklistItemRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [newText, setNewText] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error: dbErr } = await supabase
+      .from('checklist_items')
+      .select('id, text, is_done, sort_order')
+      .eq('task_id', taskId)
+      .order('sort_order');
+    if (dbErr) setError(dbErr.message);
+    else setItems((data as ChecklistItemRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]);
+
+  async function toggle(item: ChecklistItemRow) {
+    const previous = items;
+    setItems(items.map((i) => (i.id === item.id ? { ...i, is_done: !i.is_done } : i)));
+    const { error: dbErr } = await supabase
+      .from('checklist_items')
+      .update({ is_done: !item.is_done })
+      .eq('id', item.id);
+    if (dbErr) {
+      setError(dbErr.message);
+      setItems(previous);
+    }
+  }
+
+  async function addItem(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newText.trim()) return;
+    setSaving(true);
+    setError(null);
+    const nextOrder = items.length ? Math.max(...items.map((i) => i.sort_order)) + 1 : 0;
+    const { error: dbErr } = await supabase.from('checklist_items').insert({
+      task_id: taskId,
+      text: newText.trim(),
+      sort_order: nextOrder,
+    });
+    setSaving(false);
+    if (dbErr) {
+      setError(dbErr.message);
+      return;
+    }
+    setNewText('');
+    await refresh();
+  }
+
+  async function remove(item: ChecklistItemRow) {
+    if (!confirm(t('tasks.confirmDeleteChecklistItem'))) return;
+    const { error: dbErr } = await supabase.from('checklist_items').delete().eq('id', item.id);
+    if (dbErr) setError(dbErr.message);
+    else await refresh();
+  }
+
+  const done = items.filter((i) => i.is_done).length;
+  const total = items.length;
+
+  if (loading) return null;
+  // When there are no items AND user can't add, don't clutter the row.
+  if (total === 0 && !canWrite) return null;
+
+  return (
+    <div className="ms-0">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"
+      >
+        <span>{expanded ? '▾' : '▸'}</span>
+        <span>{t('tasks.checklist')}</span>
+        {total > 0 && <span>({t('tasks.checklistProgress', { done, total })})</span>}
+      </button>
+      {expanded && (
+        <div className="mt-2 rounded-md border bg-muted/30 p-3 space-y-2">
+          {items.length === 0 ? (
+            <p className="text-xs text-muted-foreground">{t('tasks.checklistEmpty')}</p>
+          ) : (
+            <div className="space-y-1">
+              {items.map((i) => (
+                <div key={i.id} className="flex items-center gap-2 bg-background rounded px-2 py-1.5">
+                  <input
+                    type="checkbox"
+                    checked={i.is_done}
+                    disabled={!canWrite}
+                    onChange={() => void toggle(i)}
+                    className="h-4 w-4 rounded border-input"
+                  />
+                  <span
+                    className={`flex-1 text-sm ${i.is_done ? 'line-through text-muted-foreground' : ''}`}
+                  >
+                    {i.text}
+                  </span>
+                  {canWrite && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive hover:text-destructive h-auto px-2 py-0.5"
+                      onClick={() => void remove(i)}
+                    >
+                      {t('common.delete')}
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          {canWrite && (
+            <form onSubmit={addItem} className="flex items-center gap-2">
+              <Input
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                placeholder={t('tasks.addChecklistItem')}
+                disabled={saving}
+                className="h-8 flex-1"
+              />
+              <Button type="submit" size="sm" disabled={saving || !newText.trim()}>
+                {t('common.add')}
+              </Button>
+            </form>
+          )}
+          {error && (
+            <p className="text-xs text-destructive" role="alert">
+              {error}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
