@@ -101,6 +101,15 @@
       "sumWarning": "Sum doesn't total 100%"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all as read",
+    "kind": {
+      "task_assigned": "Task assigned to you",
+      "ticket_assigned": "Ticket assigned to you"
+    }
+  },
   "activityLog": {
     "title": "Activity log",
     "subtitle": "Audit trail of every change (back-office only)",
