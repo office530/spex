@@ -316,6 +316,26 @@
       "planning": "תכנון"
     }
   },
+  "paymentRequests": {
+    "title": "בקשות תשלום",
+    "add": "בקשה חדשה",
+    "empty": "עדיין אין בקשות תשלום",
+    "confirmDelete": "למחוק את בקשת התשלום?",
+    "linkedInvoice": "חשבונית מקושרת",
+    "selectInvoice": "בחר חשבונית…",
+    "noInvoice": "ללא חשבונית",
+    "amount": "סכום",
+    "statusLabel": "סטטוס",
+    "paidAt": "שולם ב-{{date}}",
+    "total": "סה\"כ בקשות תשלום",
+    "status": {
+      "awaiting_payment_request": "ממתין לבקשת תשלום",
+      "awaiting_pm_approval": "ממתין לאישור מנהל",
+      "pm_approved_awaiting_back_office": "מאושר ע\"י מנהל, ממתין להנה\"ח",
+      "paid": "שולם",
+      "rejected": "נדחתה"
+    }
+  },
   "supplierInvoices": {
     "title": "חשבוניות ספקים",
     "add": "הוסף חשבונית",

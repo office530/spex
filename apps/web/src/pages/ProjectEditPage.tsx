@@ -15,6 +15,7 @@ import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
 import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
+import { PaymentRequestsPanel } from '../components/project/PaymentRequestsPanel';
 import { RfiPanel } from '../components/project/RfiPanel';
 import { SupplierInvoicesPanel } from '../components/project/SupplierInvoicesPanel';
 import { TasksPanel } from '../components/project/TasksPanel';
@@ -398,6 +399,7 @@ export function ProjectEditPage() {
           <>
             <VariationsPanel projectId={id} canWrite={canWrite} />
             <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
+            <PaymentRequestsPanel projectId={id} canWrite={canWrite} />
             <TasksPanel projectId={id} canWrite={canWrite} />
             <RfiPanel projectId={id} canWrite={canWrite} />
             <MeetingsPanel projectId={id} canWrite={canWrite} />
