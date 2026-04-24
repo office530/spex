@@ -34,7 +34,13 @@
     "activeLeads": "לידים פעילים",
     "openTasks": "משימות פתוחות שלי",
     "openRfis": "בקשות מידע פתוחות",
-    "thisWeek": "השבוע"
+    "thisWeek": "השבוע",
+    "recentProjects": "פרויקטים אחרונים",
+    "noRecentProjects": "עדיין אין פרויקטים",
+    "myUpcomingTasks": "המשימות הקרובות שלי",
+    "noUpcomingTasks": "אין משימות פתוחות",
+    "viewAll": "הצג הכל",
+    "noDueDate": "ללא תאריך יעד"
   },
   "roles": {
     "ceo": "מנכ\"ל",
