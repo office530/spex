@@ -100,6 +100,23 @@
       "sumWarning": "הסכום לא מסתכם ל-100%"
     }
   },
+  "reports": {
+    "title": "דוחות",
+    "subtitle": "סקירה פיננסית ותפעולית של כלל הארגון",
+    "activeContractValue": "ערך חוזים פעילים",
+    "invoicedThisMonth": "חויב החודש",
+    "receivedThisMonth": "התקבל החודש",
+    "outstanding": "חוב פתוח",
+    "activeProjects": "פרויקטים פעילים",
+    "activeLeads": "לידים פעילים",
+    "wonLast30": "לידים שנסגרו (30 ימים)",
+    "openTickets": "פניות פתוחות",
+    "projectsByStatus": "פרויקטים לפי סטטוס",
+    "leadsByStatus": "לידים לפי סטטוס",
+    "topProjects": "הפרויקטים הגדולים",
+    "recentReceipts": "תקבולים אחרונים",
+    "noData": "אין נתונים"
+  },
   "chashbashvat": {
     "queueSync": "סנכרן לחשבשבת",
     "queuedToast": "הוכנס לתור סנכרון",

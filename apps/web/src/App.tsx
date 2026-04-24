@@ -13,6 +13,7 @@ import { LoginPage } from './pages/Login';
 import { MilestoneTemplatesPage } from './pages/MilestoneTemplatesPage';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { PublicTicketPage } from './pages/PublicTicketPage';
+import { ReportsPage } from './pages/ReportsPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { SupplierEditPage } from './pages/SupplierEditPage';
 import { SuppliersPage } from './pages/SuppliersPage';
@@ -202,6 +203,14 @@ export function App() {
           element={
             <BackOfficeRoute>
               <MilestoneTemplatesPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <BackOfficeRoute>
+              <ReportsPage />
             </BackOfficeRoute>
           }
         />
