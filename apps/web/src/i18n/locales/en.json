@@ -316,6 +316,26 @@
       "planning": "Planning"
     }
   },
+  "supplierInvoices": {
+    "title": "Supplier invoices",
+    "add": "Add invoice",
+    "empty": "No invoices yet",
+    "confirmDelete": "Delete this invoice?",
+    "supplier": "Supplier",
+    "selectSupplier": "Select a supplier…",
+    "invoiceNumber": "Invoice number",
+    "invoiceDate": "Invoice date",
+    "amount": "Amount",
+    "fileUrl": "File link",
+    "statusLabel": "Status",
+    "total": "Invoices total",
+    "status": {
+      "received": "Received",
+      "matched": "Matched",
+      "disputed": "Disputed",
+      "processed": "Processed"
+    }
+  },
   "supplierQuotes": {
     "title": "Supplier quotes",
     "empty": "No quotes for this item yet",

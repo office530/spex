@@ -16,6 +16,7 @@ import { useAuth } from '../auth/AuthContext';
 import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
 import { RfiPanel } from '../components/project/RfiPanel';
+import { SupplierInvoicesPanel } from '../components/project/SupplierInvoicesPanel';
 import { TasksPanel } from '../components/project/TasksPanel';
 import { supabase } from '../lib/supabase';
 
@@ -396,6 +397,7 @@ export function ProjectEditPage() {
         return (
           <>
             <VariationsPanel projectId={id} canWrite={canWrite} />
+            <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
             <TasksPanel projectId={id} canWrite={canWrite} />
             <RfiPanel projectId={id} canWrite={canWrite} />
             <MeetingsPanel projectId={id} canWrite={canWrite} />
