@@ -335,12 +335,28 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                           )}
                           <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mt-1">
                             <span>{r.assignee?.full_name ?? t('tasks.noAssignee')}</span>
-                            {r.due_date && (
-                              <span>· {dateFormat.format(new Date(r.due_date))}</span>
-                            )}
+                            {r.due_date && (() => {
+                              const isOverdue =
+                                new Date(r.due_date).getTime() < Date.now() &&
+                                r.status !== 'done' &&
+                                r.status !== 'cancelled';
+                              return (
+                                <span className={isOverdue ? 'text-rose-700 font-medium' : ''}>
+                                  · {dateFormat.format(new Date(r.due_date))}
+                                </span>
+                              );
+                            })()}
                           </div>
                         </div>
                         <div className="shrink-0 flex items-center gap-1 flex-wrap">
+                          {r.due_date &&
+                            new Date(r.due_date).getTime() < Date.now() &&
+                            r.status !== 'done' &&
+                            r.status !== 'cancelled' && (
+                              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-800">
+                                {t('tasks.overdue')}
+                              </span>
+                            )}
                           <StatusBadge
                             family="task_priority"
                             value={r.priority}

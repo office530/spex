@@ -422,6 +422,7 @@
     "selectDependency": "Select a task…",
     "waitingPrereqs": "Waiting on prerequisites",
     "confirmDeleteDependency": "Delete this dependency?",
+    "overdue": "Overdue",
     "empty": "No tasks yet",
     "confirmDelete": "Delete this task?",
     "titleLabel": "Title",
