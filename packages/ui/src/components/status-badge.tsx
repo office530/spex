@@ -42,7 +42,8 @@ type StatusFamily =
   | 'supplier_invoice'
   | 'payment_request'
   | 'ticket'
-  | 'customer_invoice';
+  | 'customer_invoice'
+  | 'chashbashvat_sync';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -152,6 +153,12 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     paid: 'success',
     overdue: 'warning',
     cancelled: 'muted',
+  },
+  chashbashvat_sync: {
+    pending: 'warning',
+    processing: 'info',
+    synced: 'success',
+    failed: 'danger',
   },
 };
 

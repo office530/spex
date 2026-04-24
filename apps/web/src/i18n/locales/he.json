@@ -100,6 +100,17 @@
       "sumWarning": "הסכום לא מסתכם ל-100%"
     }
   },
+  "chashbashvat": {
+    "queueSync": "סנכרן לחשבשבת",
+    "queuedToast": "הוכנס לתור סנכרון",
+    "label": "חשבשבת",
+    "status": {
+      "pending": "ממתין",
+      "processing": "בסנכרון",
+      "synced": "סונכרן",
+      "failed": "שגיאה"
+    }
+  },
   "customerInvoices": {
     "title": "חשבוניות לקוח",
     "add": "חשבונית חדשה",
