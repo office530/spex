@@ -5,9 +5,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
+import { CalendarDays, MessageCircle, Receipt } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -450,14 +453,6 @@ type QuoteStatus = 'draft' | 'sent' | 'approved' | 'rejected' | 'cancelled';
 
 const QUOTE_STATUSES: QuoteStatus[] = ['draft', 'sent', 'approved', 'rejected', 'cancelled'];
 
-const QUOTE_STATUS_COLORS: Record<QuoteStatus, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  sent: 'bg-blue-100 text-blue-800',
-  approved: 'bg-emerald-100 text-emerald-800',
-  rejected: 'bg-rose-100 text-rose-800',
-  cancelled: 'bg-slate-100 text-slate-700',
-};
-
 interface QuoteRow {
   id: string;
   total_amount: number | null;
@@ -633,7 +628,11 @@ function CustomerQuotesPanel({ leadId }: { leadId: string }) {
           <div className="divide-y">
             {adding && renderForm()}
             {quotes.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('customerQuotes.empty')}</p>
+              <EmptyState
+                icon={Receipt}
+                title={t('customerQuotes.empty')}
+                cta={{ label: t('customerQuotes.add'), onClick: startAdd }}
+              />
             ) : (
               quotes.map((q) =>
                 editingId === q.id ? (
@@ -651,11 +650,11 @@ function CustomerQuotesPanel({ leadId }: { leadId: string }) {
                         </p>
                       )}
                     </div>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${QUOTE_STATUS_COLORS[q.status]}`}
-                    >
-                      {t(`customerQuotes.status.${q.status}`)}
-                    </span>
+                    <StatusBadge
+                      family="customer_quote"
+                      value={q.status}
+                      label={t(`customerQuotes.status.${q.status}`)}
+                    />
                     <div className="flex items-center gap-1 shrink-0">
                       <Button size="sm" variant="ghost" onClick={() => startEdit(q)}>
                         {t('common.edit')}
@@ -692,12 +691,6 @@ interface EventRow {
   duration_minutes: number | null;
   notes: string | null;
 }
-
-const EVENT_STATUS_COLORS: Record<EventStatus, string> = {
-  scheduled: 'bg-blue-100 text-blue-800',
-  cancelled: 'bg-gray-100 text-gray-600',
-  no_show: 'bg-amber-100 text-amber-800',
-};
 
 function EventsPanel({ leadId }: { leadId: string }) {
   const { t, i18n } = useTranslation();
@@ -843,7 +836,11 @@ function EventsPanel({ leadId }: { leadId: string }) {
               </form>
             )}
             {events.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('events.empty')}</p>
+              <EmptyState
+                icon={CalendarDays}
+                title={t('events.empty')}
+                cta={{ label: t('events.add'), onClick: startAdd }}
+              />
             ) : (
               events.map((ev) => (
                 <div key={ev.id} className="px-6 py-3">
@@ -859,9 +856,11 @@ function EventsPanel({ leadId }: { leadId: string }) {
                       )}
                     </div>
                     <div className="shrink-0 flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${EVENT_STATUS_COLORS[ev.status]}`}>
-                        {t(`events.status.${ev.status}`)}
-                      </span>
+                      <StatusBadge
+                        family="event"
+                        value={ev.status}
+                        label={t(`events.status.${ev.status}`)}
+                      />
                       {ev.status === 'scheduled' && (
                         <SelectField
                           id={`ev_status_${ev.id}`}
@@ -1033,7 +1032,11 @@ function InteractionsPanel({ leadId }: { leadId: string }) {
               </form>
             )}
             {interactions.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('interactions.empty')}</p>
+              <EmptyState
+                icon={MessageCircle}
+                title={t('interactions.empty')}
+                cta={{ label: t('interactions.add'), onClick: startAdd }}
+              />
             ) : (
               interactions.map((int) => (
                 <div key={int.id} className="px-6 py-3 space-y-1">

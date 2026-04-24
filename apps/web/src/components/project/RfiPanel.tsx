@@ -4,9 +4,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
+import { HelpCircle } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
@@ -16,12 +19,6 @@ type RfiRecipient = 'client' | 'consultant' | 'supplier';
 
 const STATUSES: RfiStatus[] = ['open', 'responded', 'closed'];
 const RECIPIENTS: RfiRecipient[] = ['client', 'consultant', 'supplier'];
-
-const STATUS_COLORS: Record<RfiStatus, string> = {
-  open: 'bg-amber-100 text-amber-800',
-  responded: 'bg-blue-100 text-blue-800',
-  closed: 'bg-emerald-100 text-emerald-800',
-};
 
 interface RfiRow {
   id: string;
@@ -246,7 +243,11 @@ export function RfiPanel({ projectId, canWrite }: { projectId: string; canWrite:
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('rfi.empty')}</p>
+              <EmptyState
+                icon={HelpCircle}
+                title={t('rfi.empty')}
+                cta={canWrite ? { label: t('rfi.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((r) =>
                 editingId === r.id ? (
@@ -261,11 +262,12 @@ export function RfiPanel({ projectId, canWrite }: { projectId: string; canWrite:
                           {r.recipient_name && <span> · {r.recipient_name}</span>}
                         </div>
                       </div>
-                      <span
-                        className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[r.status]}`}
-                      >
-                        {t(`rfi.status.${r.status}`)}
-                      </span>
+                      <StatusBadge
+                        family="rfi"
+                        value={r.status}
+                        label={t(`rfi.status.${r.status}`)}
+                        className="shrink-0"
+                      />
                       {canWrite && (
                         <div className="shrink-0 flex items-center gap-1">
                           <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>

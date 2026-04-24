@@ -15,7 +15,7 @@
 
 ## UI & design (non-negotiable)
 
-This project failed an early design review because features shipped faster than patterns solidified. Follow the rules below **before** adding any new UI. Full examples in `PATTERNS.md`.
+The complete design language lives in **`DESIGN.md`**. Read it before any UI work. `PATTERNS.md` has copy-paste recipes. Follow the rules below **before** adding any new UI.
 
 - **Shared primitives live in `packages/ui`** — not in page files, not in `apps/web/src/components`. If a pattern is used more than once, extract it.
 - **Status colors** come from a single source: `packages/ui/src/components/status-badge.tsx`. Do not define per-module `STATUS_COLORS` records; extend the central map.
@@ -35,7 +35,7 @@ If you think you need a new pattern not covered here, add it to `PATTERNS.md` in
 
 ## Other durable rules
 
-See `HANDOFF.md` for phase history, `BLUEPRINT.md` for architecture, `DECISIONS.md` for the tech stack, `SCHEMA.md` for the DB schema.
+See `DESIGN.md` for the full design language, `HANDOFF.md` for phase history, `BLUEPRINT.md` for architecture, `DECISIONS.md` for the tech stack, `SCHEMA.md` for the DB schema, `PATTERNS.md` for UI recipes.
 
 - Working branch: `claude/start-spex-rebuild-ZiKng`.
 - Back-office roles (full access): `ceo`, `vp`, `cfo`, `office_manager`. PM / Foreman are project-scoped via RLS.

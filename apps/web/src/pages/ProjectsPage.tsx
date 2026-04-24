@@ -1,4 +1,13 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  formatCurrencyILS,
+  Input,
+  StatusBadge,
+} from '@spex/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -20,22 +29,6 @@ interface ProjectRow {
   client: { company_name: string } | null;
   pm: { full_name: string } | null;
 }
-
-function formatCurrencyILS(value: number | null | undefined): string {
-  if (value == null) return '';
-  return new Intl.NumberFormat('he-IL', {
-    style: 'currency',
-    currency: 'ILS',
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-const statusBadgeClass: Record<ProjectStatus, string> = {
-  active: 'bg-emerald-100 text-emerald-800',
-  on_hold: 'bg-amber-100 text-amber-800',
-  completed: 'bg-slate-200 text-slate-700',
-  cancelled: 'bg-rose-100 text-rose-800',
-};
 
 export function ProjectsPage() {
   const { t } = useTranslation();
@@ -126,11 +119,12 @@ export function ProjectsPage() {
                       {formatCurrencyILS(p.contract_value)}
                     </div>
                   )}
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[p.status]}`}
-                  >
-                    {t(`projects.status.${p.status}`)}
-                  </span>
+                  <StatusBadge
+                    family="project"
+                    value={p.status}
+                    label={t(`projects.status.${p.status}`)}
+                    className="shrink-0"
+                  />
                 </Link>
               ))}
             </div>

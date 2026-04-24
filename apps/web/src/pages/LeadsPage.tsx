@@ -1,4 +1,13 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  formatCurrencyILS,
+  Input,
+  StatusBadge,
+} from '@spex/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -35,21 +44,6 @@ const ALL_STATUSES: LeadStatus[] = [
   'not_relevant',
 ];
 
-const statusBadgeClass: Record<LeadStatus, string> = {
-  new: 'bg-sky-100 text-sky-800',
-  no_answer_1: 'bg-amber-100 text-amber-800',
-  no_answer_2: 'bg-amber-100 text-amber-800',
-  no_answer_3: 'bg-amber-200 text-amber-900',
-  follow_up: 'bg-violet-100 text-violet-800',
-  planning_meeting_scheduled: 'bg-indigo-100 text-indigo-800',
-  awaiting_plans: 'bg-indigo-100 text-indigo-800',
-  quote_issued: 'bg-teal-100 text-teal-800',
-  work_meeting_scheduled: 'bg-emerald-100 text-emerald-800',
-  won: 'bg-emerald-200 text-emerald-900',
-  lost: 'bg-rose-100 text-rose-800',
-  not_relevant: 'bg-slate-200 text-slate-700',
-};
-
 interface LeadRow {
   id: string;
   full_name: string;
@@ -59,15 +53,6 @@ interface LeadRow {
   estimated_value: number | null;
   last_contact_at: string | null;
   owner: { full_name: string } | null;
-}
-
-function formatCurrencyILS(value: number | null | undefined): string {
-  if (value == null) return '';
-  return new Intl.NumberFormat('he-IL', {
-    style: 'currency',
-    currency: 'ILS',
-    maximumFractionDigits: 0,
-  }).format(value);
 }
 
 export function LeadsPage() {
@@ -176,11 +161,12 @@ export function LeadsPage() {
                         {formatCurrencyILS(l.estimated_value)}
                       </div>
                     )}
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[l.status]}`}
-                    >
-                      {t(`leads.status.${l.status}`)}
-                    </span>
+                    <StatusBadge
+                      family="lead"
+                      value={l.status}
+                      label={t(`leads.status.${l.status}`)}
+                      className="shrink-0"
+                    />
                   </Link>
                 );
               })}

@@ -6,6 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   KpiTile,
   Label,
@@ -664,7 +665,11 @@ function MembersPanel({ projectId, isAdmin, users }: MembersPanelProps) {
         {loading ? (
           <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
         ) : members.length === 0 && !adding ? (
-          <p className="text-sm text-muted-foreground p-6">{t('members.empty')}</p>
+          <EmptyState
+            icon={Users}
+            title={t('members.empty')}
+            cta={isAdmin && availableUsers.length > 0 ? { label: t('members.add'), onClick: startAdd } : undefined}
+          />
         ) : (
           <div className="divide-y">
             {members.map((m) => (
@@ -769,19 +774,6 @@ interface MilestoneRow {
   execution_status: ExecStatus;
   billing_status: BillStatus;
 }
-
-const EXEC_COLORS: Record<ExecStatus, string> = {
-  pending: 'bg-gray-100 text-gray-700',
-  in_progress: 'bg-blue-100 text-blue-800',
-  done: 'bg-emerald-100 text-emerald-800',
-};
-
-const BILL_COLORS: Record<BillStatus, string> = {
-  not_yet_due: 'bg-gray-100 text-gray-700',
-  ready_to_bill: 'bg-amber-100 text-amber-800',
-  invoiced: 'bg-blue-100 text-blue-800',
-  paid: 'bg-emerald-100 text-emerald-800',
-};
 
 function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: boolean }) {
   const { t } = useTranslation();
@@ -922,7 +914,11 @@ function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: b
               </form>
             )}
             {milestones.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('milestones.empty')}</p>
+              <EmptyState
+                icon={Milestone}
+                title={t('milestones.empty')}
+                cta={isAdmin ? { label: t('milestones.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               milestones.map((m) => (
                 <div key={m.id} className="px-6 py-3 flex items-center gap-3 flex-wrap">
@@ -931,12 +927,16 @@ function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: b
                     <div className="text-xs text-muted-foreground">{m.billing_pct}%</div>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${EXEC_COLORS[m.execution_status]}`}>
-                      {t(`milestones.execution.${m.execution_status}`)}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${BILL_COLORS[m.billing_status]}`}>
-                      {t(`milestones.billing.${m.billing_status}`)}
-                    </span>
+                    <StatusBadge
+                      family="milestone_execution"
+                      value={m.execution_status}
+                      label={t(`milestones.execution.${m.execution_status}`)}
+                    />
+                    <StatusBadge
+                      family="milestone_billing"
+                      value={m.billing_status}
+                      label={t(`milestones.billing.${m.billing_status}`)}
+                    />
                     {isAdmin && (
                       <>
                         <SelectField
@@ -991,14 +991,6 @@ const VARIATION_STATUSES: VariationStatus[] = [
   'rejected',
   'billed',
 ];
-
-const VARIATION_STATUS_COLORS: Record<VariationStatus, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  pending_approval: 'bg-amber-100 text-amber-800',
-  approved: 'bg-blue-100 text-blue-800',
-  rejected: 'bg-rose-100 text-rose-800',
-  billed: 'bg-emerald-100 text-emerald-800',
-};
 
 interface VariationRow {
   id: string;
@@ -1195,7 +1187,11 @@ function VariationsPanel({ projectId, canWrite }: { projectId: string; canWrite:
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('variations.empty')}</p>
+              <EmptyState
+                icon={SlidersHorizontal}
+                title={t('variations.empty')}
+                cta={canWrite ? { label: t('variations.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((v) =>
                 editingId === v.id ? (
@@ -1205,11 +1201,11 @@ function VariationsPanel({ projectId, canWrite }: { projectId: string; canWrite:
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-sm">{v.title}</span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${VARIATION_STATUS_COLORS[v.status]}`}
-                        >
-                          {t(`variations.status.${v.status}`)}
-                        </span>
+                        <StatusBadge
+                          family="variation"
+                          value={v.status}
+                          label={t(`variations.status.${v.status}`)}
+                        />
                       </div>
                       {v.description && (
                         <p className="text-sm text-muted-foreground whitespace-pre-line">

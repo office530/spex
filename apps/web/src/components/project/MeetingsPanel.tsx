@@ -4,9 +4,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   Label,
 } from '@spex/ui';
+import { CalendarDays } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
@@ -237,7 +239,11 @@ export function MeetingsPanel({ projectId, canWrite }: { projectId: string; canW
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('meetings.empty')}</p>
+              <EmptyState
+                icon={CalendarDays}
+                title={t('meetings.empty')}
+                cta={canWrite ? { label: t('meetings.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((r) =>
                 editingId === r.id ? (

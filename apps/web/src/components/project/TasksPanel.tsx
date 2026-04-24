@@ -4,9 +4,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
   Label,
+  StatusBadge,
 } from '@spex/ui';
+import { ListChecks } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
@@ -30,21 +33,6 @@ const STATUSES: TaskStatus[] = [
 ];
 
 const PRIORITIES: TaskPriority[] = ['low', 'medium', 'high', 'urgent'];
-
-const STATUS_COLORS: Record<TaskStatus, string> = {
-  awaiting_execution: 'bg-gray-100 text-gray-700',
-  in_progress: 'bg-blue-100 text-blue-800',
-  done: 'bg-emerald-100 text-emerald-800',
-  awaiting_manager_approval: 'bg-amber-100 text-amber-800',
-  cancelled: 'bg-slate-100 text-slate-600',
-};
-
-const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  low: 'bg-gray-100 text-gray-600',
-  medium: 'bg-blue-100 text-blue-700',
-  high: 'bg-amber-100 text-amber-800',
-  urgent: 'bg-rose-100 text-rose-800',
-};
 
 interface UserOption {
   id: string;
@@ -285,7 +273,11 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
           <div className="divide-y">
             {adding && renderForm()}
             {rows.length === 0 && !adding ? (
-              <p className="text-sm text-muted-foreground p-6">{t('tasks.empty')}</p>
+              <EmptyState
+                icon={ListChecks}
+                title={t('tasks.empty')}
+                cta={canWrite ? { label: t('tasks.add'), onClick: startAdd } : undefined}
+              />
             ) : (
               rows.map((r) =>
                 editingId === r.id ? (
@@ -308,16 +300,16 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                         </div>
                       </div>
                       <div className="shrink-0 flex items-center gap-1 flex-wrap">
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${PRIORITY_COLORS[r.priority]}`}
-                        >
-                          {t(`tasks.priority.${r.priority}`)}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[r.status]}`}
-                        >
-                          {t(`tasks.status.${r.status}`)}
-                        </span>
+                        <StatusBadge
+                          family="task_priority"
+                          value={r.priority}
+                          label={t(`tasks.priority.${r.priority}`)}
+                        />
+                        <StatusBadge
+                          family="task"
+                          value={r.status}
+                          label={t(`tasks.status.${r.status}`)}
+                        />
                       </div>
                       {canWrite && (
                         <div className="shrink-0 flex items-center gap-1">
