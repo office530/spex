@@ -35,6 +35,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavLink to="/projects" className={navLinkClass}>
               {t('nav.projects')}
             </NavLink>
+            <NavLink to="/leads" className={navLinkClass}>
+              {t('nav.leads')}
+            </NavLink>
             {isAdmin && (
               <NavLink to="/clients" className={navLinkClass}>
                 {t('nav.clients')}

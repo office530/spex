@@ -1,0 +1,600 @@
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+} from '@spex/ui';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { UserRole } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthContext';
+import { supabase } from '../lib/supabase';
+
+const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
+
+type LeadSource = 'website' | 'fb_ads' | 'referral' | 'manual';
+type LeadType = 'planning' | 'execution';
+type LeadStatus =
+  | 'new'
+  | 'no_answer_1'
+  | 'no_answer_2'
+  | 'no_answer_3'
+  | 'follow_up'
+  | 'planning_meeting_scheduled'
+  | 'awaiting_plans'
+  | 'quote_issued'
+  | 'work_meeting_scheduled'
+  | 'won'
+  | 'lost'
+  | 'not_relevant';
+type InteractionType = 'call' | 'whatsapp' | 'email' | 'meeting' | 'note';
+
+const LEAD_SOURCES: LeadSource[] = ['website', 'fb_ads', 'referral', 'manual'];
+const LEAD_TYPES: LeadType[] = ['planning', 'execution'];
+const LEAD_STATUSES: LeadStatus[] = [
+  'new',
+  'no_answer_1',
+  'no_answer_2',
+  'no_answer_3',
+  'follow_up',
+  'planning_meeting_scheduled',
+  'awaiting_plans',
+  'quote_issued',
+  'work_meeting_scheduled',
+  'won',
+  'lost',
+  'not_relevant',
+];
+const INTERACTION_TYPES: InteractionType[] = ['call', 'whatsapp', 'email', 'meeting', 'note'];
+
+interface LeadForm {
+  full_name: string;
+  phone: string;
+  email: string;
+  source: LeadSource;
+  type: LeadType;
+  status: LeadStatus;
+  estimated_value: string;
+  owner_id: string;
+  last_contact_at: string;
+  lost_reason: string;
+  notes: string;
+}
+
+interface UserOption {
+  id: string;
+  full_name: string;
+  role: UserRole;
+}
+
+interface InteractionRow {
+  id: string;
+  type: InteractionType;
+  note: string | null;
+  occurred_at: string;
+  user: { full_name: string } | null;
+}
+
+function emptyForm(ownerId: string): LeadForm {
+  return {
+    full_name: '',
+    phone: '',
+    email: '',
+    source: 'manual',
+    type: 'execution',
+    status: 'new',
+    estimated_value: '',
+    owner_id: ownerId,
+    last_contact_at: '',
+    lost_reason: '',
+    notes: '',
+  };
+}
+
+function toDatetimeInput(value: string | null): string {
+  if (!value) return '';
+  return value.slice(0, 16);
+}
+
+function fromDatetimeInput(value: string): string | null {
+  return value ? new Date(value).toISOString() : null;
+}
+
+export function LeadEditPage() {
+  const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { profile, user } = useAuth();
+  const myId = user?.id ?? '';
+  const isAdmin = profile ? BACK_OFFICE.includes(profile.role) : false;
+  const isCreate = !id;
+
+  const [form, setForm] = useState<LeadForm>(() => emptyForm(myId));
+  const [users, setUsers] = useState<UserOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const [usersRes, leadRes] = await Promise.all([
+        isAdmin
+          ? supabase
+              .from('user_profiles')
+              .select('id, full_name, role')
+              .eq('is_active', true)
+              .order('full_name')
+          : Promise.resolve({ data: [], error: null }),
+        isCreate
+          ? Promise.resolve({ data: null, error: null })
+          : supabase
+              .from('leads')
+              .select(
+                'full_name, phone, email, source, type, status, estimated_value, owner_id, last_contact_at, lost_reason, notes',
+              )
+              .eq('id', id)
+              .maybeSingle(),
+      ]);
+
+      if (usersRes.error) setError(usersRes.error.message);
+      else setUsers((usersRes.data as UserOption[]) ?? []);
+
+      if (!isCreate) {
+        if (leadRes.error || !leadRes.data) {
+          setError(leadRes.error?.message ?? t('leads.notFound'));
+        } else {
+          const l = leadRes.data as {
+            full_name: string;
+            phone: string;
+            email: string | null;
+            source: LeadSource;
+            type: LeadType;
+            status: LeadStatus;
+            estimated_value: number | null;
+            owner_id: string | null;
+            last_contact_at: string | null;
+            lost_reason: string | null;
+            notes: string | null;
+          };
+          setForm({
+            full_name: l.full_name,
+            phone: l.phone,
+            email: l.email ?? '',
+            source: l.source,
+            type: l.type,
+            status: l.status,
+            estimated_value: l.estimated_value != null ? String(l.estimated_value) : '',
+            owner_id: l.owner_id ?? '',
+            last_contact_at: toDatetimeInput(l.last_contact_at),
+            lost_reason: l.lost_reason ?? '',
+            notes: l.notes ?? '',
+          });
+        }
+      } else {
+        setForm(emptyForm(myId));
+      }
+      setLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isCreate, isAdmin, myId]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const payload = {
+      full_name: form.full_name,
+      phone: form.phone,
+      email: form.email || null,
+      source: form.source,
+      type: form.type,
+      status: form.status,
+      estimated_value: form.estimated_value ? Number(form.estimated_value) : null,
+      owner_id: form.owner_id || null,
+      last_contact_at: fromDatetimeInput(form.last_contact_at),
+      lost_reason: form.status === 'lost' ? form.lost_reason || null : null,
+      notes: form.notes || null,
+    };
+    if (isCreate) {
+      const { data, error } = await supabase.from('leads').insert(payload).select('id').single();
+      setSaving(false);
+      if (error) setError(error.message);
+      else navigate(`/leads/${data.id}`, { replace: true });
+    } else {
+      const { error } = await supabase.from('leads').update(payload).eq('id', id);
+      setSaving(false);
+      if (error) setError(error.message);
+    }
+  }
+
+  if (loading) {
+    return (
+      <p className="text-sm text-muted-foreground py-8 text-center">{t('common.loading')}</p>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">
+          {isCreate ? t('leads.newTitle') : t('leads.editTitle')}
+        </h1>
+        <Button variant="ghost" onClick={() => navigate('/leads')} disabled={saving}>
+          {t('common.back')}
+        </Button>
+      </div>
+
+      <Card>
+        <form onSubmit={handleSubmit}>
+          <CardHeader>
+            <CardTitle className="text-base">{t('leads.details')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">{t('leads.fullName')} *</Label>
+                <Input
+                  id="full_name"
+                  value={form.full_name}
+                  onChange={(e) => setForm((f) => ({ ...f, full_name: e.target.value }))}
+                  required
+                  disabled={saving}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">{t('leads.phone')} *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  required
+                  disabled={saving}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('leads.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  disabled={saving}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="source">{t('leads.sourceLabel')} *</Label>
+                <SelectField
+                  id="source"
+                  value={form.source}
+                  onChange={(v) => setForm((f) => ({ ...f, source: v as LeadSource }))}
+                  disabled={saving}
+                >
+                  {LEAD_SOURCES.map((s) => (
+                    <option key={s} value={s}>
+                      {t(`leads.source.${s}`)}
+                    </option>
+                  ))}
+                </SelectField>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">{t('leads.typeLabel')} *</Label>
+                <SelectField
+                  id="type"
+                  value={form.type}
+                  onChange={(v) => setForm((f) => ({ ...f, type: v as LeadType }))}
+                  disabled={saving}
+                >
+                  {LEAD_TYPES.map((ty) => (
+                    <option key={ty} value={ty}>
+                      {t(`leads.type.${ty}`)}
+                    </option>
+                  ))}
+                </SelectField>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="status">{t('leads.statusLabel')} *</Label>
+                <SelectField
+                  id="status"
+                  value={form.status}
+                  onChange={(v) => setForm((f) => ({ ...f, status: v as LeadStatus }))}
+                  disabled={saving}
+                >
+                  {LEAD_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {t(`leads.status.${s}`)}
+                    </option>
+                  ))}
+                </SelectField>
+              </div>
+              {isAdmin && (
+                <div className="space-y-2">
+                  <Label htmlFor="owner_id">{t('leads.owner')}</Label>
+                  <SelectField
+                    id="owner_id"
+                    value={form.owner_id}
+                    onChange={(v) => setForm((f) => ({ ...f, owner_id: v }))}
+                    disabled={saving}
+                  >
+                    <option value="">{t('leads.noOwner')}</option>
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.full_name} · {t(`roles.${u.role}`)}
+                      </option>
+                    ))}
+                  </SelectField>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="estimated_value">{t('leads.estimatedValue')}</Label>
+                <Input
+                  id="estimated_value"
+                  type="number"
+                  min="0"
+                  value={form.estimated_value}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, estimated_value: e.target.value }))
+                  }
+                  disabled={saving}
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="last_contact_at">{t('leads.lastContactAt')}</Label>
+                <Input
+                  id="last_contact_at"
+                  type="datetime-local"
+                  value={form.last_contact_at}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, last_contact_at: e.target.value }))
+                  }
+                  disabled={saving}
+                />
+              </div>
+              {form.status === 'lost' && (
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="lost_reason">{t('leads.lostReason')}</Label>
+                  <Input
+                    id="lost_reason"
+                    value={form.lost_reason}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, lost_reason: e.target.value }))
+                    }
+                    disabled={saving}
+                  />
+                </div>
+              )}
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="notes">{t('leads.notes')}</Label>
+                <textarea
+                  id="notes"
+                  value={form.notes}
+                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                  disabled={saving}
+                  rows={3}
+                  className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                />
+              </div>
+            </div>
+            {error && (
+              <p className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
+            )}
+          </CardContent>
+          <CardFooter className="justify-end">
+            <Button type="submit" disabled={saving}>
+              {saving ? t('common.saving') : t('common.save')}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+
+      {!isCreate && id && <InteractionsPanel leadId={id} />}
+    </div>
+  );
+}
+
+interface SelectFieldProps {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+  required?: boolean;
+  disabled?: boolean;
+}
+
+function SelectField({ id, value, onChange, children, required, disabled }: SelectFieldProps) {
+  return (
+    <select
+      id={id}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      required={required}
+      disabled={disabled}
+      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+    >
+      {children}
+    </select>
+  );
+}
+
+function InteractionsPanel({ leadId }: { leadId: string }) {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [interactions, setInteractions] = useState<InteractionRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [type, setType] = useState<InteractionType>('call');
+  const [note, setNote] = useState('');
+  const [occurredAt, setOccurredAt] = useState(() => toDatetimeInput(new Date().toISOString()));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error } = await supabase
+      .from('interactions')
+      .select('id, type, note, occurred_at, user:user_profiles(full_name)')
+      .eq('lead_id', leadId)
+      .order('occurred_at', { ascending: false });
+    if (error) {
+      setError(error.message);
+    } else {
+      setInteractions((data as unknown as InteractionRow[]) ?? []);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leadId]);
+
+  function startAdd() {
+    setAdding(true);
+    setType('call');
+    setNote('');
+    setOccurredAt(toDatetimeInput(new Date().toISOString()));
+    setError(null);
+  }
+
+  function cancelAdd() {
+    setAdding(false);
+    setError(null);
+  }
+
+  async function addInteraction(e: FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    setSaving(true);
+    setError(null);
+    const { error } = await supabase.from('interactions').insert({
+      lead_id: leadId,
+      type,
+      note: note || null,
+      user_id: user.id,
+      occurred_at: fromDatetimeInput(occurredAt),
+    });
+    setSaving(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    cancelAdd();
+    await refresh();
+  }
+
+  const dateFormat = new Intl.DateTimeFormat(i18n.language, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  });
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base">{t('interactions.title')}</CardTitle>
+        {!adding && (
+          <Button size="sm" variant="outline" onClick={startAdd}>
+            {t('interactions.add')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : (
+          <div className="divide-y">
+            {adding && (
+              <form onSubmit={addInteraction} className="px-6 py-4 space-y-3 bg-muted/40">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="int_type">{t('interactions.typeLabel')}</Label>
+                    <SelectField
+                      id="int_type"
+                      value={type}
+                      onChange={(v) => setType(v as InteractionType)}
+                      disabled={saving}
+                    >
+                      {INTERACTION_TYPES.map((t2) => (
+                        <option key={t2} value={t2}>
+                          {t(`interactions.type.${t2}`)}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="int_at">{t('interactions.occurredAt')}</Label>
+                    <Input
+                      id="int_at"
+                      type="datetime-local"
+                      value={occurredAt}
+                      onChange={(e) => setOccurredAt(e.target.value)}
+                      required
+                      disabled={saving}
+                    />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label htmlFor="int_note">{t('interactions.note')}</Label>
+                    <textarea
+                      id="int_note"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={2}
+                      disabled={saving}
+                      className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+                {error && (
+                  <p className="text-sm text-destructive" role="alert">
+                    {error}
+                  </p>
+                )}
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={cancelAdd}
+                    disabled={saving}
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                  <Button type="submit" size="sm" disabled={saving}>
+                    {saving ? t('common.saving') : t('common.add')}
+                  </Button>
+                </div>
+              </form>
+            )}
+            {interactions.length === 0 && !adding ? (
+              <p className="text-sm text-muted-foreground p-6">{t('interactions.empty')}</p>
+            ) : (
+              interactions.map((int) => (
+                <div key={int.id} className="px-6 py-3 space-y-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-sm font-medium">
+                      {t(`interactions.type.${int.type}`)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {dateFormat.format(new Date(int.occurred_at))}
+                      {int.user && <span> · {int.user.full_name}</span>}
+                    </span>
+                  </div>
+                  {int.note && (
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      {int.note}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -9,7 +9,8 @@
     "logout": "התנתקות",
     "users": "משתמשים",
     "clients": "לקוחות",
-    "projects": "פרויקטים"
+    "projects": "פרויקטים",
+    "leads": "לידים"
   },
   "login": {
     "title": "התחברות למערכת",
@@ -120,6 +121,70 @@
       "pm": "מנהל פרויקט",
       "foreman": "מנהל עבודה",
       "viewer": "צופה"
+    }
+  },
+  "leads": {
+    "title": "לידים",
+    "listTitle": "צינור לידים",
+    "new": "ליד חדש",
+    "newTitle": "ליד חדש",
+    "editTitle": "עריכת ליד",
+    "details": "פרטי הליד",
+    "empty": "עדיין אין לידים",
+    "noMatches": "לא נמצאו לידים התואמים לסינון",
+    "notFound": "הליד לא נמצא",
+    "searchPlaceholder": "חיפוש לפי שם, טלפון או בעלים…",
+    "allStatuses": "כל הסטטוסים",
+    "fullName": "שם מלא",
+    "phone": "טלפון",
+    "email": "אימייל",
+    "sourceLabel": "מקור",
+    "typeLabel": "סוג",
+    "statusLabel": "סטטוס",
+    "owner": "בעלים",
+    "noOwner": "ללא בעלים",
+    "estimatedValue": "ערך משוער",
+    "lastContactAt": "קשר אחרון",
+    "lostReason": "סיבת אובדן",
+    "notes": "הערות",
+    "source": {
+      "website": "אתר אינטרנט",
+      "fb_ads": "פרסומות פייסבוק",
+      "referral": "הפניה",
+      "manual": "הוזן ידנית"
+    },
+    "type": {
+      "planning": "תכנון",
+      "execution": "ביצוע"
+    },
+    "status": {
+      "new": "חדש",
+      "no_answer_1": "אין מענה (1)",
+      "no_answer_2": "אין מענה (2)",
+      "no_answer_3": "אין מענה (3)",
+      "follow_up": "למעקב",
+      "planning_meeting_scheduled": "פגישת תכנון נקבעה",
+      "awaiting_plans": "ממתין לתוכניות",
+      "quote_issued": "הצעת מחיר הוצאה",
+      "work_meeting_scheduled": "פגישת עבודה נקבעה",
+      "won": "נסגר",
+      "lost": "אבד",
+      "not_relevant": "לא רלוונטי"
+    }
+  },
+  "interactions": {
+    "title": "ציר זמן",
+    "add": "רישום אינטראקציה",
+    "empty": "עדיין לא נרשמו אינטראקציות",
+    "typeLabel": "סוג",
+    "occurredAt": "זמן האינטראקציה",
+    "note": "הערה",
+    "type": {
+      "call": "שיחה",
+      "whatsapp": "ווטסאפ",
+      "email": "אימייל",
+      "meeting": "פגישה",
+      "note": "הערה"
     }
   },
   "common": {

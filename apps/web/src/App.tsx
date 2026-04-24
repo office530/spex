@@ -6,6 +6,8 @@ import { AppShell } from './components/AppShell';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
+import { LeadEditPage } from './pages/LeadEditPage';
+import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { ProjectsPage } from './pages/ProjectsPage';
@@ -104,6 +106,30 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <ProjectEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/leads"
+          element={
+            <AuthenticatedRoute>
+              <LeadsPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/leads/new"
+          element={
+            <AuthenticatedRoute>
+              <LeadEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/leads/:id"
+          element={
+            <AuthenticatedRoute>
+              <LeadEditPage />
             </AuthenticatedRoute>
           }
         />
