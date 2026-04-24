@@ -7,6 +7,8 @@ import { ActivityLogPage } from './pages/ActivityLogPage';
 import { AutomationRulesPage } from './pages/AutomationRulesPage';
 import { BoqPage } from './pages/BoqPage';
 import { CalendarPage } from './pages/CalendarPage';
+import { ConsultantEditPage } from './pages/ConsultantEditPage';
+import { ConsultantsPage } from './pages/ConsultantsPage';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
@@ -119,6 +121,30 @@ export function App() {
           element={
             <BackOfficeRoute>
               <SupplierEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/consultants"
+          element={
+            <BackOfficeRoute>
+              <ConsultantsPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/consultants/new"
+          element={
+            <BackOfficeRoute>
+              <ConsultantEditPage />
+            </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/consultants/:id"
+          element={
+            <BackOfficeRoute>
+              <ConsultantEditPage />
             </BackOfficeRoute>
           }
         />

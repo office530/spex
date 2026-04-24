@@ -10,6 +10,7 @@
     "users": "Users",
     "clients": "Clients",
     "suppliers": "Suppliers",
+    "consultants": "Consultants",
     "projects": "Projects",
     "leads": "Leads",
     "tickets": "Tickets",
@@ -300,6 +301,23 @@
       "resolved": "Resolved",
       "cancelled": "Cancelled"
     }
+  },
+  "consultants": {
+    "title": "Consultants",
+    "listTitle": "Consultant list",
+    "new": "New consultant",
+    "newTitle": "New consultant",
+    "editTitle": "Edit consultant",
+    "details": "Consultant details",
+    "empty": "No consultants yet",
+    "noMatches": "No consultants match your search",
+    "notFound": "Consultant not found",
+    "searchPlaceholder": "Search by name, specialty, phone…",
+    "name": "Name",
+    "specialty": "Specialty",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Notes"
   },
   "suppliers": {
     "title": "Suppliers",

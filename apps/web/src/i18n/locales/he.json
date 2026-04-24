@@ -10,6 +10,7 @@
     "users": "משתמשים",
     "clients": "לקוחות",
     "suppliers": "ספקים",
+    "consultants": "יועצים",
     "projects": "פרויקטים",
     "leads": "לידים",
     "tickets": "פניות",
@@ -300,6 +301,23 @@
       "resolved": "נפתרה",
       "cancelled": "בוטלה"
     }
+  },
+  "consultants": {
+    "title": "יועצים",
+    "listTitle": "רשימת יועצים",
+    "new": "יועץ חדש",
+    "newTitle": "יועץ חדש",
+    "editTitle": "עריכת יועץ",
+    "details": "פרטי יועץ",
+    "empty": "עדיין אין יועצים",
+    "noMatches": "לא נמצאו יועצים התואמים לחיפוש",
+    "notFound": "היועץ לא נמצא",
+    "searchPlaceholder": "חיפוש לפי שם, תחום, טלפון…",
+    "name": "שם",
+    "specialty": "תחום התמחות",
+    "phone": "טלפון",
+    "email": "אימייל",
+    "notes": "הערות"
   },
   "suppliers": {
     "title": "ספקים",
