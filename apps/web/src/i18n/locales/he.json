@@ -223,6 +223,27 @@
     "unitPrice": "מחיר יחידה",
     "estimatedTotal": "סה\"כ משוער"
   },
+  "supplierQuotes": {
+    "title": "הצעות ספקים",
+    "empty": "עדיין אין הצעות לפריט זה",
+    "add": "הוסף הצעה",
+    "confirmDelete": "למחוק את ההצעה?",
+    "supplier": "ספק",
+    "selectSupplier": "בחר ספק…",
+    "amount": "סכום",
+    "statusLabel": "סטטוס",
+    "countShort": "{{count}} הצעות",
+    "countOne": "הצעה אחת",
+    "countZero": "אין הצעות",
+    "status": {
+      "draft": "טיוטה",
+      "submitted": "נשלחה",
+      "under_review": "בבדיקה",
+      "approved": "אושרה",
+      "rejected": "נדחתה",
+      "revised": "עודכנה"
+    }
+  },
   "customerQuotes": {
     "title": "הצעות מחיר",
     "add": "הצעת מחיר חדשה",
