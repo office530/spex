@@ -17,65 +17,134 @@ import { useAuth } from '../auth/AuthContext';
 
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors [&>svg]:h-4 [&>svg]:w-4 ${
-    isActive
-      ? 'bg-muted font-medium text-foreground'
-      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-  }`;
-
 interface NavItem {
   to: string;
   end?: boolean;
   icon: LucideIcon;
   key: string;
-  adminOnly?: boolean;
 }
 
-const NAV_ITEMS: NavItem[] = [
+const WORKSPACE: NavItem[] = [
   { to: '/', end: true, icon: LayoutDashboard, key: 'nav.dashboard' },
   { to: '/projects', icon: FolderKanban, key: 'nav.projects' },
   { to: '/leads', icon: Target, key: 'nav.leads' },
-  { to: '/clients', icon: Building2, key: 'nav.clients', adminOnly: true },
-  { to: '/suppliers', icon: Truck, key: 'nav.suppliers', adminOnly: true },
-  { to: '/users', icon: Users, key: 'nav.users', adminOnly: true },
 ];
+
+const DIRECTORY: NavItem[] = [
+  { to: '/clients', icon: Building2, key: 'nav.clients' },
+  { to: '/suppliers', icon: Truck, key: 'nav.suppliers' },
+  { to: '/users', icon: Users, key: 'nav.users' },
+];
+
+const linkClass = ({ isActive }: { isActive: boolean }) =>
+  `flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors [&>svg]:h-4 [&>svg]:w-4 ${
+    isActive
+      ? 'bg-sidebar-accent text-sidebar-active font-medium'
+      : 'text-sidebar-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/60'
+  }`;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const { profile, user, signOut } = useAuth();
   const roleLabel = profile ? t(`roles.${profile.role}`) : t('roles.unknown');
   const displayName = profile?.full_name || user?.email || '';
+  const initials = (displayName || '·')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((s) => s[0])
+    .join('')
+    .toUpperCase();
   const isAdmin = profile ? BACK_OFFICE.includes(profile.role) : false;
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/40">
-      <nav className="border-b bg-background sticky top-0 z-10">
-        <div className="container mx-auto max-w-6xl flex items-center h-14 px-4 gap-4">
-          <NavLink to="/" className="text-lg font-bold shrink-0">
-            {t('app.name')}
-          </NavLink>
-          <div className="flex items-center gap-1 flex-1 overflow-x-auto">
-            {NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin).map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
-                <item.icon />
-                {t(item.key)}
-              </NavLink>
-            ))}
+    <div className="min-h-screen flex bg-muted/40">
+      <aside className="hidden md:flex flex-col w-60 shrink-0 bg-sidebar text-sidebar-foreground">
+        <div className="px-5 py-5">
+          <div className="text-lg font-bold">{t('app.name')}</div>
+          <div className="text-xs text-sidebar-muted-foreground mt-0.5">
+            {t('app.tagline')}
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="text-sm text-end hidden sm:block">
-              <div className="font-medium leading-tight">{displayName}</div>
-              <div className="text-xs text-muted-foreground">{roleLabel}</div>
+        </div>
+        <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
+          <NavSection label={t('nav.sections.workspace')} items={WORKSPACE} />
+          {isAdmin && (
+            <NavSection label={t('nav.sections.directory')} items={DIRECTORY} />
+          )}
+        </nav>
+        <div className="p-3 border-t border-sidebar-accent/50">
+          <div className="flex items-center gap-3 rounded-md px-2 py-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-sm font-medium">
+              {initials}
             </div>
-            <Button variant="outline" size="sm" onClick={() => void signOut()}>
-              <LogOut className="h-4 w-4 me-1.5" />
-              {t('nav.logout')}
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium truncate">{displayName}</div>
+              <div className="text-xs text-sidebar-muted-foreground truncate">{roleLabel}</div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void signOut()}
+              className="h-8 w-8 p-0 text-sidebar-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
+              aria-label={t('nav.logout')}
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
-      </nav>
-      <main className="flex-1 container mx-auto max-w-6xl px-4 py-6">{children}</main>
+      </aside>
+
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 inset-x-0 z-20 h-12 flex items-center justify-between bg-sidebar text-sidebar-foreground px-4">
+        <div className="font-bold">{t('app.name')}</div>
+        <div className="flex items-center gap-1 overflow-x-auto">
+          {[...WORKSPACE, ...(isAdmin ? DIRECTORY : [])].map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `rounded-md p-1.5 ${
+                  isActive
+                    ? 'text-sidebar-active bg-sidebar-accent'
+                    : 'text-sidebar-muted-foreground'
+                }`
+              }
+              aria-label={t(item.key)}
+            >
+              <item.icon className="h-5 w-5" />
+            </NavLink>
+          ))}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void signOut()}
+            className="h-8 w-8 p-0 text-sidebar-muted-foreground"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <main className="flex-1 min-w-0 pt-12 md:pt-0">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">{children}</div>
+      </main>
+    </div>
+  );
+}
+
+function NavSection({ label, items }: { label: string; items: NavItem[] }) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1">
+      <div className="px-3 text-xs font-medium text-sidebar-muted-foreground uppercase tracking-wider">
+        {label}
+      </div>
+      {items.map((item) => (
+        <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
+          <item.icon />
+          {t(item.key)}
+        </NavLink>
+      ))}
     </div>
   );
 }

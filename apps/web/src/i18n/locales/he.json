@@ -11,7 +11,11 @@
     "clients": "לקוחות",
     "suppliers": "ספקים",
     "projects": "פרויקטים",
-    "leads": "לידים"
+    "leads": "לידים",
+    "sections": {
+      "workspace": "עבודה שוטפת",
+      "directory": "ספרייה"
+    }
   },
   "login": {
     "title": "התחברות למערכת",

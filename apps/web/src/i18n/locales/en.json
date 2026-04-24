@@ -11,7 +11,11 @@
     "clients": "Clients",
     "suppliers": "Suppliers",
     "projects": "Projects",
-    "leads": "Leads"
+    "leads": "Leads",
+    "sections": {
+      "workspace": "Workspace",
+      "directory": "Directory"
+    }
   },
   "login": {
     "title": "Sign in",
