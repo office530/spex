@@ -232,6 +232,24 @@
       "cancelled": "בוטלה"
     }
   },
+  "variations": {
+    "title": "בלתמים",
+    "add": "הוסף בלתם",
+    "empty": "עדיין אין בלתמים",
+    "confirmDelete": "למחוק את הבלתם?",
+    "total": "סה\"כ בלתמים",
+    "titleLabel": "כותרת",
+    "description": "תיאור",
+    "amount": "סכום",
+    "statusLabel": "סטטוס",
+    "status": {
+      "draft": "טיוטה",
+      "pending_approval": "ממתין לאישור",
+      "approved": "אושר",
+      "rejected": "נדחה",
+      "billed": "חויב"
+    }
+  },
   "milestones": {
     "title": "אבני דרך",
     "add": "הוסף אבן דרך",

@@ -81,7 +81,7 @@ export function ProjectEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const isAdmin = profile ? BACK_OFFICE.includes(profile.role) : false;
   const isCreate = !id;
   const fromLeadId = isCreate ? (searchParams.get('from_lead') ?? null) : null;
@@ -379,6 +379,12 @@ export function ProjectEditPage() {
         <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
       )}
       {!isCreate && id && <MilestonesPanel projectId={id} isAdmin={isAdmin} />}
+      {!isCreate && id && (
+        <VariationsPanel
+          projectId={id}
+          canWrite={isAdmin || (form.pm_id !== '' && form.pm_id === user?.id)}
+        />
+      )}
     </div>
   );
 }
@@ -808,6 +814,270 @@ function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: b
                   </div>
                 </div>
               ))
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+type VariationStatus = 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'billed';
+
+const VARIATION_STATUSES: VariationStatus[] = [
+  'draft',
+  'pending_approval',
+  'approved',
+  'rejected',
+  'billed',
+];
+
+const VARIATION_STATUS_COLORS: Record<VariationStatus, string> = {
+  draft: 'bg-gray-100 text-gray-700',
+  pending_approval: 'bg-amber-100 text-amber-800',
+  approved: 'bg-blue-100 text-blue-800',
+  rejected: 'bg-rose-100 text-rose-800',
+  billed: 'bg-emerald-100 text-emerald-800',
+};
+
+interface VariationRow {
+  id: string;
+  title: string;
+  description: string | null;
+  amount: number | null;
+  status: VariationStatus;
+  approved_at: string | null;
+}
+
+function formatCurrencyILS(value: number | null | undefined): string {
+  if (value == null) return '—';
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function VariationsPanel({ projectId, canWrite }: { projectId: string; canWrite: boolean }) {
+  const { t } = useTranslation();
+  const [rows, setRows] = useState<VariationRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    amount: '',
+    status: 'draft' as VariationStatus,
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function refresh() {
+    const { data, error } = await supabase
+      .from('variations')
+      .select('id, title, description, amount, status, approved_at')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    if (error) setError(error.message);
+    else setRows((data as VariationRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
+
+  function startAdd() {
+    setEditingId(null);
+    setForm({ title: '', description: '', amount: '', status: 'draft' });
+    setError(null);
+    setAdding(true);
+  }
+
+  function startEdit(v: VariationRow) {
+    setAdding(false);
+    setEditingId(v.id);
+    setForm({
+      title: v.title,
+      description: v.description ?? '',
+      amount: v.amount != null ? String(v.amount) : '',
+      status: v.status,
+    });
+    setError(null);
+  }
+
+  function cancelForm() {
+    setAdding(false);
+    setEditingId(null);
+    setError(null);
+  }
+
+  async function saveForm(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const current = rows.find((r) => r.id === editingId);
+    const transitioningToApproved =
+      form.status === 'approved' && current?.status !== 'approved';
+    const payload: Record<string, unknown> = {
+      title: form.title,
+      description: form.description || null,
+      amount: form.amount ? Number(form.amount) : null,
+      status: form.status,
+    };
+    if (transitioningToApproved) payload.approved_at = new Date().toISOString();
+    else if (form.status !== 'approved' && form.status !== 'billed') payload.approved_at = null;
+    const { error } = adding
+      ? await supabase.from('variations').insert({ ...payload, project_id: projectId })
+      : await supabase.from('variations').update(payload).eq('id', editingId!);
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    cancelForm();
+    await refresh();
+  }
+
+  async function removeRow(v: VariationRow) {
+    if (!confirm(t('variations.confirmDelete'))) return;
+    const { error } = await supabase.from('variations').delete().eq('id', v.id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  const total = rows.reduce((sum, r) => sum + (r.amount ?? 0), 0);
+
+  function renderForm() {
+    return (
+      <form onSubmit={saveForm} className="px-6 py-4 space-y-3 bg-muted/40">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor="v_title">{t('variations.titleLabel')} *</Label>
+            <Input
+              id="v_title"
+              value={form.title}
+              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              required
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="v_amount">{t('variations.amount')}</Label>
+            <Input
+              id="v_amount"
+              type="number"
+              value={form.amount}
+              onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
+              disabled={saving}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="v_status">{t('variations.statusLabel')}</Label>
+            <SelectField
+              id="v_status"
+              value={form.status}
+              onChange={(v) => setForm((f) => ({ ...f, status: v as VariationStatus }))}
+              disabled={saving}
+            >
+              {VARIATION_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {t(`variations.status.${s}`)}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+          <div className="space-y-1 sm:col-span-2">
+            <Label htmlFor="v_desc">{t('variations.description')}</Label>
+            <textarea
+              id="v_desc"
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              rows={3}
+              disabled={saving}
+              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+            />
+          </div>
+        </div>
+        {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={cancelForm} disabled={saving}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" size="sm" disabled={saving}>
+            {saving ? t('common.saving') : t('common.save')}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base">
+          {t('variations.title')}
+          {rows.length > 0 && (
+            <span className="ms-2 text-xs font-normal text-muted-foreground">
+              ({formatCurrencyILS(total)})
+            </span>
+          )}
+        </CardTitle>
+        {canWrite && !adding && !editingId && (
+          <Button size="sm" variant="outline" onClick={startAdd}>
+            {t('variations.add')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : (
+          <div className="divide-y">
+            {adding && renderForm()}
+            {rows.length === 0 && !adding ? (
+              <p className="text-sm text-muted-foreground p-6">{t('variations.empty')}</p>
+            ) : (
+              rows.map((v) =>
+                editingId === v.id ? (
+                  <div key={v.id}>{renderForm()}</div>
+                ) : (
+                  <div key={v.id} className="px-6 py-3 flex items-start gap-3 flex-wrap">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-sm">{v.title}</span>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${VARIATION_STATUS_COLORS[v.status]}`}
+                        >
+                          {t(`variations.status.${v.status}`)}
+                        </span>
+                      </div>
+                      {v.description && (
+                        <p className="text-sm text-muted-foreground whitespace-pre-line">
+                          {v.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="shrink-0 text-sm font-medium">
+                      {formatCurrencyILS(v.amount)}
+                    </div>
+                    {canWrite && (
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button size="sm" variant="ghost" onClick={() => startEdit(v)}>
+                          {t('common.edit')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => void removeRow(v)}
+                        >
+                          {t('common.delete')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ),
+              )
             )}
           </div>
         )}
