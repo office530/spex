@@ -223,6 +223,74 @@
     "unitPrice": "Unit price",
     "estimatedTotal": "Estimated total"
   },
+  "tasks": {
+    "title": "Tasks",
+    "add": "Add task",
+    "empty": "No tasks yet",
+    "confirmDelete": "Delete this task?",
+    "titleLabel": "Title",
+    "description": "Description",
+    "statusLabel": "Status",
+    "priorityLabel": "Priority",
+    "assignee": "Assignee",
+    "noAssignee": "Unassigned",
+    "dueDate": "Due date",
+    "status": {
+      "awaiting_execution": "Awaiting execution",
+      "in_progress": "In progress",
+      "done": "Done",
+      "awaiting_manager_approval": "Awaiting manager approval",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "rfi": {
+    "title": "RFIs",
+    "add": "New RFI",
+    "empty": "No RFIs yet",
+    "confirmDelete": "Delete this RFI?",
+    "subject": "Subject",
+    "body": "Body",
+    "recipientLabel": "Recipient",
+    "recipientName": "Recipient name",
+    "statusLabel": "Status",
+    "response": "Response",
+    "recipient": {
+      "client": "Client",
+      "consultant": "Consultant",
+      "supplier": "Supplier"
+    },
+    "status": {
+      "open": "Open",
+      "responded": "Responded",
+      "closed": "Closed"
+    }
+  },
+  "meetings": {
+    "title": "Meetings",
+    "add": "New meeting",
+    "empty": "No meetings yet",
+    "confirmDelete": "Delete this meeting?",
+    "titleLabel": "Title",
+    "heldAt": "Held at",
+    "typeLabel": "Type",
+    "decisions": "Decisions",
+    "actionItems": "Action items",
+    "addAction": "Add action",
+    "emptyActions": "No actions yet",
+    "actionSummary": "Summary",
+    "confirmDeleteAction": "Delete this action?",
+    "type": {
+      "supervision": "Supervision",
+      "handover": "Handover",
+      "planning": "Planning"
+    }
+  },
   "supplierQuotes": {
     "title": "Supplier quotes",
     "empty": "No quotes for this item yet",

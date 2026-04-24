@@ -13,6 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { MeetingsPanel } from '../components/project/MeetingsPanel';
+import { RfiPanel } from '../components/project/RfiPanel';
+import { TasksPanel } from '../components/project/TasksPanel';
 import { supabase } from '../lib/supabase';
 
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
@@ -386,12 +389,18 @@ export function ProjectEditPage() {
         <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
       )}
       {!isCreate && id && <MilestonesPanel projectId={id} isAdmin={isAdmin} />}
-      {!isCreate && id && (
-        <VariationsPanel
-          projectId={id}
-          canWrite={isAdmin || (form.pm_id !== '' && form.pm_id === user?.id)}
-        />
-      )}
+      {(() => {
+        if (isCreate || !id) return null;
+        const canWrite = isAdmin || (form.pm_id !== '' && form.pm_id === user?.id);
+        return (
+          <>
+            <VariationsPanel projectId={id} canWrite={canWrite} />
+            <TasksPanel projectId={id} canWrite={canWrite} />
+            <RfiPanel projectId={id} canWrite={canWrite} />
+            <MeetingsPanel projectId={id} canWrite={canWrite} />
+          </>
+        );
+      })()}
     </div>
   );
 }

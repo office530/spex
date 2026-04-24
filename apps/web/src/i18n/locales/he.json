@@ -223,6 +223,74 @@
     "unitPrice": "מחיר יחידה",
     "estimatedTotal": "סה\"כ משוער"
   },
+  "tasks": {
+    "title": "משימות",
+    "add": "הוסף משימה",
+    "empty": "עדיין אין משימות",
+    "confirmDelete": "למחוק את המשימה?",
+    "titleLabel": "כותרת",
+    "description": "תיאור",
+    "statusLabel": "סטטוס",
+    "priorityLabel": "עדיפות",
+    "assignee": "אחראי",
+    "noAssignee": "לא הוקצה",
+    "dueDate": "יעד",
+    "status": {
+      "awaiting_execution": "ממתין לביצוע",
+      "in_progress": "בביצוע",
+      "done": "הושלם",
+      "awaiting_manager_approval": "ממתין לאישור מנהל",
+      "cancelled": "בוטל"
+    },
+    "priority": {
+      "low": "נמוכה",
+      "medium": "בינונית",
+      "high": "גבוהה",
+      "urgent": "דחופה"
+    }
+  },
+  "rfi": {
+    "title": "בקשות מידע",
+    "add": "בקשה חדשה",
+    "empty": "עדיין אין בקשות מידע",
+    "confirmDelete": "למחוק את הבקשה?",
+    "subject": "נושא",
+    "body": "פירוט",
+    "recipientLabel": "נמען",
+    "recipientName": "שם הנמען",
+    "statusLabel": "סטטוס",
+    "response": "תגובה",
+    "recipient": {
+      "client": "לקוח",
+      "consultant": "יועץ",
+      "supplier": "ספק"
+    },
+    "status": {
+      "open": "פתוחה",
+      "responded": "התקבלה תגובה",
+      "closed": "סגורה"
+    }
+  },
+  "meetings": {
+    "title": "פגישות",
+    "add": "פגישה חדשה",
+    "empty": "עדיין אין פגישות",
+    "confirmDelete": "למחוק את הפגישה?",
+    "titleLabel": "כותרת",
+    "heldAt": "מועד",
+    "typeLabel": "סוג",
+    "decisions": "החלטות",
+    "actionItems": "פעולות לביצוע",
+    "addAction": "הוסף פעולה",
+    "emptyActions": "עדיין אין פעולות",
+    "actionSummary": "תיאור",
+    "confirmDeleteAction": "למחוק את הפעולה?",
+    "type": {
+      "supervision": "פיקוח",
+      "handover": "מסירה",
+      "planning": "תכנון"
+    }
+  },
   "supplierQuotes": {
     "title": "הצעות ספקים",
     "empty": "עדיין אין הצעות לפריט זה",
