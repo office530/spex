@@ -9,13 +9,25 @@ import { supabase } from '../lib/supabase';
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
 
 type ProjectStatus = 'active' | 'on_hold' | 'completed' | 'cancelled';
+type ProjectType = 'execution' | 'planning_execution';
 
 interface ProjectRow {
   id: string;
   name: string;
   status: ProjectStatus;
+  type: ProjectType;
+  contract_value: number | null;
   client: { company_name: string } | null;
   pm: { full_name: string } | null;
+}
+
+function formatCurrencyILS(value: number | null | undefined): string {
+  if (value == null) return '';
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 const statusBadgeClass: Record<ProjectStatus, string> = {
@@ -40,7 +52,7 @@ export function ProjectsPage() {
       const { data, error } = await supabase
         .from('projects')
         .select(
-          'id, name, status, client:clients(company_name), pm:user_profiles!projects_pm_id_fkey(full_name)',
+          'id, name, status, type, contract_value, client:clients(company_name), pm:user_profiles!projects_pm_id_fkey(full_name)',
         )
         .order('name');
       if (error) {
@@ -101,13 +113,19 @@ export function ProjectsPage() {
                   to={`/projects/${p.id}`}
                   className="flex items-center justify-between px-6 py-3 gap-4 hover:bg-muted/60 transition-colors"
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="font-medium truncate">{p.name}</div>
                     <div className="text-xs text-muted-foreground truncate">
                       {p.client?.company_name ?? '—'}
                       {p.pm && <span> · {p.pm.full_name}</span>}
+                      <span> · {t(`projects.types.${p.type}`)}</span>
                     </div>
                   </div>
+                  {p.contract_value != null && (
+                    <div className="shrink-0 text-sm font-medium hidden sm:block">
+                      {formatCurrencyILS(p.contract_value)}
+                    </div>
+                  )}
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass[p.status]}`}
                   >
