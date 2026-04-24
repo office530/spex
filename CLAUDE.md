@@ -1,5 +1,16 @@
 # Spex — agent instructions
 
+## Orientation (read in this order)
+
+1. **`HANDOFF.md` §Current state + §Progress log** — what's already shipped + what's left. Don't restart a phase that's done.
+2. **`BLUEPRINT.md` §10 phased plan** — the authoritative roadmap. Every piece of work should map to a phase.
+3. **`DECISIONS.md`** — locked product + stack decisions. Don't re-open them.
+4. **`DESIGN.md`** — authoritative UI/UX spec. Read before any visual work.
+5. **`PATTERNS.md`** — copy-paste UI recipes. Cite a section when a new pattern is introduced.
+6. **`MIRO_READOUT.md`** — original requirements source. Resolves ambiguity in BLUEPRINT.
+7. **`SCHEMA.md`** — database schema reference (also in `packages/db/src/schema/`).
+8. **`SALVAGE.md`** — reusable snippets from the old Base44 app.
+
 ## Language (non-negotiable)
 
 **The entire user-facing UI must be in Hebrew.** No exceptions.
@@ -33,12 +44,39 @@ The complete design language lives in **`DESIGN.md`**. Read it before any UI wor
 
 If you think you need a new pattern not covered here, add it to `PATTERNS.md` in the same PR that introduces it.
 
-## Other durable rules
+## Workflow rules (durable)
 
-See `DESIGN.md` for the full design language, `HANDOFF.md` for phase history, `BLUEPRINT.md` for architecture, `DECISIONS.md` for the tech stack, `SCHEMA.md` for the DB schema, `PATTERNS.md` for UI recipes.
+- **Branch**: all work goes on `claude/start-spex-rebuild-ZiKng` (long-lived working branch). Each phase is a commit (or stack of commits) → push → PR → merge to `main`.
+- **Supabase project**: `vxzflohvtfrkwycpaxiy` (ap-southeast-1 Singapore). All DDL goes through `mcp__supabase__apply_migration`. The same SQL is **also** saved as `supabase/migrations/NNNN_descriptive_name.sql` so git tracks what's been applied. Current highest-numbered file is the source of truth for "what's applied".
+- **Migrations applied to date**: `0001_auth_rls.sql` → `0006_auto_invoice_on_milestone_ready.sql`. Next one is `0007_*`.
+- **Roles**: back-office (full access) = `ceo`, `vp`, `cfo`, `office_manager`. PM / Foreman are project-scoped via RLS. The full matrix is in `BLUEPRINT.md §7` — obey it when gating UI.
+- **Each phase**: write code → `pnpm --filter web build` → commit → push → open PR (can be non-draft since auto-merge is approved) → `mcp__github__enable_pr_auto_merge` (waits for CI) OR merge manually once `lint · typecheck · test` is green. Shay has **pre-authorized auto-merge** for PRs Claude authors on `claude/*` branches: CI green + no unresolved review comments is the gate. Debug failing CI; don't skip hooks.
+- **After every merged phase**: append one row to `HANDOFF.md` §Progress log so the next session sees current state at a glance.
 
-- Working branch: `claude/start-spex-rebuild-ZiKng`.
-- Back-office roles (full access): `ceo`, `vp`, `cfo`, `office_manager`. PM / Foreman are project-scoped via RLS.
-- Supabase project: `vxzflohvtfrkwycpaxiy` (ap-southeast-1 Singapore).
-- Each phase: write code → `pnpm --filter web build` → commit → push → open a **draft** PR.
-- **Auto-merge approved by Shay** for PRs you author on `claude/*` branches: after push, wait for CI (`lint · typecheck · test`) green AND no unresolved review comments, then merge the PR yourself (`mcp__github__merge_pull_request`). If CI fails, debug and fix before asking. If a review comment lands, address it first.
+## External-integration status (reference only — don't try to build these without explicit go-ahead)
+
+All of these are blocked pending user-side setup. Schema columns and/or sync queues are already in place, but runtime integration is not.
+
+| Integration | Status | Notes |
+|---|---|---|
+| Chashbashvat API | 🚫 Blocked | Sync queue + triggers live (`chashbashvat_sync_jobs`). Worker is future Railway job — see `BLUEPRINT.md §6.4`. |
+| Google Drive | 🚫 Blocked | Substituted Supabase Storage for documents (see `DECISIONS.md #5` — documented deviation). |
+| Google Calendar | 🚫 Blocked | Events table + `google_event_id` column exist; no sync yet. |
+| WhatsApp (Green API) | 🚫 Blocked | Blueprint §8.1 lists 18 templates. Not wired. |
+| Email | 🚫 Blocked | Same NotificationPreference pipeline as WA. Not wired. |
+| Facebook Lead Ads | 🚫 Blocked | Lead source `fb_ads` exists; no webhook. |
+
+## What to build next (pointer)
+
+Per the audit (2026-04-24), the non-blocked / non-library-dependent work left is roughly:
+
+1. Overdue tasks flagged red (Miro §7)
+2. Default customer-invoice due date = 5 days from issuance (Miro §5)
+3. ActivityLog viewer + triggers (Blueprint Phase 6, schema exists)
+4. In-app notifications center + preferences UI (Blueprint Phase 6, schema exists — `notification_preferences`, `notification_logs`)
+5. Calendar grid view for events (Blueprint Phase 1 / Miro §6)
+6. AutomationRule UI (Blueprint Phase 6, schema exists — read-only to start)
+7. Captcha + rate-limit on public `/ticket` (hCaptcha)
+
+Library-dependent (install before building): task Kanban (`@dnd-kit/core`), Gantt (`gantt-task-react` or similar), PDF export (`@react-pdf/renderer`).
+
