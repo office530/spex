@@ -9,7 +9,8 @@
     "logout": "Log out",
     "users": "Users",
     "clients": "Clients",
-    "projects": "Projects"
+    "projects": "Projects",
+    "leads": "Leads"
   },
   "login": {
     "title": "Sign in",
@@ -120,6 +121,70 @@
       "pm": "Project Manager",
       "foreman": "Foreman",
       "viewer": "Viewer"
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "listTitle": "Lead pipeline",
+    "new": "New lead",
+    "newTitle": "New lead",
+    "editTitle": "Edit lead",
+    "details": "Lead details",
+    "empty": "No leads yet",
+    "noMatches": "No leads match your filters",
+    "notFound": "Lead not found",
+    "searchPlaceholder": "Search by name, phone, or owner…",
+    "allStatuses": "All statuses",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "email": "Email",
+    "sourceLabel": "Source",
+    "typeLabel": "Type",
+    "statusLabel": "Status",
+    "owner": "Owner",
+    "noOwner": "No owner",
+    "estimatedValue": "Estimated value",
+    "lastContactAt": "Last contact",
+    "lostReason": "Lost reason",
+    "notes": "Notes",
+    "source": {
+      "website": "Website",
+      "fb_ads": "Facebook ads",
+      "referral": "Referral",
+      "manual": "Manual entry"
+    },
+    "type": {
+      "planning": "Planning",
+      "execution": "Execution"
+    },
+    "status": {
+      "new": "New",
+      "no_answer_1": "No answer (1)",
+      "no_answer_2": "No answer (2)",
+      "no_answer_3": "No answer (3)",
+      "follow_up": "Follow up",
+      "planning_meeting_scheduled": "Planning meeting scheduled",
+      "awaiting_plans": "Awaiting plans",
+      "quote_issued": "Quote issued",
+      "work_meeting_scheduled": "Work meeting scheduled",
+      "won": "Won",
+      "lost": "Lost",
+      "not_relevant": "Not relevant"
+    }
+  },
+  "interactions": {
+    "title": "Timeline",
+    "add": "Log interaction",
+    "empty": "No interactions logged yet",
+    "typeLabel": "Type",
+    "occurredAt": "Occurred at",
+    "note": "Note",
+    "type": {
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "meeting": "Meeting",
+      "note": "Note"
     }
   },
   "common": {
