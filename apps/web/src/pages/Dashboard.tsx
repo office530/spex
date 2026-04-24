@@ -12,11 +12,6 @@ export function DashboardPage() {
           <CardTitle>{t('dashboard.welcome')}</CardTitle>
           <CardDescription>{t('dashboard.scaffoldNotice')}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Phase 0 step 6 — role-gated nav shell + user profile CRUD.
-          </p>
-        </CardContent>
       </Card>
     </div>
   );
