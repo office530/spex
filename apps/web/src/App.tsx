@@ -14,6 +14,7 @@ import { LeadEditPage } from './pages/LeadEditPage';
 import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
 import { MilestoneTemplatesPage } from './pages/MilestoneTemplatesPage';
+import { NotificationPreferencesPage } from './pages/NotificationPreferencesPage';
 import { ProjectEditPage } from './pages/ProjectEditPage';
 import { PublicTicketPage } from './pages/PublicTicketPage';
 import { ReportsPage } from './pages/ReportsPage';
@@ -215,6 +216,14 @@ export function App() {
             <BackOfficeRoute>
               <AutomationRulesPage />
             </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/settings/notifications"
+          element={
+            <AuthenticatedRoute>
+              <NotificationPreferencesPage />
+            </AuthenticatedRoute>
           }
         />
         <Route

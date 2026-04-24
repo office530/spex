@@ -1,5 +1,5 @@
 import { Button } from '@spex/ui';
-import { Bell } from 'lucide-react';
+import { Bell, Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -103,15 +103,28 @@ export function NotificationBell() {
         <div className="absolute bottom-full start-0 mb-2 z-20 w-80 rounded-lg border bg-popover text-popover-foreground shadow-lg">
           <div className="flex items-center justify-between gap-2 px-4 py-2 border-b">
             <div className="text-sm font-semibold">{t('notifications.title')}</div>
-            {unread > 0 && (
+            <div className="flex items-center gap-2">
+              {unread > 0 && (
+                <button
+                  type="button"
+                  onClick={() => void markAllRead()}
+                  className="text-xs text-primary hover:underline"
+                >
+                  {t('notifications.markAllRead')}
+                </button>
+              )}
               <button
                 type="button"
-                onClick={() => void markAllRead()}
-                className="text-xs text-primary hover:underline"
+                onClick={() => {
+                  setOpen(false);
+                  navigate('/settings/notifications');
+                }}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label={t('notifications.title')}
               >
-                {t('notifications.markAllRead')}
+                <Settings className="h-3.5 w-3.5" />
               </button>
-            )}
+            </div>
           </div>
           <div className="max-h-80 overflow-y-auto divide-y">
             {rows.length === 0 ? (
