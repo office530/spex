@@ -5,6 +5,7 @@ import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
 import { ActivityLogPage } from './pages/ActivityLogPage';
 import { BoqPage } from './pages/BoqPage';
+import { CalendarPage } from './pages/CalendarPage';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
@@ -221,6 +222,14 @@ export function App() {
             <BackOfficeRoute>
               <ActivityLogPage />
             </BackOfficeRoute>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <AuthenticatedRoute>
+              <CalendarPage />
+            </AuthenticatedRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
