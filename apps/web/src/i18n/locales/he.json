@@ -542,6 +542,17 @@
       "processed": "טופלה"
     }
   },
+  "rfq_grouper": {
+    "label": "בקשה להצעות",
+    "openButton": "פתח בקשה להצעות",
+    "closeButton": "סגור בקשה",
+    "reopenButton": "פתח מחדש",
+    "status": {
+      "open": "פתוחה",
+      "closed": "סגורה",
+      "cancelled": "בוטלה"
+    }
+  },
   "supplierQuotes": {
     "title": "הצעות ספקים",
     "empty": "עדיין אין הצעות לפריט זה",

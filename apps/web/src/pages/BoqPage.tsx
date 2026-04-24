@@ -713,10 +713,17 @@ interface SupplierQuotesListProps {
   canWrite: boolean;
 }
 
+type RfqStatus = 'open' | 'closed' | 'cancelled';
+interface RfqRow {
+  id: string;
+  status: RfqStatus;
+}
+
 function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesListProps) {
   const { t } = useTranslation();
   const [quotes, setQuotes] = useState<SupplierQuoteRow[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
+  const [rfq, setRfq] = useState<RfqRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState<{
@@ -728,7 +735,7 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
   const [error, setError] = useState<string | null>(null);
 
   async function refresh() {
-    const [qRes, sRes] = await Promise.all([
+    const [qRes, sRes, rfqRes] = await Promise.all([
       supabase
         .from('supplier_quotes')
         .select('id, supplier_id, amount, status, supplier:suppliers(name)')
@@ -737,11 +744,39 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
       canWrite && suppliers.length === 0
         ? supabase.from('suppliers').select('id, name').eq('status', 'active').order('name')
         : Promise.resolve({ data: null, error: null }),
+      supabase
+        .from('rfqs')
+        .select('id, status')
+        .eq('boq_line_item_id', lineItemId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
     if (qRes.error) setError(qRes.error.message);
     else setQuotes((qRes.data as unknown as SupplierQuoteRow[]) ?? []);
     if (sRes.data) setSuppliers(sRes.data as SupplierOption[]);
+    setRfq((rfqRes.data as RfqRow | null) ?? null);
     setLoading(false);
+  }
+
+  async function openRfq() {
+    const { error: dbErr } = await supabase.from('rfqs').insert({
+      project_id: projectId,
+      boq_line_item_id: lineItemId,
+      status: 'open',
+    });
+    if (dbErr) setError(dbErr.message);
+    else await refresh();
+  }
+
+  async function toggleRfq(nextStatus: RfqStatus) {
+    if (!rfq) return;
+    const { error: dbErr } = await supabase
+      .from('rfqs')
+      .update({ status: nextStatus })
+      .eq('id', rfq.id);
+    if (dbErr) setError(dbErr.message);
+    else await refresh();
   }
 
   useEffect(() => {
@@ -770,6 +805,7 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
       supplier_id: form.supplier_id,
       amount: form.amount ? Number(form.amount) : null,
       status: form.status,
+      rfq_id: rfq?.status === 'open' ? rfq.id : null,
     });
     setSaving(false);
     if (error) { setError(error.message); return; }
@@ -786,6 +822,28 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
 
   return (
     <div className="rounded-md border bg-muted/30 p-3 space-y-2">
+      {/* RFQ status banner */}
+      <div className="flex items-center gap-2">
+        {rfq ? (
+          <StatusBadge
+            family="rfq"
+            value={rfq.status}
+            label={`${t('rfq_grouper.label')} · ${t(`rfq_grouper.status.${rfq.status}`)}`}
+          />
+        ) : (
+          <span className="text-xs text-muted-foreground">{t('rfq_grouper.label')}</span>
+        )}
+        {canWrite && (!rfq || rfq.status !== 'open') && (
+          <Button size="sm" variant="ghost" className="h-auto px-2 py-1 text-xs" onClick={() => void (rfq ? toggleRfq('open') : openRfq())}>
+            {rfq ? t('rfq_grouper.reopenButton') : t('rfq_grouper.openButton')}
+          </Button>
+        )}
+        {canWrite && rfq?.status === 'open' && (
+          <Button size="sm" variant="ghost" className="h-auto px-2 py-1 text-xs" onClick={() => void toggleRfq('closed')}>
+            {t('rfq_grouper.closeButton')}
+          </Button>
+        )}
+      </div>
       {loading ? (
         <p className="text-xs text-muted-foreground">{t('common.loading')}</p>
       ) : quotes.length === 0 && !adding ? (
