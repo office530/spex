@@ -371,6 +371,7 @@ export function ProjectEditPage() {
       {!isCreate && id && (
         <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
       )}
+      {!isCreate && id && <MilestonesPanel projectId={id} isAdmin={isAdmin} />}
     </div>
   );
 }
@@ -573,6 +574,233 @@ function MembersPanel({ projectId, isAdmin, users }: MembersPanelProps) {
                   </Button>
                 </div>
               </form>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+type ExecStatus = 'pending' | 'in_progress' | 'done';
+type BillStatus = 'not_yet_due' | 'ready_to_bill' | 'invoiced' | 'paid';
+
+const EXEC_STATUSES: ExecStatus[] = ['pending', 'in_progress', 'done'];
+const BILL_STATUSES: BillStatus[] = ['not_yet_due', 'ready_to_bill', 'invoiced', 'paid'];
+
+interface MilestoneRow {
+  id: string;
+  name: string;
+  billing_pct: number;
+  sort_order: number;
+  execution_status: ExecStatus;
+  billing_status: BillStatus;
+}
+
+const EXEC_COLORS: Record<ExecStatus, string> = {
+  pending: 'bg-gray-100 text-gray-700',
+  in_progress: 'bg-blue-100 text-blue-800',
+  done: 'bg-emerald-100 text-emerald-800',
+};
+
+const BILL_COLORS: Record<BillStatus, string> = {
+  not_yet_due: 'bg-gray-100 text-gray-700',
+  ready_to_bill: 'bg-amber-100 text-amber-800',
+  invoiced: 'bg-blue-100 text-blue-800',
+  paid: 'bg-emerald-100 text-emerald-800',
+};
+
+function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: boolean }) {
+  const { t } = useTranslation();
+  const [milestones, setMilestones] = useState<MilestoneRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newPct, setNewPct] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    const { data, error } = await supabase
+      .from('milestones')
+      .select('id, name, billing_pct, sort_order, execution_status, billing_status')
+      .eq('project_id', projectId)
+      .order('sort_order');
+    if (error) setError(error.message);
+    else setMilestones((data as MilestoneRow[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
+
+  function startAdd() {
+    setAdding(true);
+    setNewName('');
+    setNewPct('');
+    setError(null);
+  }
+
+  function cancelAdd() {
+    setAdding(false);
+    setError(null);
+  }
+
+  async function addMilestone(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const nextOrder = milestones.length
+      ? Math.max(...milestones.map((m) => m.sort_order)) + 1
+      : 0;
+    const { error } = await supabase.from('milestones').insert({
+      project_id: projectId,
+      name: newName,
+      billing_pct: Number(newPct) || 0,
+      sort_order: nextOrder,
+    });
+    setSaving(false);
+    if (error) { setError(error.message); return; }
+    cancelAdd();
+    await refresh();
+  }
+
+  async function updateExec(id: string, status: ExecStatus) {
+    const { error } = await supabase.from('milestones').update({ execution_status: status }).eq('id', id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  async function updateBill(id: string, status: BillStatus) {
+    const { error } = await supabase.from('milestones').update({ billing_status: status }).eq('id', id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  async function removeMilestone(m: MilestoneRow) {
+    if (!confirm(t('milestones.confirmDelete'))) return;
+    const { error } = await supabase.from('milestones').delete().eq('id', m.id);
+    if (error) setError(error.message);
+    else await refresh();
+  }
+
+  const totalPct = milestones.reduce((sum, m) => sum + (m.billing_pct ?? 0), 0);
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2">
+        <CardTitle className="text-base">
+          {t('milestones.title')}
+          {milestones.length > 0 && (
+            <span className="ms-2 text-xs font-normal text-muted-foreground">
+              ({totalPct}%)
+            </span>
+          )}
+        </CardTitle>
+        {isAdmin && !adding && (
+          <Button size="sm" variant="outline" onClick={startAdd}>
+            {t('milestones.add')}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="p-0">
+        {loading ? (
+          <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+        ) : (
+          <div className="divide-y">
+            {adding && (
+              <form onSubmit={addMilestone} className="px-6 py-4 space-y-3 bg-muted/40">
+                <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
+                  <div className="space-y-1">
+                    <Label htmlFor="ms_name">{t('milestones.name')} *</Label>
+                    <Input
+                      id="ms_name"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      required
+                      disabled={saving}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="ms_pct">{t('milestones.billingPct')} *</Label>
+                    <Input
+                      id="ms_pct"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={newPct}
+                      onChange={(e) => setNewPct(e.target.value)}
+                      required
+                      disabled={saving}
+                    />
+                  </div>
+                </div>
+                {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="ghost" size="sm" onClick={cancelAdd} disabled={saving}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button type="submit" size="sm" disabled={saving}>
+                    {saving ? t('common.saving') : t('common.add')}
+                  </Button>
+                </div>
+              </form>
+            )}
+            {milestones.length === 0 && !adding ? (
+              <p className="text-sm text-muted-foreground p-6">{t('milestones.empty')}</p>
+            ) : (
+              milestones.map((m) => (
+                <div key={m.id} className="px-6 py-3 flex items-center gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium truncate">{m.name}</div>
+                    <div className="text-xs text-muted-foreground">{m.billing_pct}%</div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${EXEC_COLORS[m.execution_status]}`}>
+                      {t(`milestones.execution.${m.execution_status}`)}
+                    </span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${BILL_COLORS[m.billing_status]}`}>
+                      {t(`milestones.billing.${m.billing_status}`)}
+                    </span>
+                    {isAdmin && (
+                      <>
+                        <SelectField
+                          id={`ms_exec_${m.id}`}
+                          value={m.execution_status}
+                          onChange={(v) => void updateExec(m.id, v as ExecStatus)}
+                        >
+                          {EXEC_STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                              {t(`milestones.execution.${s}`)}
+                            </option>
+                          ))}
+                        </SelectField>
+                        <SelectField
+                          id={`ms_bill_${m.id}`}
+                          value={m.billing_status}
+                          onChange={(v) => void updateBill(m.id, v as BillStatus)}
+                        >
+                          {BILL_STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                              {t(`milestones.billing.${s}`)}
+                            </option>
+                          ))}
+                        </SelectField>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => void removeMilestone(m)}
+                        >
+                          {t('common.delete')}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
             )}
           </div>
         )}
