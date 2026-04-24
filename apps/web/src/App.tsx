@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
+import { BoqPage } from './pages/BoqPage';
 import { ClientEditPage } from './pages/ClientEditPage';
 import { ClientsPage } from './pages/ClientsPage';
 import { DashboardPage } from './pages/Dashboard';
@@ -106,6 +107,14 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <ProjectEditPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id/boq"
+          element={
+            <AuthenticatedRoute>
+              <BoqPage />
             </AuthenticatedRoute>
           }
         />

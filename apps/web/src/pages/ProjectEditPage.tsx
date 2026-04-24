@@ -218,9 +218,16 @@ export function ProjectEditPage() {
         <h1 className="text-2xl font-bold">
           {isCreate ? t('projects.newTitle') : t('projects.editTitle')}
         </h1>
-        <Button variant="ghost" onClick={() => navigate('/projects')} disabled={saving}>
-          {t('common.back')}
-        </Button>
+        <div className="flex items-center gap-2">
+          {!isCreate && id && (
+            <Button variant="outline" size="sm" onClick={() => navigate(`/projects/${id}/boq`)}>
+              {t('boq.manage')}
+            </Button>
+          )}
+          <Button variant="ghost" onClick={() => navigate('/projects')} disabled={saving}>
+            {t('common.back')}
+          </Button>
+        </div>
       </div>
 
       <Card>
