@@ -14,6 +14,7 @@
     "leads": "Leads",
     "tickets": "Tickets",
     "settings": "Settings",
+    "activity": "Activity log",
     "sections": {
       "workspace": "Workspace",
       "directory": "Directory"
@@ -98,6 +99,22 @@
       "sumLabel": "Billing % sum: {{sum}}%",
       "sumOk": "100% — all good",
       "sumWarning": "Sum doesn't total 100%"
+    }
+  },
+  "activityLog": {
+    "title": "Activity log",
+    "subtitle": "Audit trail of every change (back-office only)",
+    "empty": "No activity yet",
+    "action": {
+      "insert": "created",
+      "update": "updated",
+      "delete": "deleted"
+    },
+    "entity": {
+      "projects": "Project",
+      "leads": "Lead",
+      "customer_invoices": "Invoice",
+      "tasks": "Task"
     }
   },
   "reports": {
