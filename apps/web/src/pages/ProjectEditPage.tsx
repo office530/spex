@@ -7,7 +7,18 @@ import {
   CardTitle,
   Input,
   Label,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@spex/ui';
+import {
+  CalendarDays,
+  ClipboardList,
+  Receipt,
+  SlidersHorizontal,
+  Users,
+} from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -31,7 +42,7 @@ const PROJECT_TYPES: ProjectType[] = ['execution', 'planning_execution'];
 const PROJECT_STATUSES: ProjectStatus[] = ['active', 'on_hold', 'completed', 'cancelled'];
 const MEMBER_ROLES: MemberRole[] = ['pm', 'foreman', 'viewer'];
 
-interface ProjectForm {
+interface ProjectFormState {
   name: string;
   client_id: string;
   type: ProjectType;
@@ -43,7 +54,7 @@ interface ProjectForm {
   notes: string;
 }
 
-const emptyForm: ProjectForm = {
+const emptyForm: ProjectFormState = {
   name: '',
   client_id: '',
   type: 'execution',
@@ -92,7 +103,7 @@ export function ProjectEditPage() {
   const isCreate = !id;
   const fromLeadId = isCreate ? (searchParams.get('from_lead') ?? null) : null;
 
-  const [form, setForm] = useState<ProjectForm>(emptyForm);
+  const [form, setForm] = useState<ProjectFormState>(emptyForm);
   const [clients, setClients] = useState<ClientOption[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -243,8 +254,110 @@ export function ProjectEditPage() {
         />
       )}
 
-      <Card>
-        <form onSubmit={handleSubmit}>
+      {isCreate || !id ? (
+        <ProjectForm
+          form={form}
+          setForm={setForm}
+          clients={clients}
+          users={users}
+          error={error}
+          saving={saving}
+          readOnly={readOnly}
+          isAdmin={isAdmin}
+          onSubmit={handleSubmit}
+        />
+      ) : (
+        (() => {
+          const canWrite = isAdmin || (form.pm_id !== '' && form.pm_id === user?.id);
+          return (
+            <Tabs defaultValue="general">
+              <TabsList>
+                <TabsTrigger value="general">
+                  <SlidersHorizontal />
+                  {t('projects.tabs.general')}
+                </TabsTrigger>
+                <TabsTrigger value="team">
+                  <Users />
+                  {t('projects.tabs.team')}
+                </TabsTrigger>
+                <TabsTrigger value="milestones">
+                  <ClipboardList />
+                  {t('projects.tabs.milestones')}
+                </TabsTrigger>
+                <TabsTrigger value="financials">
+                  <Receipt />
+                  {t('projects.tabs.financials')}
+                </TabsTrigger>
+                <TabsTrigger value="operations">
+                  <CalendarDays />
+                  {t('projects.tabs.operations')}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="general">
+                <ProjectForm
+                  form={form}
+                  setForm={setForm}
+                  clients={clients}
+                  users={users}
+                  error={error}
+                  saving={saving}
+                  readOnly={readOnly}
+                  isAdmin={isAdmin}
+                  onSubmit={handleSubmit}
+                />
+              </TabsContent>
+              <TabsContent value="team">
+                <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
+              </TabsContent>
+              <TabsContent value="milestones">
+                <MilestonesPanel projectId={id} isAdmin={isAdmin} />
+              </TabsContent>
+              <TabsContent value="financials">
+                <VariationsPanel projectId={id} canWrite={canWrite} />
+                <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
+                <PaymentRequestsPanel projectId={id} canWrite={canWrite} />
+              </TabsContent>
+              <TabsContent value="operations">
+                <TasksPanel projectId={id} canWrite={canWrite} />
+                <RfiPanel projectId={id} canWrite={canWrite} />
+                <MeetingsPanel projectId={id} canWrite={canWrite} />
+                <HandoverPanel projectId={id} canWrite={canWrite} />
+              </TabsContent>
+            </Tabs>
+          );
+        })()
+      )}
+    </div>
+  );
+}
+
+interface ProjectFormProps {
+  form: ProjectFormState;
+  setForm: React.Dispatch<React.SetStateAction<ProjectFormState>>;
+  clients: ClientOption[];
+  users: UserOption[];
+  error: string | null;
+  saving: boolean;
+  readOnly: boolean;
+  isAdmin: boolean;
+  onSubmit: (e: FormEvent) => void;
+}
+
+function ProjectForm({
+  form,
+  setForm,
+  clients,
+  users,
+  error,
+  saving,
+  readOnly,
+  isAdmin,
+  onSubmit,
+}: ProjectFormProps) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+        <form onSubmit={onSubmit}>
           <CardHeader>
             <CardTitle className="text-base">{t('projects.details')}</CardTitle>
           </CardHeader>
@@ -387,27 +500,6 @@ export function ProjectEditPage() {
           )}
         </form>
       </Card>
-
-      {!isCreate && id && (
-        <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
-      )}
-      {!isCreate && id && <MilestonesPanel projectId={id} isAdmin={isAdmin} />}
-      {(() => {
-        if (isCreate || !id) return null;
-        const canWrite = isAdmin || (form.pm_id !== '' && form.pm_id === user?.id);
-        return (
-          <>
-            <VariationsPanel projectId={id} canWrite={canWrite} />
-            <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
-            <PaymentRequestsPanel projectId={id} canWrite={canWrite} />
-            <TasksPanel projectId={id} canWrite={canWrite} />
-            <RfiPanel projectId={id} canWrite={canWrite} />
-            <MeetingsPanel projectId={id} canWrite={canWrite} />
-            <HandoverPanel projectId={id} canWrite={canWrite} />
-          </>
-        );
-      })()}
-    </div>
   );
 }
 

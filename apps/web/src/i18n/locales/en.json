@@ -133,6 +133,13 @@
       "milestones": "Milestones",
       "billedShort": "billed"
     },
+    "tabs": {
+      "general": "General",
+      "team": "Team",
+      "milestones": "Milestones",
+      "financials": "Financials",
+      "operations": "Operations"
+    },
     "types": {
       "execution": "Execution only",
       "planning_execution": "Planning + execution"

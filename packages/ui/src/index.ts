@@ -9,4 +9,22 @@ export {
   CardContent,
   CardFooter,
 } from './components/card';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from './components/table';
+export { StatusBadge, type StatusBadgeProps, type StatusTone } from './components/status-badge';
+export { EmptyState, type EmptyStateProps } from './components/empty-state';
+export {
+  formatCurrencyILS,
+  toDatetimeInput,
+  fromDatetimeInput,
+  toDateInput,
+  fromDateInput,
+} from './lib/format';
 export { cn } from './lib/utils';
