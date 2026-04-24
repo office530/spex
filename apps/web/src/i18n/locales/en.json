@@ -102,6 +102,17 @@
       "toggleOn": "Enable",
       "toggleOff": "Disable"
     },
+    "notifications": {
+      "title": "Notification preferences",
+      "description": "Choose how you want to be notified for each event. Default is in-app only.",
+      "empty": "No events configured",
+      "event": "Event",
+      "channels": {
+        "in_app": "In app",
+        "email": "Email",
+        "whatsapp": "WhatsApp"
+      }
+    },
     "milestoneTemplates": {
       "title": "Milestone templates",
       "description": "These milestones are auto-seeded into every new project.",
