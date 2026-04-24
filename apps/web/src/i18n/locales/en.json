@@ -83,6 +83,27 @@
     "address": "Address",
     "notes": "Notes"
   },
+  "documents": {
+    "title": "Documents",
+    "empty": "No documents yet",
+    "upload": "Upload file",
+    "uploading": "Uploading…",
+    "download": "Download",
+    "confirmDelete": "Delete this file?",
+    "folder": "Folder",
+    "uploadedBy": "Uploaded by",
+    "uploadedAt": "Uploaded {{date}}",
+    "folders": {
+      "plans": "Plans",
+      "consultants": "Consultants",
+      "contract": "Contract",
+      "invoices": "Invoices",
+      "photos": "Photos",
+      "meetings": "Meetings",
+      "handover": "Handover",
+      "other": "Other"
+    }
+  },
   "tickets": {
     "title": "Tickets",
     "listTitle": "Ticket list",
@@ -192,7 +213,8 @@
       "team": "Team",
       "milestones": "Milestones",
       "financials": "Financials",
-      "operations": "Operations"
+      "operations": "Operations",
+      "documents": "Documents"
     },
     "types": {
       "execution": "Execution only",

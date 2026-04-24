@@ -83,6 +83,27 @@
     "address": "כתובת",
     "notes": "הערות"
   },
+  "documents": {
+    "title": "מסמכים",
+    "empty": "עדיין אין מסמכים",
+    "upload": "העלאת קובץ",
+    "uploading": "מעלה…",
+    "download": "הורדה",
+    "confirmDelete": "למחוק את הקובץ?",
+    "folder": "תיקייה",
+    "uploadedBy": "הועלה על ידי",
+    "uploadedAt": "הועלה ב-{{date}}",
+    "folders": {
+      "plans": "תוכניות",
+      "consultants": "יועצים",
+      "contract": "חוזה",
+      "invoices": "חשבוניות",
+      "photos": "תמונות",
+      "meetings": "פגישות",
+      "handover": "מסירה",
+      "other": "אחר"
+    }
+  },
   "tickets": {
     "title": "פניות",
     "listTitle": "רשימת פניות",
@@ -192,7 +213,8 @@
       "team": "צוות",
       "milestones": "אבני דרך",
       "financials": "כספים",
-      "operations": "תפעול"
+      "operations": "תפעול",
+      "documents": "מסמכים"
     },
     "types": {
       "execution": "ביצוע בלבד",
