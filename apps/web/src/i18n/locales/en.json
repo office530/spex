@@ -100,6 +100,17 @@
       "sumWarning": "Sum doesn't total 100%"
     }
   },
+  "chashbashvat": {
+    "queueSync": "Sync to Chashbashvat",
+    "queuedToast": "Queued for sync",
+    "label": "Chashbashvat",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "synced": "Synced",
+      "failed": "Failed"
+    }
+  },
   "customerInvoices": {
     "title": "Customer invoices",
     "add": "New invoice",

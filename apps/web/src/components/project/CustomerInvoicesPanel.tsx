@@ -12,9 +12,10 @@ import {
   StatusBadge,
   toDateInput,
 } from '@spex/ui';
-import { Receipt } from 'lucide-react';
+import { Receipt, Send } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { enqueueChashbashvatSync, type SyncStatus } from '../../lib/chashbashvat';
 import { supabase } from '../../lib/supabase';
 
 type InvoiceKind = 'tax_invoice' | 'deal_invoice';
@@ -50,6 +51,7 @@ interface InvoiceRow {
   issued_at: string | null;
   paid_at: string | null;
   notes: string | null;
+  chashbashvat_sync_status: SyncStatus | null;
   milestone: { name: string } | null;
   receipts: ReceiptRow[];
 }
@@ -98,7 +100,7 @@ export function CustomerInvoicesPanel({
       supabase
         .from('customer_invoices')
         .select(
-          'id, milestone_id, kind, status, amount, due_date, issued_at, paid_at, notes, milestone:milestones(name)',
+          'id, milestone_id, kind, status, amount, due_date, issued_at, paid_at, notes, chashbashvat_sync_status, milestone:milestones(name)',
         )
         .eq('project_id', projectId)
         .order('created_at', { ascending: false }),
@@ -205,6 +207,27 @@ export function CustomerInvoicesPanel({
     const { error: delErr } = await supabase.from('customer_invoices').delete().eq('id', r.id);
     if (delErr) setError(delErr.message);
     else await refresh();
+  }
+
+  async function queueSync(r: InvoiceRow) {
+    try {
+      await enqueueChashbashvatSync({
+        entityType: 'customer_invoice',
+        entityId: r.id,
+        operation: r.chashbashvat_sync_status ? 'update' : 'create',
+        payload: {
+          amount: r.amount,
+          kind: r.kind,
+          due_date: r.due_date,
+          issued_at: r.issued_at,
+          milestone_name: r.milestone?.name ?? null,
+          notes: r.notes,
+        },
+      });
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'sync enqueue failed');
+    }
   }
 
   const total = rows.reduce((s, r) => s + (r.amount ?? 0), 0);
@@ -376,6 +399,7 @@ export function CustomerInvoicesPanel({
                     canWrite={canWrite}
                     onEdit={() => startEdit(r)}
                     onDelete={() => void remove(r)}
+                    onSync={() => void queueSync(r)}
                     onReceiptChange={refresh}
                     dateFmt={dateFmt}
                   />
@@ -394,6 +418,7 @@ interface InvoiceRowDisplayProps {
   canWrite: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onSync: () => void;
   onReceiptChange: () => void | Promise<void>;
   dateFmt: Intl.DateTimeFormat;
 }
@@ -403,6 +428,7 @@ function InvoiceRowDisplay({
   canWrite,
   onEdit,
   onDelete,
+  onSync,
   onReceiptChange,
   dateFmt,
 }: InvoiceRowDisplayProps) {
@@ -433,8 +459,22 @@ function InvoiceRowDisplay({
           label={t(`customerInvoices.status.${row.status}`)}
           className="shrink-0"
         />
+        {row.chashbashvat_sync_status && (
+          <StatusBadge
+            family="chashbashvat_sync"
+            value={row.chashbashvat_sync_status}
+            label={`${t('chashbashvat.label')} · ${t(`chashbashvat.status.${row.chashbashvat_sync_status}`)}`}
+            className="shrink-0"
+          />
+        )}
         {canWrite && (
           <div className="shrink-0 flex items-center gap-1">
+            {row.status === 'issued' && row.chashbashvat_sync_status !== 'synced' && (
+              <Button size="sm" variant="ghost" onClick={onSync}>
+                <Send className="h-3.5 w-3.5 me-1" />
+                {t('chashbashvat.queueSync')}
+              </Button>
+            )}
             <Button size="sm" variant="ghost" onClick={onEdit}>
               {t('common.edit')}
             </Button>
