@@ -110,6 +110,13 @@
       "manager": "מנהל",
       "anonymous": "אנונימי"
     },
+    "publicTitle": "פתיחת פנייה",
+    "publicDescription": "מלא את הפרטים ונחזור אליך בהקדם.",
+    "publicSubmit": "שליחת פנייה",
+    "publicSubmitting": "שולח…",
+    "publicSuccess": "הפנייה התקבלה",
+    "publicSuccessDescription": "תודה! נחזור אליך בהקדם האפשרי.",
+    "publicSubmitAnother": "פנייה נוספת",
     "status": {
       "new": "חדשה",
       "in_progress": "בטיפול",

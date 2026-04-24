@@ -11,6 +11,7 @@ import { LeadEditPage } from './pages/LeadEditPage';
 import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
 import { ProjectEditPage } from './pages/ProjectEditPage';
+import { PublicTicketPage } from './pages/PublicTicketPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { SupplierEditPage } from './pages/SupplierEditPage';
 import { SuppliersPage } from './pages/SuppliersPage';
@@ -42,6 +43,7 @@ export function App() {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/ticket" element={<PublicTicketPage />} />
         <Route
           path="/"
           element={
