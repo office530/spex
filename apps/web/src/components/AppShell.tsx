@@ -73,6 +73,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen flex bg-muted/40">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground focus:shadow-md"
+      >
+        {t('nav.skipToContent')}
+      </a>
       <aside className="hidden md:flex flex-col w-60 shrink-0 bg-sidebar text-sidebar-foreground">
         <div className="px-5 py-5">
           <div className="text-lg font-bold">{t('app.name')}</div>
@@ -135,13 +141,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             size="sm"
             onClick={() => void signOut()}
             className="h-8 w-8 p-0 text-sidebar-muted-foreground"
+            aria-label={t('nav.logout')}
           >
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      <main className="flex-1 min-w-0 pt-12 md:pt-0">
+      <main id="main-content" className="flex-1 min-w-0 pt-12 md:pt-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">{children}</div>
       </main>
     </div>
