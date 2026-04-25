@@ -13,6 +13,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import {
+  computeChapterTotal,
+  computeLineTotal,
+  computeProjectTotal,
+} from '../lib/boqCalculations';
 import { supabase } from '../lib/supabase';
 
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
@@ -135,10 +140,7 @@ export function BoqPage() {
     else await refresh();
   }
 
-  const projectTotal = chapters.reduce(
-    (sum, c) => sum + c.items.reduce((s, i) => s + (i.estimated_total ?? 0), 0),
-    0,
-  );
+  const projectTotal = computeProjectTotal(chapters);
 
   if (loading) {
     return (
@@ -254,7 +256,7 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
   const [nameDraft, setNameDraft] = useState(chapter.name);
   const [savingName, setSavingName] = useState(false);
 
-  const chapterTotal = chapter.items.reduce((s, i) => s + (i.estimated_total ?? 0), 0);
+  const chapterTotal = computeChapterTotal(chapter.items);
 
   function resetNewItem() {
     setNewItem({ description: '', unit: '', quantity: '', unit_price: '', notes: '' });
@@ -267,7 +269,7 @@ function ChapterCard({ chapter, projectId, canWrite, onChange, onDelete }: Chapt
     setError(null);
     const qty = newItem.quantity ? Number(newItem.quantity) : null;
     const price = newItem.unit_price ? Number(newItem.unit_price) : null;
-    const total = qty != null && price != null ? qty * price : null;
+    const total = computeLineTotal(qty, price);
     const nextOrder = chapter.items.length
       ? Math.max(...chapter.items.map((i) => i.sort_order)) + 1
       : 0;
@@ -521,7 +523,7 @@ function LineItemRow({ item, projectId, canWrite, onChange }: LineItemRowProps) 
     setError(null);
     const qty = form.quantity ? Number(form.quantity) : null;
     const price = form.unit_price ? Number(form.unit_price) : null;
-    const total = qty != null && price != null ? qty * price : null;
+    const total = computeLineTotal(qty, price);
     const { error } = await supabase
       .from('boq_line_items')
       .update({
