@@ -16,6 +16,7 @@ import { Receipt, Send } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { enqueueChashbashvatSync, type SyncStatus } from '../../lib/chashbashvat';
+import { defaultInvoiceDueDate } from '../../lib/invoiceDefaults';
 import { supabase } from '../../lib/supabase';
 
 type InvoiceKind = 'tax_invoice' | 'deal_invoice';
@@ -178,15 +179,11 @@ export function CustomerInvoicesPanel({
     if (!form.amount) return;
     setSaving(true);
     setError(null);
-    // Miro §5: when an invoice goes 'issued', default payment date = 5 days
-    // from issuance. Only auto-fills when due_date is left blank.
-    let effectiveDueDate = form.due_date;
-    if (form.status === 'issued' && !form.due_date) {
-      const base = form.issued_at ? new Date(form.issued_at) : new Date();
-      const due = new Date(base);
-      due.setDate(due.getDate() + 5);
-      effectiveDueDate = due.toISOString().slice(0, 10);
-    }
+    const effectiveDueDate = defaultInvoiceDueDate({
+      status: form.status,
+      dueDate: form.due_date,
+      issuedAt: form.issued_at,
+    });
     const payload = {
       milestone_id: form.milestone_id || null,
       kind: form.kind,

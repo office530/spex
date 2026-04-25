@@ -14,6 +14,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { toDatetimeInput, fromDatetimeInput } from './format';
+import { isTaskOverdue } from '../../lib/taskHelpers';
 
 type TaskStatus =
   | 'awaiting_execution'
@@ -333,11 +334,7 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                       <span className="text-muted-foreground">{bucket.length}</span>
                     </div>
                     {bucket.map((r) => {
-                      const isOverdue =
-                        r.due_date &&
-                        new Date(r.due_date).getTime() < Date.now() &&
-                        r.status !== 'done' &&
-                        r.status !== 'cancelled';
+                      const isOverdue = isTaskOverdue(r);
                       return (
                         <button
                           key={r.id}
@@ -422,28 +419,23 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                           )}
                           <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mt-1">
                             <span>{r.assignee?.full_name ?? t('tasks.noAssignee')}</span>
-                            {r.due_date && (() => {
-                              const isOverdue =
-                                new Date(r.due_date).getTime() < Date.now() &&
-                                r.status !== 'done' &&
-                                r.status !== 'cancelled';
-                              return (
-                                <span className={isOverdue ? 'text-rose-700 font-medium' : ''}>
-                                  · {dateFormat.format(new Date(r.due_date))}
-                                </span>
-                              );
-                            })()}
+                            {r.due_date && (
+                              <span
+                                className={
+                                  isTaskOverdue(r) ? 'text-rose-700 font-medium' : ''
+                                }
+                              >
+                                · {dateFormat.format(new Date(r.due_date))}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="shrink-0 flex items-center gap-1 flex-wrap">
-                          {r.due_date &&
-                            new Date(r.due_date).getTime() < Date.now() &&
-                            r.status !== 'done' &&
-                            r.status !== 'cancelled' && (
-                              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-800">
-                                {t('tasks.overdue')}
-                              </span>
-                            )}
+                          {isTaskOverdue(r) && (
+                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-800">
+                              {t('tasks.overdue')}
+                            </span>
+                          )}
                           <StatusBadge
                             family="task_priority"
                             value={r.priority}

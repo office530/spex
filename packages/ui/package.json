@@ -13,7 +13,8 @@
   "scripts": {
     "lint": "echo '[ui] lint not yet scaffolded' && exit 0",
     "typecheck": "tsc --noEmit",
-    "test": "echo '[ui] tests not yet scaffolded' && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@types/react-dom": "^18.3.1",
+    "vitest": "^2.1.4"
   }
 }

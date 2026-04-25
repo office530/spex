@@ -74,6 +74,9 @@ importers:
       vite:
         specifier: ^5.4.10
         version: 5.4.21(@types/node@20.19.39)
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@20.19.39)
 
   packages/db:
     dependencies:
@@ -133,6 +136,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.1
         version: 18.3.7(@types/react@18.3.28)
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9(@types/node@20.19.39)
 
 packages:
 
