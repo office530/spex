@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "echo '[web] lint not yet scaffolded' && exit 0",
     "typecheck": "tsc --noEmit",
-    "test": "echo '[web] tests not yet scaffolded' && exit 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
     "tailwindcss-animate": "^1.0.7",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
   }
 }

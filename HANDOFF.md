@@ -134,6 +134,7 @@ Post-Phase-6 polish sweep (Miro catch-up):
 | 41 | NotificationPreferences grid (in_app / email / whatsapp) | ✅ |
 | 42 | Tasks kanban view toggle (status columns, no DnD yet) | ✅ |
 | 43 | Consultants entity (list + edit, back-office CRUD) | ✅ |
+| 44 | Public ticket image attachments + soft anon rate-limit | ✅ (captcha + IP rate-limit — pending hCaptcha account + edge function) |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
@@ -157,6 +158,7 @@ Migrations (in `supabase/migrations/`):
 - `0009_automation_rules_rls_and_seed.sql` — RLS + 7 seeded inactive WA rules from BLUEPRINT §8.1
 - `0010_notification_preferences_rls.sql` — RLS + UNIQUE(user_id, event_type, channel)
 - `0011_consultants_entity.sql` — consultants table + RLS (back-office write)
+- `0012_ticket_attachments_storage.sql` — `ticket-uploads` storage bucket + anon-insert policy + soft anon rate-limit trigger on tickets
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 
