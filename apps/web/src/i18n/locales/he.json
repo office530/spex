@@ -487,6 +487,13 @@
       "operations": "תפעול",
       "documents": "מסמכים"
     },
+    "financials": {
+      "customerInvoices": "חשבוניות לקוח",
+      "variations": "בלתמים",
+      "purchaseOrders": "הזמנות רכש",
+      "supplierInvoices": "חשבוניות ספק",
+      "paymentRequests": "בקשות תשלום"
+    },
     "types": {
       "execution": "ביצוע בלבד",
       "planning_execution": "תכנון + ביצוע"
