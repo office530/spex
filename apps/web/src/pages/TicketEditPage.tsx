@@ -9,10 +9,18 @@ import {
   Label,
   StatusBadge,
 } from '@spex/ui';
+import { Image as ImageIcon } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+
+interface TicketAttachment {
+  path: string;
+  name: string;
+  size: number;
+  mime: string;
+}
 
 type TicketStatus =
   | 'new'
@@ -72,6 +80,8 @@ export function TicketEditPage() {
   const [form, setForm] = useState<TicketForm>(emptyForm);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [users, setUsers] = useState<UserOption[]>([]);
+  const [attachments, setAttachments] = useState<TicketAttachment[]>([]);
+  const [signedUrls, setSignedUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(!isCreate);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +101,7 @@ export function TicketEditPage() {
           : supabase
               .from('tickets')
               .select(
-                'subject, body, opener_type, opener_name, opener_contact, status, project_id, assigned_to_id',
+                'subject, body, opener_type, opener_name, opener_contact, status, project_id, assigned_to_id, attachments',
               )
               .eq('id', id)
               .maybeSingle(),
@@ -112,6 +122,7 @@ export function TicketEditPage() {
             status: TicketStatus;
             project_id: string | null;
             assigned_to_id: string | null;
+            attachments: TicketAttachment[] | null;
           };
           setForm({
             subject: tk.subject,
@@ -123,6 +134,7 @@ export function TicketEditPage() {
             project_id: tk.project_id ?? '',
             assigned_to_id: tk.assigned_to_id ?? '',
           });
+          if (Array.isArray(tk.attachments)) setAttachments(tk.attachments);
         }
       }
       setLoading(false);
@@ -131,6 +143,27 @@ export function TicketEditPage() {
       cancelled = true;
     };
   }, [id, isCreate, t]);
+
+  useEffect(() => {
+    if (attachments.length === 0) return;
+    let cancelled = false;
+    void (async () => {
+      const paths = attachments.map((a) => a.path);
+      const { data } = await supabase.storage
+        .from('ticket-uploads')
+        .createSignedUrls(paths, 3600);
+      if (cancelled || !data) return;
+      const map: Record<string, string> = {};
+      data.forEach((row, idx) => {
+        const path = paths[idx];
+        if (path && row.signedUrl) map[path] = row.signedUrl;
+      });
+      setSignedUrls(map);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [attachments]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -190,6 +223,14 @@ export function TicketEditPage() {
                   label={t(`tickets.status.${form.status}`)}
                   className="bg-white/15 text-white"
                 />
+                {attachments.length > 0 && (
+                  <span>
+                    ·{' '}
+                    {t('tickets.attachmentsCount', {
+                      count: attachments.length,
+                    })}
+                  </span>
+                )}
               </div>
             </div>
             <Button
@@ -206,6 +247,43 @@ export function TicketEditPage() {
       )}
 
       <div className={isCreate ? '' : 'max-w-3xl mx-auto space-y-6'}>
+        {!isCreate && attachments.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">{t('tickets.attachmentsLabel')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {attachments.map((a) => {
+                  const url = signedUrls[a.path];
+                  const isImage = a.mime?.startsWith('image/');
+                  return (
+                    <a
+                      key={a.path}
+                      href={url ?? '#'}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-md overflow-hidden border bg-muted hover:opacity-90 transition-opacity"
+                      title={a.name}
+                    >
+                      {isImage && url ? (
+                        <img
+                          src={url}
+                          alt={a.name}
+                          className="aspect-square object-cover w-full"
+                        />
+                      ) : (
+                        <div className="aspect-square flex items-center justify-center text-muted-foreground">
+                          <ImageIcon className="h-6 w-6" />
+                        </div>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
         <Card>
           <form onSubmit={handleSubmit}>
             <CardHeader>
