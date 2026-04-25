@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  DatePicker,
   EmptyState,
   formatCurrencyILS,
   fromDateInput,
@@ -308,32 +309,38 @@ export function CustomerInvoicesPanel({
           </div>
           <div className="space-y-1">
             <Label htmlFor="inv_due">{t('customerInvoices.dueDate')}</Label>
-            <Input
+            <DatePicker
               id="inv_due"
-              type="date"
-              value={form.due_date}
-              onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
+              value={form.due_date || null}
+              onChange={(v) => setForm((f) => ({ ...f, due_date: v ?? '' }))}
               disabled={saving}
+              triggerLabel={t('customerInvoices.dueDate')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="inv_issued">{t('customerInvoices.issuedAt')}</Label>
-            <Input
+            <DatePicker
               id="inv_issued"
-              type="date"
-              value={form.issued_at}
-              onChange={(e) => setForm((f) => ({ ...f, issued_at: e.target.value }))}
+              value={form.issued_at || null}
+              onChange={(v) => setForm((f) => ({ ...f, issued_at: v ?? '' }))}
               disabled={saving}
+              triggerLabel={t('customerInvoices.issuedAt')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="space-y-1">
             <Label htmlFor="inv_paid">{t('customerInvoices.paidAt')}</Label>
-            <Input
+            <DatePicker
               id="inv_paid"
-              type="date"
-              value={form.paid_at}
-              onChange={(e) => setForm((f) => ({ ...f, paid_at: e.target.value }))}
+              value={form.paid_at || null}
+              onChange={(v) => setForm((f) => ({ ...f, paid_at: v ?? '' }))}
               disabled={saving}
+              triggerLabel={t('customerInvoices.paidAt')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="space-y-1 sm:col-span-2">
