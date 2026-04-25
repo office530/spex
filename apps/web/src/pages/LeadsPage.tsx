@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  EmptyState,
   formatCurrencyILS,
   HoverCard,
   HoverCardContent,
@@ -35,7 +36,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Eye, MoreHorizontal, Pencil, Target } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -306,9 +307,12 @@ export function LeadsPage() {
               {(error as Error).message}
             </p>
           ) : table.getRowModel().rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground p-6">
-              {globalFilter || statusFilter ? t('leads.noMatches') : t('leads.empty')}
-            </p>
+            <EmptyState
+              icon={Target}
+              title={
+                globalFilter || statusFilter ? t('leads.noMatches') : t('leads.empty')
+              }
+            />
           ) : (
             <Table>
               <TableHeader>

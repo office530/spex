@@ -4,6 +4,8 @@ import {
   EmptyState,
   Input,
   PageHeader,
+  SegmentedControl,
+  type SegmentedControlOption,
   SkeletonRows,
   StatusBadge,
   Table,
@@ -108,12 +110,12 @@ export function MyTasksPage() {
     setParams(np, { replace: true });
   }
 
-  const statusOptions: Array<{ value: StatusFilter; key: string }> = [
-    { value: 'open', key: 'myTasks.filterOpen' },
-    { value: 'in_progress', key: 'tasks.status.in_progress' },
-    { value: 'awaiting_manager_approval', key: 'tasks.status.awaiting_manager_approval' },
-    { value: 'done', key: 'tasks.status.done' },
-    { value: 'all', key: 'myTasks.filterAll' },
+  const statusOptions: ReadonlyArray<SegmentedControlOption<StatusFilter>> = [
+    { value: 'open', label: t('myTasks.filterOpen') },
+    { value: 'in_progress', label: t('tasks.status.in_progress') },
+    { value: 'awaiting_manager_approval', label: t('tasks.status.awaiting_manager_approval') },
+    { value: 'done', label: t('tasks.status.done') },
+    { value: 'all', label: t('myTasks.filterAll') },
   ];
 
   return (
@@ -135,22 +137,12 @@ export function MyTasksPage() {
                 className="ps-8"
               />
             </div>
-            <div className="flex items-center gap-1 p-1 rounded-md bg-muted">
-              {statusOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setFilter({ status: opt.value })}
-                  className={`text-xs font-medium px-3 py-1 rounded transition-colors ${
-                    statusFilter === opt.value
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {t(opt.key)}
-                </button>
-              ))}
-            </div>
+            <SegmentedControl
+              value={statusFilter}
+              onChange={(value) => setFilter({ status: value })}
+              options={statusOptions}
+              ariaLabel={t('myTasks.col.status')}
+            />
           </div>
 
           {loading ? (
