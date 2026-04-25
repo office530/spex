@@ -9,7 +9,18 @@ import {
   Label,
   StatusBadge,
 } from '@spex/ui';
+import {
+  DndContext,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import { ListChecks } from 'lucide-react';
+import { toast } from 'sonner';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
@@ -171,6 +182,32 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
 
   const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' });
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
+
+  async function handleKanbanDragEnd(e: DragEndEvent) {
+    const taskId = String(e.active.id);
+    const targetStatus = e.over?.id ? String(e.over.id) : null;
+    if (!targetStatus) return;
+    const task = rows.find((r) => r.id === taskId);
+    if (!task || task.status === targetStatus) return;
+    const previous = task.status;
+    setRows((prev) =>
+      prev.map((r) => (r.id === taskId ? { ...r, status: targetStatus as TaskRow['status'] } : r)),
+    );
+    const { error } = await supabase
+      .from('tasks')
+      .update({ status: targetStatus })
+      .eq('id', taskId);
+    if (error) {
+      setRows((prev) =>
+        prev.map((r) => (r.id === taskId ? { ...r, status: previous } : r)),
+      );
+      toast.error(t('common.errorToast'), { description: error.message });
+    }
+  }
+
   function renderForm() {
     return (
       <form onSubmit={save} className="px-6 py-4 space-y-3 bg-muted/40">
@@ -321,61 +358,35 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
               cta={canWrite ? { label: t('tasks.add'), onClick: () => startAdd() } : undefined}
             />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-4">
-              {STATUSES.map((status) => {
-                const bucket = rows.filter((r) => r.status === status);
-                return (
-                  <div
-                    key={status}
-                    className="bg-muted/30 rounded-lg p-2 space-y-2 min-h-[160px]"
-                  >
-                    <div className="flex items-center justify-between text-xs font-medium px-1">
-                      <span>{t(`tasks.status.${status}`)}</span>
-                      <span className="text-muted-foreground">{bucket.length}</span>
-                    </div>
-                    {bucket.map((r) => {
-                      const isOverdue = isTaskOverdue(r);
-                      return (
-                        <button
+            <DndContext sensors={sensors} onDragEnd={handleKanbanDragEnd}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-4">
+                {STATUSES.map((status) => {
+                  const bucket = rows.filter((r) => r.status === status);
+                  return (
+                    <KanbanColumn
+                      key={status}
+                      status={status}
+                      label={t(`tasks.status.${status}`)}
+                      count={bucket.length}
+                    >
+                      {bucket.map((r) => (
+                        <KanbanCard
                           key={r.id}
-                          type="button"
-                          onClick={() => startEdit(r)}
-                          className="w-full text-start bg-background rounded p-2 shadow-sm hover:shadow space-y-1 transition-shadow"
-                        >
-                          <div className="text-sm font-medium truncate">{r.title}</div>
-                          {r.assignee?.full_name && (
-                            <div className="text-xs text-muted-foreground truncate">
-                              {r.assignee.full_name}
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1 flex-wrap">
-                            <StatusBadge
-                              family="task_priority"
-                              value={r.priority}
-                              label={t(`tasks.priority.${r.priority}`)}
-                            />
-                            {r.due_date && (
-                              <span
-                                className={`text-xs ${
-                                  isOverdue
-                                    ? 'text-rose-700 font-medium'
-                                    : 'text-muted-foreground'
-                                }`}
-                              >
-                                {dateFormat.format(new Date(r.due_date))}
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                    {bucket.length === 0 && (
-                      <div className="text-xs text-muted-foreground text-center py-2">—</div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                          task={r}
+                          priorityLabel={t(`tasks.priority.${r.priority}`)}
+                          dateFormat={dateFormat}
+                          overdue={isTaskOverdue(r)}
+                          onClick={() => canWrite && startEdit(r)}
+                        />
+                      ))}
+                      {bucket.length === 0 && (
+                        <div className="text-xs text-muted-foreground text-center py-2">—</div>
+                      )}
+                    </KanbanColumn>
+                  );
+                })}
+              </div>
+            </DndContext>
           )
         ) : (
           <div className="divide-y">
@@ -791,6 +802,75 @@ function TaskDependencies({
           {error && <p className="text-xs text-destructive" role="alert">{error}</p>}
         </div>
       )}
+    </div>
+  );
+}
+
+interface KanbanColumnProps {
+  status: TaskStatus;
+  label: string;
+  count: number;
+  children: React.ReactNode;
+}
+
+function KanbanColumn({ status, label, count, children }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({ id: status });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`bg-muted/30 rounded-lg p-2 space-y-2 min-h-[160px] transition-colors ${
+        isOver ? 'bg-primary/10 ring-2 ring-primary/40' : ''
+      }`}
+    >
+      <div className="flex items-center justify-between text-xs font-medium px-1">
+        <span>{label}</span>
+        <span className="text-muted-foreground">{count}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+interface KanbanCardProps {
+  task: TaskRow;
+  priorityLabel: string;
+  dateFormat: Intl.DateTimeFormat;
+  overdue: boolean;
+  onClick: () => void;
+}
+
+function KanbanCard({ task, priorityLabel, dateFormat, overdue, onClick }: KanbanCardProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: task.id,
+  });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+      className="w-full text-start bg-background rounded p-2 shadow-sm hover:shadow space-y-1 transition-shadow cursor-grab active:cursor-grabbing"
+    >
+      <div className="text-sm font-medium truncate">{task.title}</div>
+      {task.assignee?.full_name && (
+        <div className="text-xs text-muted-foreground truncate">{task.assignee.full_name}</div>
+      )}
+      <div className="flex items-center gap-1 flex-wrap">
+        <StatusBadge family="task_priority" value={task.priority} label={priorityLabel} />
+        {task.due_date && (
+          <span
+            className={`text-xs ${
+              overdue ? 'text-rose-700 font-medium' : 'text-muted-foreground'
+            }`}
+          >
+            {dateFormat.format(new Date(task.due_date))}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -7,9 +7,10 @@ import {
   EmptyState,
   Input,
 } from '@spex/ui';
-import { Signature } from 'lucide-react';
+import { Download, Signature } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 
 interface ChecklistItem {
@@ -138,6 +139,40 @@ export function HandoverPanel({ projectId, canWrite }: { projectId: string; canW
     }
   }
 
+  async function exportPdf() {
+    if (!handover) return;
+    const { data: project } = await supabase
+      .from('projects')
+      .select('name, client:clients(company_name)')
+      .eq('id', projectId)
+      .maybeSingle();
+    const proj = project as { name: string; client: { company_name: string } | null } | null;
+    try {
+      const [{ HandoverPdf }, { downloadPdf }] = await Promise.all([
+        import('../../lib/pdf/HandoverPdf'),
+        import('../../lib/pdf/download'),
+      ]);
+      await downloadPdf(
+        <HandoverPdf
+          projectName={proj?.name ?? '—'}
+          clientName={proj?.client?.company_name ?? null}
+          checklist={checklist}
+          signedAt={handover.signed_at}
+          signedDateLabel={t('handover.signedAtLabel', { defaultValue: 'נחתם בתאריך' })}
+          unsignedLabel={t('handover.notSigned', { defaultValue: 'טרם נחתם' })}
+          generatedAtLabel={t('handover.generatedAt', {
+            defaultValue: 'הופק על ידי Spex',
+          })}
+        />,
+        `handover-${(proj?.name ?? 'project').replace(/\s+/g, '-')}.pdf`,
+      );
+    } catch (e) {
+      toast.error(t('common.errorToast'), {
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
   const checklist = handover?.checklist ?? [];
   const done = checklist.filter((i) => i.done).length;
   const dateFmt = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short', timeStyle: 'short' });
@@ -158,16 +193,29 @@ export function HandoverPanel({ projectId, canWrite }: { projectId: string; canW
             </span>
           )}
         </CardTitle>
-        {canWrite && handover && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            onClick={() => void removeHandover()}
-          >
-            {t('common.delete')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {handover && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void exportPdf()}
+              className="gap-1.5"
+            >
+              <Download className="h-3.5 w-3.5" />
+              {t('handover.exportPdf')}
+            </Button>
+          )}
+          {canWrite && handover && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-destructive hover:text-destructive"
+              onClick={() => void removeHandover()}
+            >
+              {t('common.delete')}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         {loading ? (

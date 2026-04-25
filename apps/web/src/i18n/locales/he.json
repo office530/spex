@@ -305,6 +305,7 @@
     "publicAttachmentUploadFailed": "העלאת קבצים נכשלה. נסה שוב.",
     "publicCooldown": "המתן רגע לפני שליחה נוספת.",
     "publicRateLimited": "שלחת פניות רבות מדי. נסה שוב בעוד מספר דקות.",
+    "publicCaptchaRequired": "אנא השלם את אימות ה-captcha.",
     "attachmentsLabel": "קבצים מצורפים",
     "attachmentsCount": "{{count}} קבצים מצורפים",
     "attachmentsCount_one": "קובץ מצורף אחד",
@@ -401,6 +402,7 @@
       "general": "כללי",
       "team": "צוות",
       "milestones": "אבני דרך",
+      "schedule": "לוח זמנים",
       "financials": "כספים",
       "operations": "תפעול",
       "documents": "מסמכים"
@@ -576,6 +578,10 @@
     "progress": "{{done}}/{{total}} בוצעו",
     "confirmDeleteItem": "למחוק את הפריט?",
     "confirmDelete": "למחוק את פרוטוקול המסירה?",
+    "exportPdf": "ייצוא PDF",
+    "signedAtLabel": "נחתם בתאריך",
+    "notSigned": "טרם נחתם",
+    "generatedAt": "הופק על ידי Spex",
     "defaults": {
       "electrical": "בדיקת חשמל ותאורה",
       "plumbing": "בדיקת אינסטלציה",
@@ -589,6 +595,8 @@
     "add": "פגישה חדשה",
     "empty": "עדיין אין פגישות",
     "confirmDelete": "למחוק את הפגישה?",
+    "exportPdf": "ייצוא PDF",
+    "generatedAt": "הופק על ידי Spex",
     "titleLabel": "כותרת",
     "heldAt": "מועד",
     "typeLabel": "סוג",
@@ -772,6 +780,10 @@
     "entitiesHeading": "תוצאות חיפוש",
     "navHeading": "ניווט מהיר",
     "toggle": "פתח / סגור"
+  },
+  "schedule": {
+    "title": "לוח זמנים",
+    "empty": "אין אבני דרך להצגה"
   },
   "common": {
     "loading": "טוען…",
