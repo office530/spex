@@ -205,7 +205,7 @@ export function TicketEditPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+        <div className="rounded-2xl bg-mesh-hero text-primary-foreground p-6 sm:p-8 shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="space-y-2 min-w-0">
               <div className="text-xs font-medium text-primary-foreground/70">

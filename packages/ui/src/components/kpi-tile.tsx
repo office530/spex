@@ -33,6 +33,8 @@ export interface KpiTileProps {
   /** Required formatter when `numericValue` is provided. */
   format?: (n: number) => string;
   footer?: ReactNode;
+  /** Highlight a tile with an animated gradient ring (e.g. "needs attention"). */
+  highlight?: boolean;
   className?: string;
 }
 
@@ -44,12 +46,19 @@ export function KpiTile({
   numericValue,
   format,
   footer,
+  highlight,
   className,
 }: KpiTileProps) {
   const animated = numericValue != null && format != null;
   return (
-    <Card className={cn('h-full', className)}>
-      <CardContent className="p-4 space-y-3">
+    <Card
+      className={cn(
+        'h-full',
+        highlight && 'gradient-border-animated shadow-md',
+        className,
+      )}
+    >
+      <CardContent className="p-4 space-y-3 relative z-10">
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs text-muted-foreground">{label}</span>
           <div
