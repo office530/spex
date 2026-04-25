@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  DatePicker,
   EmptyState,
   formatCurrencyILS,
   fromDateInput,
@@ -231,12 +232,14 @@ export function PurchaseOrdersPanel({
           </div>
           <div className="space-y-1">
             <Label htmlFor="po_issued">{t('purchaseOrders.issuedAt')}</Label>
-            <Input
+            <DatePicker
               id="po_issued"
-              type="date"
-              value={form.issued_at}
-              onChange={(e) => setForm((f) => ({ ...f, issued_at: e.target.value }))}
+              value={form.issued_at || null}
+              onChange={(v) => setForm((f) => ({ ...f, issued_at: v ?? '' }))}
               disabled={saving}
+              triggerLabel={t('purchaseOrders.issuedAt')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="space-y-1 sm:col-span-2">

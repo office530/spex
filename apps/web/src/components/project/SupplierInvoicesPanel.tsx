@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  DatePicker,
   EmptyState,
   formatCurrencyILS,
   Input,
@@ -208,12 +209,14 @@ export function SupplierInvoicesPanel({
           </div>
           <div className="space-y-1">
             <Label htmlFor="si_date">{t('supplierInvoices.invoiceDate')}</Label>
-            <Input
+            <DatePicker
               id="si_date"
-              type="date"
-              value={form.invoice_date}
-              onChange={(e) => setForm((f) => ({ ...f, invoice_date: e.target.value }))}
+              value={form.invoice_date || null}
+              onChange={(v) => setForm((f) => ({ ...f, invoice_date: v ?? '' }))}
               disabled={saving}
+              triggerLabel={t('supplierInvoices.invoiceDate')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="space-y-1">

@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
   EmptyState,
+  DatePicker,
   Input,
   KpiTile,
   Label,
@@ -569,26 +570,26 @@ function ProjectForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="start_date">{t('projects.startDate')}</Label>
-                <Input
+                <DatePicker
                   id="start_date"
-                  type="date"
-                  value={form.start_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, start_date: e.target.value }))
-                  }
+                  value={form.start_date || null}
+                  onChange={(v) => setForm((f) => ({ ...f, start_date: v ?? '' }))}
                   disabled={saving || readOnly}
+                  triggerLabel={t('projects.startDate')}
+                  clearLabel={t('common.remove')}
+                  doneLabel={t('common.save')}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="target_end_date">{t('projects.targetEndDate')}</Label>
-                <Input
+                <DatePicker
                   id="target_end_date"
-                  type="date"
-                  value={form.target_end_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, target_end_date: e.target.value }))
-                  }
+                  value={form.target_end_date || null}
+                  onChange={(v) => setForm((f) => ({ ...f, target_end_date: v ?? '' }))}
                   disabled={saving || readOnly}
+                  triggerLabel={t('projects.targetEndDate')}
+                  clearLabel={t('common.remove')}
+                  doneLabel={t('common.save')}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
