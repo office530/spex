@@ -35,6 +35,19 @@ export {
   type IconTone,
 } from './components/kpi-tile';
 export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from './components/dialog';
+export { DatePicker, type DatePickerProps } from './components/date-picker';
+export {
   formatCurrencyILS,
   toDatetimeInput,
   fromDatetimeInput,
