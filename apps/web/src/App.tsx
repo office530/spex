@@ -1,32 +1,90 @@
+import { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import { RequireAuth } from './auth/RequireAuth';
 import { RequireRole } from './auth/RequireRole';
 import { AppShell } from './components/AppShell';
-import { ActivityLogPage } from './pages/ActivityLogPage';
-import { AutomationRulesPage } from './pages/AutomationRulesPage';
-import { BoqPage } from './pages/BoqPage';
-import { CalendarPage } from './pages/CalendarPage';
-import { ConsultantEditPage } from './pages/ConsultantEditPage';
-import { ConsultantsPage } from './pages/ConsultantsPage';
-import { ClientEditPage } from './pages/ClientEditPage';
-import { ClientsPage } from './pages/ClientsPage';
-import { DashboardPage } from './pages/Dashboard';
-import { LeadEditPage } from './pages/LeadEditPage';
-import { LeadsPage } from './pages/LeadsPage';
 import { LoginPage } from './pages/Login';
-import { MilestoneTemplatesPage } from './pages/MilestoneTemplatesPage';
-import { NotificationPreferencesPage } from './pages/NotificationPreferencesPage';
-import { ProjectEditPage } from './pages/ProjectEditPage';
-import { PublicTicketPage } from './pages/PublicTicketPage';
-import { ReportsPage } from './pages/ReportsPage';
-import { ProjectsPage } from './pages/ProjectsPage';
-import { SupplierEditPage } from './pages/SupplierEditPage';
-import { SuppliersPage } from './pages/SuppliersPage';
-import { TicketEditPage } from './pages/TicketEditPage';
-import { TicketsPage } from './pages/TicketsPage';
-import { UserEditPage } from './pages/UserEditPage';
-import { UsersPage } from './pages/UsersPage';
+
+const ActivityLogPage = lazy(() =>
+  import('./pages/ActivityLogPage').then((m) => ({ default: m.ActivityLogPage })),
+);
+const AutomationRulesPage = lazy(() =>
+  import('./pages/AutomationRulesPage').then((m) => ({ default: m.AutomationRulesPage })),
+);
+const BoqPage = lazy(() =>
+  import('./pages/BoqPage').then((m) => ({ default: m.BoqPage })),
+);
+const CalendarPage = lazy(() =>
+  import('./pages/CalendarPage').then((m) => ({ default: m.CalendarPage })),
+);
+const ConsultantEditPage = lazy(() =>
+  import('./pages/ConsultantEditPage').then((m) => ({ default: m.ConsultantEditPage })),
+);
+const ConsultantsPage = lazy(() =>
+  import('./pages/ConsultantsPage').then((m) => ({ default: m.ConsultantsPage })),
+);
+const ClientEditPage = lazy(() =>
+  import('./pages/ClientEditPage').then((m) => ({ default: m.ClientEditPage })),
+);
+const ClientsPage = lazy(() =>
+  import('./pages/ClientsPage').then((m) => ({ default: m.ClientsPage })),
+);
+const DashboardPage = lazy(() =>
+  import('./pages/Dashboard').then((m) => ({ default: m.DashboardPage })),
+);
+const LeadEditPage = lazy(() =>
+  import('./pages/LeadEditPage').then((m) => ({ default: m.LeadEditPage })),
+);
+const LeadsPage = lazy(() =>
+  import('./pages/LeadsPage').then((m) => ({ default: m.LeadsPage })),
+);
+const MilestoneTemplatesPage = lazy(() =>
+  import('./pages/MilestoneTemplatesPage').then((m) => ({ default: m.MilestoneTemplatesPage })),
+);
+const NotificationPreferencesPage = lazy(() =>
+  import('./pages/NotificationPreferencesPage').then((m) => ({
+    default: m.NotificationPreferencesPage,
+  })),
+);
+const ProjectEditPage = lazy(() =>
+  import('./pages/ProjectEditPage').then((m) => ({ default: m.ProjectEditPage })),
+);
+const PublicTicketPage = lazy(() =>
+  import('./pages/PublicTicketPage').then((m) => ({ default: m.PublicTicketPage })),
+);
+const ReportsPage = lazy(() =>
+  import('./pages/ReportsPage').then((m) => ({ default: m.ReportsPage })),
+);
+const ProjectsPage = lazy(() =>
+  import('./pages/ProjectsPage').then((m) => ({ default: m.ProjectsPage })),
+);
+const SupplierEditPage = lazy(() =>
+  import('./pages/SupplierEditPage').then((m) => ({ default: m.SupplierEditPage })),
+);
+const SuppliersPage = lazy(() =>
+  import('./pages/SuppliersPage').then((m) => ({ default: m.SuppliersPage })),
+);
+const TicketEditPage = lazy(() =>
+  import('./pages/TicketEditPage').then((m) => ({ default: m.TicketEditPage })),
+);
+const TicketsPage = lazy(() =>
+  import('./pages/TicketsPage').then((m) => ({ default: m.TicketsPage })),
+);
+const UserEditPage = lazy(() =>
+  import('./pages/UserEditPage').then((m) => ({ default: m.UserEditPage })),
+);
+const UsersPage = lazy(() =>
+  import('./pages/UsersPage').then((m) => ({ default: m.UsersPage })),
+);
+
+function RouteFallback() {
+  const { t } = useTranslation();
+  return (
+    <p className="text-sm text-muted-foreground py-12 text-center">{t('common.loading')}</p>
+  );
+}
 
 const BACK_OFFICE = ['ceo', 'vp', 'cfo', 'office_manager'] as const;
 
@@ -49,7 +107,8 @@ function BackOfficeRoute({ children }: { children: React.ReactNode }) {
 export function App() {
   return (
     <AuthProvider>
-      <Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/ticket" element={<PublicTicketPage />} />
         <Route
@@ -276,8 +335,9 @@ export function App() {
             </AuthenticatedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </AuthProvider>
   );
 }
