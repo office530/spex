@@ -764,6 +764,15 @@
       "note": "Note"
     }
   },
+  "cmdk": {
+    "title": "Quick search",
+    "placeholder": "Search projects, leads, clients…",
+    "startTyping": "Start typing to search",
+    "noResults": "No results",
+    "entitiesHeading": "Results",
+    "navHeading": "Navigation",
+    "toggle": "open / close"
+  },
   "common": {
     "loading": "Loading…",
     "edit": "Edit",

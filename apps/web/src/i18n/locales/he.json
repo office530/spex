@@ -764,6 +764,15 @@
       "note": "הערה"
     }
   },
+  "cmdk": {
+    "title": "חיפוש מהיר",
+    "placeholder": "חפש פרויקט, ליד, לקוח…",
+    "startTyping": "התחל להקליד כדי לחפש",
+    "noResults": "לא נמצאו תוצאות",
+    "entitiesHeading": "תוצאות חיפוש",
+    "navHeading": "ניווט מהיר",
+    "toggle": "פתח / סגור"
+  },
   "common": {
     "loading": "טוען…",
     "edit": "עריכה",

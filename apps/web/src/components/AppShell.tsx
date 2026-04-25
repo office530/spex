@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { CommandPalette } from './CommandPalette';
 import { NotificationBell } from './NotificationBell';
 
 const BACK_OFFICE: UserRole[] = ['ceo', 'vp', 'cfo', 'office_manager'];
@@ -151,6 +152,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main id="main-content" className="flex-1 min-w-0 pt-12 md:pt-0">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">{children}</div>
       </main>
+      <CommandPalette />
     </div>
   );
 }
