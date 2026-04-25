@@ -127,6 +127,13 @@ Post-Phase-6 polish sweep (Miro catch-up):
 |---|---|---|
 | 35 | Overdue tasks flagged red (Miro §7) | ✅ |
 | 36 | Default customer-invoice due date = issued_at + 5 days (Miro §5) | ✅ |
+| 37 | ActivityLog viewer + generic audit trigger | ✅ |
+| 38 | In-app notifications bell + 30s poll | ✅ |
+| 39 | Calendar month grid (RTL, Hebrew weekday labels) | ✅ |
+| 40 | AutomationRule UI + 7 seeded inactive WA rules | ✅ |
+| 41 | NotificationPreferences grid (in_app / email / whatsapp) | ✅ |
+| 42 | Tasks kanban view toggle (status columns, no DnD yet) | ✅ |
+| 43 | Consultants entity (list + edit, back-office CRUD) | ✅ |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
@@ -148,9 +155,8 @@ Migrations (in `supabase/migrations/`):
 - `0007_activity_log_triggers.sql` — generic audit trigger wired to projects / leads / customer_invoices / tasks
 - `0008_in_app_notifications.sql` — notifications table + task/ticket assignment triggers
 - `0009_automation_rules_rls_and_seed.sql` — RLS + 7 seeded inactive WA rules from BLUEPRINT §8.1
-- `0004_project_documents_storage.sql` — storage bucket + 4 policies + documents columns
-- `0005_chashbashvat_sync_infrastructure.sql` — sync queue table + triggers to mirror status onto source entities
-- `0006_auto_invoice_on_milestone_ready.sql` — milestone `ready_to_bill` → customer_invoice trigger
+- `0010_notification_preferences_rls.sql` — RLS + UNIQUE(user_id, event_type, channel)
+- `0011_consultants_entity.sql` — consultants table + RLS (back-office write)
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 
