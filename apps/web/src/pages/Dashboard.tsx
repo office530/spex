@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
   EmptyState,
@@ -319,12 +318,6 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.welcome')}</CardTitle>
-          <CardDescription>{t('dashboard.scaffoldNotice')}</CardDescription>
-        </CardHeader>
-      </Card>
     </div>
   );
 }

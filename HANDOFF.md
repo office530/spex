@@ -202,6 +202,7 @@ Migrations (in `supabase/migrations/`):
 - `0010_notification_preferences_rls.sql` — RLS + UNIQUE(user_id, event_type, channel)
 - `0011_consultants_entity.sql` — consultants table + RLS (back-office write)
 - `0012_ticket_attachments_storage.sql` — `ticket-uploads` storage bucket + anon-insert policy + soft anon rate-limit trigger on tickets
+- `0013_chashbashvat_jobs_policy_tighten.sql` — narrowed RLS on `chashbashvat_sync_jobs` (applied to remote 2026-04-25)
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 

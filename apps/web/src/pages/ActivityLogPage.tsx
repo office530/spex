@@ -1,4 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle, EmptyState } from '@spex/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  SkeletonRows,
+  StatusBadge,
+} from '@spex/ui';
 import { History } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,12 +23,6 @@ interface ActivityRow {
   occurred_at: string;
   user: { full_name: string } | null;
 }
-
-const ACTION_COLORS: Record<Action, string> = {
-  insert: 'bg-emerald-100 text-emerald-800',
-  update: 'bg-blue-100 text-blue-800',
-  delete: 'bg-rose-100 text-rose-800',
-};
 
 export function ActivityLogPage() {
   const { t, i18n } = useTranslation();
@@ -64,7 +66,7 @@ export function ActivityLogPage() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+            <SkeletonRows count={8} />
           ) : error ? (
             <p className="text-sm text-destructive p-6 text-center">{error}</p>
           ) : rows.length === 0 ? (
@@ -93,11 +95,12 @@ export function ActivityLogPage() {
                         {r.entity_id}
                       </div>
                     </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_COLORS[r.action]}`}
-                    >
-                      {actionLabel}
-                    </span>
+                    <StatusBadge
+                      family="audit_action"
+                      value={r.action}
+                      label={actionLabel}
+                      className="shrink-0"
+                    />
                     <div className="text-xs text-muted-foreground shrink-0">
                       {dateFmt.format(new Date(r.occurred_at))}
                     </div>

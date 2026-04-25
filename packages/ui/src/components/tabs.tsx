@@ -38,10 +38,16 @@ export const TabsList = React.forwardRef<
 });
 TabsList.displayName = TabsPrimitive.List.displayName;
 
+interface TabsTriggerProps
+  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> {
+  /** Optional inline count badge (e.g. "RFI 3"). Hidden when undefined. */
+  count?: number;
+}
+
 export const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => {
+  TabsTriggerProps
+>(({ className, children, count, ...props }, ref) => {
   const variant = React.useContext(TabsVariantContext);
   return (
     <TabsPrimitive.Trigger
@@ -57,7 +63,21 @@ export const TabsTrigger = React.forwardRef<
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+      {typeof count === 'number' && count > 0 && (
+        <span
+          className={cn(
+            'ms-0.5 inline-flex items-center justify-center rounded-full text-[10px] font-medium px-1.5 min-w-[1.25rem] h-5 leading-none tabular-nums',
+            'bg-muted text-muted-foreground',
+            'group-data-[state=active]:bg-primary/15 group-data-[state=active]:text-primary',
+          )}
+          aria-hidden
+        >
+          {count}
+        </span>
+      )}
+    </TabsPrimitive.Trigger>
   );
 });
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;

@@ -35,8 +35,6 @@
   },
   "dashboard": {
     "title": "לוח בקרה",
-    "welcome": "ברוך הבא ל-Spex",
-    "scaffoldNotice": "שלד בלבד — הפונקציונליות נוספת בשלבים הבאים",
     "activeProjects": "פרויקטים פעילים",
     "activeLeads": "לידים פעילים",
     "openTasks": "משימות פתוחות שלי",

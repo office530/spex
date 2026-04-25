@@ -5,6 +5,7 @@ import {
   CardTitle,
   formatCurrencyILS,
   KpiTile,
+  SkeletonRows,
   type IconTone,
 } from '@spex/ui';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
@@ -400,7 +401,7 @@ export function ReportsPage() {
                 </div>
               )
             ) : (
-              <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+              <SkeletonRows count={5} />
             )}
           </CardContent>
         </Card>
@@ -435,7 +436,7 @@ export function ReportsPage() {
                 </div>
               )
             ) : (
-              <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+              <SkeletonRows count={5} />
             )}
           </CardContent>
         </Card>

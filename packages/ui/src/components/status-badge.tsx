@@ -45,7 +45,10 @@ type StatusFamily =
   | 'customer_invoice'
   | 'chashbashvat_sync'
   | 'purchase_order'
-  | 'rfq';
+  | 'rfq'
+  | 'audit_action'
+  | 'automation_rule'
+  | 'flag';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -174,6 +177,27 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     closed: 'success',
     cancelled: 'muted',
   },
+  // Postgres trigger op codes for ActivityLog audit trail (0007_activity_log_triggers.sql)
+  audit_action: {
+    insert: 'success',
+    update: 'info',
+    delete: 'danger',
+    select: 'muted',
+  },
+  // Used in AutomationRulesPage for the active/inactive toggle (replaces hand-rolled emerald/slate ternary)
+  automation_rule: {
+    active: 'success',
+    inactive: 'muted',
+  },
+  // Generic family for derived/computed flags that aren't part of an enum (e.g. an "overdue"
+  // overlay on a task, "cheapest" highlight on a supplier quote). Add new flag values here
+  // — do NOT bloat the parent family with derived states.
+  flag: {
+    overdue: 'danger',
+    cheapest: 'success',
+    new: 'info',
+    pinned: 'accent',
+  },
 };
 
 export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -182,18 +206,27 @@ export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> 
   label: string;
 }
 
-export function StatusBadge({ family, value, label, className, ...props }: StatusBadgeProps) {
+export function StatusBadge({
+  family,
+  value,
+  label,
+  className,
+  children,
+  ...props
+}: StatusBadgeProps) {
   const tone = STATUS_TONES[family][value] ?? 'neutral';
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
         TONE_CLASSES[tone],
         className,
       )}
       {...props}
     >
-      {label}
+      {/* When children are provided (e.g. an icon + label combo), render them instead of the
+         plain label. Callers must still pass `label` for the i18n contract / aria. */}
+      {children ?? label}
     </span>
   );
 }

@@ -24,6 +24,9 @@ Currently-supported families (keep this list in sync as new enums land):
 | `rfi` | `open`, `responded`, `closed` |
 | `supplier_invoice` | `received`, `matched`, `disputed`, `processed` |
 | `payment_request` | the 5 payment request statuses |
+| `audit_action` | `insert`, `update`, `delete`, `select` |
+| `automation_rule` | `active`, `inactive` |
+| `flag` | derived flags: `overdue`, `cheapest`, `new`, `pinned` — for badges that aren't part of an enum |
 
 Color palette (apply consistently across all families):
 
@@ -43,14 +46,18 @@ A page with more than 4 content sections uses `<Tabs>` from `@spex/ui`:
 <Tabs defaultValue="overview">
   <TabsList>
     <TabsTrigger value="overview"><LayoutDashboard /> {t('...')}</TabsTrigger>
-    <TabsTrigger value="financials"><Receipt /> {t('...')}</TabsTrigger>
+    <TabsTrigger value="rfi" count={openRfiCount}>
+      <HelpCircle /> {t('rfi.title')}
+    </TabsTrigger>
+    <TabsTrigger value="financials"><Receipt /> {t('financials.title')}</TabsTrigger>
   </TabsList>
   <TabsContent value="overview">…</TabsContent>
+  <TabsContent value="rfi">…</TabsContent>
   <TabsContent value="financials">…</TabsContent>
 </Tabs>
 ```
 
-Tab triggers always have an icon + Hebrew label. Keep the number of tabs ≤ 5 on mobile.
+Tab triggers always have an icon + Hebrew label. Keep the number of tabs ≤ 5 on mobile. **`<TabsTrigger>` accepts a `count?: number` prop** that renders an inline pill badge (e.g. "RFI 3"). The badge is hidden when count is 0 / undefined.
 
 ## 3. Tables
 
@@ -111,24 +118,118 @@ Always `lucide-react`. Common choices:
 
 ## 7. Forms
 
-- Group fields into sections with `<FieldGroup label="…">` when a form has >5 fields.
+- Group fields into sections with `<FieldGroup label="…" description="…">` when a form has >5 fields. The primitive ships in `@spex/ui` (Phase 66):
+
+  ```tsx
+  import { FieldGroup, Label, Input, MoneyInput } from '@spex/ui';
+
+  <FieldGroup label={t('project.basics')} description={t('project.basicsDesc')}>
+    <div>
+      <Label htmlFor="name">{t('project.name')} *</Label>
+      <Input id="name" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
+    </div>
+    <div>
+      <Label htmlFor="contract_value">{t('project.contractValue')} *</Label>
+      <MoneyInput
+        id="contract_value"
+        value={form.contract_value}
+        onChange={(v) => setForm({ ...form, contract_value: v })}
+      />
+    </div>
+  </FieldGroup>
+  <FieldGroup label={t('project.team')} last>
+    {...}
+  </FieldGroup>
+  ```
+
 - Required fields: asterisk after label (`{t('...')} *`).
 - Inline error: `<p role="alert" className="text-sm text-destructive">`.
-- Dates: `<input type="date">` for input, `Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' })` for display.
+- Dates: `<DatePicker>` for input, `Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' })` for display.
 - Phones: `type="tel"`.
-- Money: `<MoneyInput>`.
+- Money: `<MoneyInput>` — ILS-formatted on blur, strips non-digits on paste.
+
+## 7a. Loading buttons
+
+`<Button loading>` shows an inline spinner and auto-disables. Replaces the previous pattern of manually combining `disabled` + a `<Loader2>` import per page.
+
+```tsx
+import { Button } from '@spex/ui';
+
+<Button type="submit" loading={mutation.isPending}>
+  {t('common.save')}
+</Button>
+```
 
 ## 8. Page shells
 
-Every top-level page has a consistent header:
+Every top-level page has a consistent header. The `<PageHeader>` primitive ships in `@spex/ui` (Phase 66):
 
 ```tsx
+import { PageHeader, Button } from '@spex/ui';
+
 <PageHeader
-  title={t('...')}
-  subtitle={optional}
-  actions={<Button>{t('...')}</Button>}
-  back={optional}
+  title={t('projects.title')}
+  subtitle={t('projects.subtitle')}
+  back={{ href: '/' }}                      // optional — renders ArrowRight + label
+  actions={
+    <Button asChild>
+      <Link to="/projects/new">{t('projects.new')}</Link>
+    </Button>
+  }
 />
+```
+
+For entity edit pages with multi-level breadcrumbs, pair with `<Breadcrumb>`:
+
+```tsx
+import { Breadcrumb, BreadcrumbItem, PageHeader } from '@spex/ui';
+
+<div className="space-y-2">
+  <Breadcrumb>
+    <BreadcrumbItem href="/projects">{t('nav.projects')}</BreadcrumbItem>
+    <BreadcrumbItem current>{project.name}</BreadcrumbItem>
+  </Breadcrumb>
+  <PageHeader title={project.name} actions={...} />
+</div>
+```
+
+## 8a. Side drawer (peek-without-leaving)
+
+Right-slide detail pane on top of Radix Dialog. Use for task / ticket / supplier quick-look. RTL: visually slides in from the start (right) edge in Hebrew.
+
+```tsx
+import {
+  SideDrawer,
+  SideDrawerTrigger,
+  SideDrawerContent,
+  SideDrawerHeader,
+  SideDrawerTitle,
+  SideDrawerDescription,
+  SideDrawerBody,
+  SideDrawerFooter,
+} from '@spex/ui';
+
+<SideDrawer open={taskDetail !== null} onOpenChange={(o) => !o && setTaskDetail(null)}>
+  <SideDrawerContent width="md" side="start">
+    <SideDrawerHeader>
+      <SideDrawerTitle>{task.title}</SideDrawerTitle>
+      <SideDrawerDescription>{task.project.name}</SideDrawerDescription>
+    </SideDrawerHeader>
+    <SideDrawerBody>{...}</SideDrawerBody>
+    <SideDrawerFooter>{...}</SideDrawerFooter>
+  </SideDrawerContent>
+</SideDrawer>
+```
+
+## 8b. Date-range picker
+
+Pair of linked DatePickers with from/to validation. Replaces the previous "two side-by-side `<DatePicker>`s" pattern in Reports / ActivityLog / invoice filters.
+
+```tsx
+import { DateRangePicker, type DateRange } from '@spex/ui';
+
+const [range, setRange] = React.useState<DateRange>({ from: null, to: null });
+<DateRangePicker value={range} onChange={setRange} />
 ```
 
 ## 9. Density scale

@@ -6,14 +6,21 @@
 
 @layer base {
   :root {
+    /* Spex tokens — Direction A v1 (Site Foreman). Source: UX_MOODBOARD.md.
+       Action color = safety orange. Chrome = slate. Background surfaces = white on slate-50. */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 173 77% 32%;
+
+    /* Primary = safety orange #f97316 → HSL 25 95% 53% */
+    --primary: 25 95% 53%;
     --primary-foreground: 0 0% 100%;
+    /* Focus ring matches primary */
+    --ring: 25 95% 53%;
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -24,15 +31,21 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 173 77% 32%;
-    --radius: 0.75rem;
-    --sidebar: 173 40% 12%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-muted-foreground: 175 15% 70%;
-    --sidebar-accent: 173 50% 20%;
-    --sidebar-active: 173 77% 45%;
-    --hero-from: 173 50% 14%;
-    --hero-to: 173 77% 24%;
+
+    /* Slightly tighter radius per UX_MOODBOARD.md (was 0.75rem) */
+    --radius: 0.5rem;
+
+    /* Sidebar = slate-800 chrome with white text + slate-700 hover/active */
+    --sidebar: 217 33% 17%;             /* slate-800 #1e293b */
+    --sidebar-foreground: 210 40% 96%;  /* slate-50 #f1f5f9 */
+    --sidebar-muted-foreground: 215 16% 65%; /* slate-400 ~ #94a3b8 */
+    --sidebar-accent: 215 25% 27%;      /* slate-700 #334155 (hover/active bg) */
+    --sidebar-active: 0 0% 100%;        /* pure white text on active link */
+
+    /* Hero gradient kept for backward-compat (entity hero pages until Phase 69 redesign).
+       Now slate-700 → slate-800 instead of teal. */
+    --hero-from: 215 25% 27%;           /* slate-700 */
+    --hero-to: 217 33% 17%;             /* slate-800 */
   }
 
   .dark {

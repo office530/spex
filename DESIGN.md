@@ -2,7 +2,7 @@
 
 The authoritative design reference. `CLAUDE.md` enforces it; `PATTERNS.md` gives code recipes. Every new page, component, or feature MUST match the specifications below.
 
-Design DNA, condensed: **sidebar-nav dashboards** with **hero regions**, **pastel status pills**, **icon-chipped KPIs**, **avatar stacks**, **soft cards**, and **one signature color** (dark teal). Hebrew-first, RTL.
+Design DNA, condensed: **sidebar-nav dashboards** with **data-dense lists**, **pastel status pills**, **icon-chipped KPIs**, **avatar stacks**, **flat white cards on slate-50**, and **one action color** (safety orange). Hebrew-first, RTL. Locked direction is documented in [UX_MOODBOARD.md](UX_MOODBOARD.md).
 
 ---
 
@@ -16,24 +16,27 @@ Design DNA, condensed: **sidebar-nav dashboards** with **hero regions**, **paste
 
 ## 2. Color
 
-### 2.1 Brand palette
+### 2.1 Brand palette (Direction A v1 — Site Foreman)
 
-| Token | Purpose | HSL |
-|---|---|---|
-| `--primary` | Signature teal (buttons, links, focus ring) | `173 77% 32%` |
-| `--primary-foreground` | Text on primary | `0 0% 100%` |
-| `--sidebar` | Sidebar background (dark teal) | `173 40% 12%` |
-| `--sidebar-foreground` | Sidebar body text | `0 0% 96%` |
-| `--sidebar-muted-foreground` | Sidebar meta / inactive link | `175 15% 70%` |
-| `--sidebar-accent` | Sidebar hover / active bg | `173 50% 20%` |
-| `--sidebar-active` | Sidebar active link text | `173 77% 45%` |
-| `--hero-from` / `--hero-to` | Hero gradient stops | `173 50% 14%` → `173 77% 24%` |
-| `--background` | Page body | `0 0% 100%` |
-| `--foreground` | Body text | `222.2 84% 4.9%` |
-| `--muted` | Soft backdrops, card hover | `210 40% 96.1%` |
-| `--muted-foreground` | Secondary text | `215.4 16.3% 46.9%` |
-| `--border` | Card / row dividers | `214.3 31.8% 91.4%` |
-| `--destructive` | Error state | `0 84.2% 60.2%` |
+| Token | Purpose | HSL | ≈ Hex |
+|---|---|---|---|
+| `--primary` | Action color (buttons, links, focus ring) — safety orange | `25 95% 53%` | `#f97316` |
+| `--primary-foreground` | Text on primary | `0 0% 100%` | white |
+| `--ring` | Focus ring (matches primary) | `25 95% 53%` | `#f97316` |
+| `--sidebar` | Sidebar background — slate-800 | `217 33% 17%` | `#1e293b` |
+| `--sidebar-foreground` | Sidebar body text | `210 40% 96%` | slate-50 |
+| `--sidebar-muted-foreground` | Sidebar meta / inactive link | `215 16% 65%` | slate-400 |
+| `--sidebar-accent` | Sidebar hover / active bg — slate-700 | `215 25% 27%` | `#334155` |
+| `--sidebar-active` | Sidebar active link text | `0 0% 100%` | white |
+| `--hero-from` → `--hero-to` | Legacy hero gradient (slate-700 → slate-800). Phase 69 entity hero pages will replace this with a flat band; keep tokens until then. | `215 25% 27%` → `217 33% 17%` | slate-700 → slate-800 |
+| `--background` | Page body | `0 0% 100%` | white |
+| `--foreground` | Body text | `222.2 84% 4.9%` | slate-900 |
+| `--muted` | Page bg (used as `bg-muted/40` in `<AppShell>`) and card hover | `210 40% 96.1%` | slate-100 |
+| `--muted-foreground` | Secondary text | `215.4 16.3% 46.9%` | slate-500 |
+| `--border` | Card / row dividers | `214.3 31.8% 91.4%` | slate-200 |
+| `--destructive` | Error state | `0 84.2% 60.2%` | rose-500 |
+
+> The teal palette (`--primary 173 77% 32%`) shipped in Phases 0–65 was retired on 2026-04-25 when Direction A v1 was locked. See [UX_MOODBOARD.md](UX_MOODBOARD.md) for the full token rationale and "what's in / what's out" table.
 
 ### 2.2 Status tones (pastel pill palette)
 
@@ -88,13 +91,15 @@ Never deviate from this scale without explicit reason documented in PR descripti
 
 ## 5. Radius & elevation
 
-- Radius tokens: `--radius: 0.75rem` (was 0.5rem; upped for softer feel)
+- Radius tokens: `--radius: 0.5rem` (tightened from `0.75rem` in Phase 66 — the industrial direction reads cleaner with sharper corners)
   - `rounded-sm` = `calc(r - 4px)`; `rounded-md` = `calc(r - 2px)`; `rounded-lg` = `r`; `rounded-2xl` for hero
 - Elevation (shadows):
   - No shadow on flat surfaces (lists inside cards)
-  - `shadow-sm` on cards (default)
-  - `shadow-md` on the hero banner
-  - No `shadow-lg` / `shadow-xl` unless explicitly called out (e.g. modal)
+  - `shadow-sm` on cards (default — `<Card>` renders this)
+  - `shadow-md` on the sticky top bar bottom edge OR via `<Card variant="elevated">`
+  - `<Card variant="interactive">` adds hover-lift + cursor-pointer + border tint on hover
+  - No `shadow-lg` / `shadow-xl` unless explicitly called out (e.g. modal, side drawer)
+- **No glass / `backdrop-blur` on cards.** The only place glass is allowed in v1 is the sticky top bar (`bg-muted/85 backdrop-blur`). Everywhere else: solid white cards on solid `bg-muted` page bg.
 
 ## 6. Iconography
 
@@ -143,25 +148,20 @@ Two styles:
 </div>
 ```
 
-**B. Hero banner** (entity detail pages — project, lead, client):
+**B. Hero banner** (entity detail pages — project, lead, client) — **PHASING OUT in Phase 69.**
+
+The teal-gradient hero is a legacy Phases 0–65 pattern that conflicts with the locked A v1 direction (no decorative gradients on entity pages). Tokens `--hero-from` / `--hero-to` remain mapped to slate-700/800 so existing usages keep rendering, but new entity hero work in Phase 69 will replace the gradient banner with a flat slate band + a primary-color accent strip.
+
+For Phase 66 + 67 + 68: keep the existing hero usages on ProjectEditPage / LeadEditPage / ClientEditPage as-is (slate gradient now, instead of teal). Don't add new hero gradients elsewhere.
 
 ```tsx
+{/* Legacy — keep working, do not propagate. Phase 69 replaces this with a flat header. */}
 <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
-  <div className="flex items-start justify-between gap-4 flex-wrap">
-    <div className="space-y-2 min-w-0">
-      <div className="text-xs font-medium text-primary-foreground/70">{category}</div>
-      <h1 className="text-2xl sm:text-3xl font-bold truncate">{title}</h1>
-      <div className="flex items-center gap-3 text-sm text-primary-foreground/80 flex-wrap">
-        {metadataBits}
-        <StatusBadge ... className="bg-white/15 text-white" />
-      </div>
-    </div>
-    <div className="flex items-center gap-2 shrink-0">{actions}</div>
-  </div>
+  ...
 </div>
 ```
 
-Hero is reserved for entity detail pages; list pages use the standard header.
+Hero is reserved for entity detail pages; list pages use the standard header (Pattern A above) via the new `<PageHeader>` primitive ([§8 below](#8-components-inventory-spexui)).
 
 ### 7.3 Tabs
 
@@ -169,18 +169,45 @@ A page with more than 4 content sections uses `<Tabs>`. Tab triggers MUST have a
 
 ## 8. Components inventory (`@spex/ui`)
 
-- `Button` — primary / outline / ghost / destructive; `sm` / default / `lg`
-- `Input`, `Label`
-- `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`
-- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
-- `Table`, `TableHeader`, `TableBody`, `TableRow`, `TableHead`, `TableCell`
-- `StatusBadge` — pastel pill driven by (`family`, `value`)
-- `KpiTile` — icon chip + label + value + footer slot
-- `KpiDelta` — +/- chip with arrow
-- `EmptyState` — icon + title + description + optional CTA
-- `formatCurrencyILS`, `toDatetimeInput`, `fromDatetimeInput`, `toDateInput`, `fromDateInput`
+### 8.1 Layout & shell
+- `PageHeader` — title + subtitle + back + actions slot. Use on every list/edit page (PATTERNS.md §8).
+- `Breadcrumb` + `BreadcrumbItem` — hierarchical nav, RTL chevrons. Required on multi-level entity pages.
+- `SideDrawer` (+ `SideDrawerTrigger` / `SideDrawerContent` / `SideDrawerHeader` / `SideDrawerBody` / `SideDrawerFooter` / `SideDrawerTitle` / `SideDrawerDescription` / `SideDrawerClose`) — right-slide detail pane on Radix Dialog; use for task/ticket/supplier quick-look instead of full-page navigation.
 
-New patterns get extracted here before landing in the app (see CLAUDE.md §UI).
+### 8.2 Buttons & inputs
+- `Button` — primary / outline / ghost / destructive / secondary / link; `sm` / default / `lg` / icon. **Now supports `loading` prop** (auto-disable + inline `<Loader2>` spinner).
+- `Input`, `Label`
+- `MoneyInput` — ILS-formatted on blur, strips non-digits on paste. Required for monetary fields per PATTERNS.md §5.
+- `DatePicker` — single-date with Hebrew locale.
+- `DateRangePicker` — composes two `<DatePicker>`s with linked `from/to` validation. Use for invoice filters, Reports ranges, ActivityLog windows.
+- `Combobox` — searchable single-select.
+- `FieldGroup` — label + description + slot for form-section grouping. Required on forms with >5 fields per PATTERNS.md §7.
+
+### 8.3 Cards & surfaces
+- `Card` (+ `CardHeader` / `CardTitle` / `CardDescription` / `CardContent` / `CardFooter`) — `variant`: `default` (flat `shadow-sm`) / `elevated` (`shadow-md`) / `interactive` (cursor-pointer, hover-lift, border tint).
+- `Tabs` (+ `TabsList` / `TabsTrigger` / `TabsContent`) — `variant`: `pill` / `underline`. **`<TabsTrigger>` accepts `count?: number`** for inline count badges (e.g. "RFI 3 פתוחות").
+- `Table` (+ `TableHeader` / `TableBody` / `TableRow` / `TableHead` / `TableCell`)
+- `Skeleton` / `SkeletonRows` — first-paint loading placeholder (use everywhere a `<p>{t('common.loading')}</p>` was previously used).
+- `Dialog` family — modal dialogs.
+- `DropdownMenu` family — overflow / row actions.
+- `Popover` / `HoverCard` — floating panels.
+
+### 8.4 Data viz
+- `StatusBadge` — pastel pill driven by (`family`, `value`, `label`). 22 families: project · milestone_execution · milestone_billing · lead · supplier_quote · customer_quote · supplier · task · task_priority · event · variation · rfi · supplier_invoice · payment_request · ticket · customer_invoice · chashbashvat_sync · purchase_order · rfq · audit_action · automation_rule · flag.
+- `KpiTile` — icon chip + label + value + footer slot. `iconTone`: 7 semantic tones.
+- `KpiDelta` — +/- chip with arrow.
+- `ProgressRing` — radial progress (milestone %, handover %).
+- `AnimatedNumber` — counter tween for KPI updates.
+
+### 8.5 Empty / placeholder
+- `EmptyState` — icon + title + description + optional CTA. Banned: bare `<p>אין X</p>`.
+
+### 8.6 Helpers
+- `Avatar` / `AvatarStack` — round avatars with hash-based color, overflow `+N` chip.
+- `formatCurrencyILS`, `toDatetimeInput`, `fromDatetimeInput`, `toDateInput`, `fromDateInput`
+- `cn` — className merger (clsx + tailwind-merge).
+
+New patterns get extracted here before landing in the app (see [CLAUDE.md §UI](CLAUDE.md#ui--design-non-negotiable)).
 
 ## 9. Data viz conventions
 
@@ -194,7 +221,7 @@ Icon chip (top-right) + label (top-left) + big value + optional footer (typicall
 Team members, attendees — round avatars overlapping left-to-right (RTL: right-to-left in the visual), 20-24 px, `-ms-1` overlap. Overflow chip `+N` in last slot.
 
 ### 9.4 Progress
-Horizontal progress bars on per-entity headers (milestones `3/11`, handover `4/5`). Use `h-1 bg-muted rounded-full` + `bg-primary` fill. Keep subtle.
+Horizontal progress bars on per-entity headers (milestones `3/11`, handover `4/5`). Use `h-1.5 bg-muted rounded-full` + `bg-primary` fill (orange in v1). Keep subtle. For radial progress on KPI / milestone summaries, use `<ProgressRing>` instead.
 
 ## 10. Motion
 

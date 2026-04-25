@@ -8,6 +8,7 @@ import {
   Label,
   StatusBadge,
 } from '@spex/ui';
+import { Award } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -870,9 +871,15 @@ function SupplierQuotesList({ lineItemId, projectId, canWrite }: SupplierQuotesL
                     <div className="flex-1 min-w-0 truncate">{q.supplier?.name ?? '—'}</div>
                     <div className="shrink-0 font-medium">{formatCurrency(q.amount)}</div>
                     {q.id === cheapestId && (
-                      <span className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-800">
-                        🏆 {t('supplierQuotes.cheapest')}
-                      </span>
+                      <StatusBadge
+                        family="flag"
+                        value="cheapest"
+                        label={t('supplierQuotes.cheapest')}
+                        className="shrink-0 gap-1 [&>svg]:h-3 [&>svg]:w-3"
+                      >
+                        <Award className="h-3 w-3" aria-hidden />
+                        {t('supplierQuotes.cheapest')}
+                      </StatusBadge>
                     )}
                     <StatusBadge
                       family="supplier_quote"

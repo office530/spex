@@ -6,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
   EmptyState,
+  SkeletonRows,
+  StatusBadge,
 } from '@spex/ui';
 import { Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -77,7 +79,7 @@ export function AutomationRulesPage() {
             </p>
           )}
           {loading ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+            <SkeletonRows count={5} />
           ) : rows.length === 0 ? (
             <EmptyState icon={Zap} title={t('settings.automations.empty')} />
           ) : (
@@ -102,17 +104,16 @@ export function AutomationRulesPage() {
                       )}
                     </div>
                   </div>
-                  <span
-                    className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+                  <StatusBadge
+                    family="automation_rule"
+                    value={r.is_active ? 'active' : 'inactive'}
+                    label={
                       r.is_active
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {r.is_active
-                      ? t('settings.automations.active')
-                      : t('settings.automations.inactive')}
-                  </span>
+                        ? t('settings.automations.active')
+                        : t('settings.automations.inactive')
+                    }
+                    className="shrink-0"
+                  />
                   <Button size="sm" variant="outline" onClick={() => void toggle(r)}>
                     {r.is_active
                       ? t('settings.automations.toggleOff')

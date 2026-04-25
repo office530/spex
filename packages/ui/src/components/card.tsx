@@ -1,12 +1,27 @@
 import { forwardRef, type HTMLAttributes } from 'react';
 import { cn } from '../lib/utils';
 
-export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Visual variant.
+   * - `default` (flat) — `shadow-sm`, no hover lift.
+   * - `elevated` — `shadow-md` baseline, used for the sticky top regions or hero panels.
+   * - `interactive` — clickable card: cursor-pointer, hover-lift, hover-border tint. Use when the
+   *    whole card is a link.
+   */
+  variant?: 'default' | 'elevated' | 'interactive';
+}
+
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = 'default', ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
+        'rounded-lg border bg-card text-card-foreground transition-all',
+        variant === 'default' && 'shadow-sm',
+        variant === 'elevated' && 'shadow-md',
+        variant === 'interactive' &&
+          'shadow-sm cursor-pointer hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5',
         className,
       )}
       {...props}
