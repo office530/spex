@@ -43,6 +43,7 @@ import { MeetingsPanel } from '../components/project/MeetingsPanel';
 import { PaymentRequestsPanel } from '../components/project/PaymentRequestsPanel';
 import { PurchaseOrdersPanel } from '../components/project/PurchaseOrdersPanel';
 import { RfiPanel } from '../components/project/RfiPanel';
+import { SchedulePanel } from '../components/project/SchedulePanel';
 import { SupplierInvoicesPanel } from '../components/project/SupplierInvoicesPanel';
 import { TasksPanel } from '../components/project/TasksPanel';
 import { supabase } from '../lib/supabase';
@@ -405,6 +406,10 @@ export function ProjectEditPage() {
                   {t('projects.tabs.milestones')}
                   <TabCountBadge value={tabCounts?.milestones} />
                 </TabsTrigger>
+                <TabsTrigger value="schedule">
+                  <CalendarDays />
+                  {t('projects.tabs.schedule')}
+                </TabsTrigger>
                 <TabsTrigger value="financials">
                   <Receipt />
                   {t('projects.tabs.financials')}
@@ -438,6 +443,13 @@ export function ProjectEditPage() {
               </TabsContent>
               <TabsContent value="milestones">
                 <MilestonesPanel projectId={id} isAdmin={isAdmin} />
+              </TabsContent>
+              <TabsContent value="schedule">
+                <SchedulePanel
+                  projectId={id}
+                  startDate={form.start_date || null}
+                  targetEndDate={form.target_end_date || null}
+                />
               </TabsContent>
               <TabsContent value="financials">
                 <CustomerInvoicesPanel projectId={id} canWrite={canWrite} />

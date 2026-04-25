@@ -401,6 +401,7 @@
       "general": "כללי",
       "team": "צוות",
       "milestones": "אבני דרך",
+      "schedule": "לוח זמנים",
       "financials": "כספים",
       "operations": "תפעול",
       "documents": "מסמכים"
@@ -772,6 +773,10 @@
     "entitiesHeading": "תוצאות חיפוש",
     "navHeading": "ניווט מהיר",
     "toggle": "פתח / סגור"
+  },
+  "schedule": {
+    "title": "לוח זמנים",
+    "empty": "אין אבני דרך להצגה"
   },
   "common": {
     "loading": "טוען…",

@@ -401,6 +401,7 @@
       "general": "General",
       "team": "Team",
       "milestones": "Milestones",
+      "schedule": "Schedule",
       "financials": "Financials",
       "operations": "Operations",
       "documents": "Documents"
@@ -772,6 +773,10 @@
     "entitiesHeading": "Results",
     "navHeading": "Navigation",
     "toggle": "open / close"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "empty": "No milestones to display"
   },
   "common": {
     "loading": "Loading…",
