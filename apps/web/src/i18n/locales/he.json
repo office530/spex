@@ -787,6 +787,8 @@
     "savedToast": "השינויים נשמרו",
     "createdToast": "נוצר בהצלחה",
     "deletedToast": "נמחק",
-    "errorToast": "שגיאה בשמירה"
+    "errorToast": "שגיאה בשמירה",
+    "actions": "פעולות",
+    "view": "צפייה"
   }
 }

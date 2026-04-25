@@ -787,6 +787,8 @@
     "savedToast": "Changes saved",
     "createdToast": "Created",
     "deletedToast": "Deleted",
-    "errorToast": "Save failed"
+    "errorToast": "Save failed",
+    "actions": "Actions",
+    "view": "View"
   }
 }

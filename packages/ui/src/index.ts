@@ -47,6 +47,34 @@ export {
   DialogTrigger,
 } from './components/dialog';
 export { DatePicker, type DatePickerProps } from './components/date-picker';
+export { Skeleton, SkeletonRows, type SkeletonProps } from './components/skeleton';
+export {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from './components/dropdown-menu';
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from './components/popover';
+export { HoverCard, HoverCardContent, HoverCardTrigger } from './components/hover-card';
+export { Combobox, type ComboboxProps, type ComboboxOption } from './components/combobox';
+export { AnimatedNumber, type AnimatedNumberProps } from './components/animated-number';
 export {
   formatCurrencyILS,
   toDatetimeInput,

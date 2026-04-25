@@ -4,8 +4,18 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Combobox,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   formatCurrencyILS,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Input,
+  SkeletonRows,
   StatusBadge,
   Table,
   TableBody,
@@ -25,7 +35,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
 } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -107,9 +117,42 @@ export function LeadsPage() {
     () => [
       columnHelper.accessor('full_name', {
         header: t('leads.fullName') as string,
-        cell: (info) => (
-          <div className="font-medium">{info.getValue()}</div>
-        ),
+        cell: (info) => {
+          const lead = info.row.original;
+          return (
+            <HoverCard openDelay={200}>
+              <HoverCardTrigger asChild>
+                <span className="font-medium hover:underline cursor-default">
+                  {lead.full_name}
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent align="start" className="space-y-2">
+                <div className="font-semibold">{lead.full_name}</div>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <div>{lead.phone}</div>
+                  {lead.owner?.full_name && (
+                    <div>
+                      {t('leads.owner')}: {lead.owner.full_name}
+                    </div>
+                  )}
+                  <div>
+                    {t('leads.sourceLabel')}: {t(`leads.source.${lead.source}`)}
+                  </div>
+                  {lead.estimated_value != null && (
+                    <div>
+                      {t('leads.estimatedValue')}: {formatCurrencyILS(lead.estimated_value)}
+                    </div>
+                  )}
+                </div>
+                <StatusBadge
+                  family="lead"
+                  value={lead.status}
+                  label={t(`leads.status.${lead.status}`)}
+                />
+              </HoverCardContent>
+            </HoverCard>
+          );
+        },
       }),
       columnHelper.accessor('phone', {
         header: t('leads.phone') as string,
@@ -152,8 +195,44 @@ export function LeadsPage() {
           />
         ),
       }),
+      columnHelper.display({
+        id: 'actions',
+        header: () => <span className="sr-only">{t('common.actions')}</span>,
+        cell: (info) => {
+          const lead = info.row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                onClick={(e) => e.stopPropagation()}
+                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label={t('common.actions')}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/leads/${lead.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Eye className="h-4 w-4" />
+                  {t('common.view')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/leads/${lead.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Pencil className="h-4 w-4" />
+                  {t('common.edit')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled>{lead.phone}</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      }),
     ],
-    [dateFmt, t],
+    [dateFmt, navigate, t],
   );
 
   const columnFilters: ColumnFiltersState = useMemo(
@@ -199,29 +278,29 @@ export function LeadsPage() {
       <Card>
         <CardHeader className="gap-3">
           <CardTitle className="text-base">{t('leads.listTitle')}</CardTitle>
-          <div className="grid gap-2 sm:grid-cols-[1fr_12rem]">
+          <div className="grid gap-2 sm:grid-cols-[1fr_14rem]">
             <Input
               placeholder={t('leads.searchPlaceholder')}
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
             />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as LeadStatus | '')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              <option value="">{t('leads.allStatuses')}</option>
-              {ALL_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {t(`leads.status.${s}`)}
-                </option>
-              ))}
-            </select>
+            <Combobox
+              value={statusFilter || null}
+              onChange={(v) => setStatusFilter((v as LeadStatus | null) ?? '')}
+              placeholder={t('leads.allStatuses')}
+              options={ALL_STATUSES.map((s) => ({
+                value: s,
+                label: t(`leads.status.${s}`),
+              }))}
+              clearLabel={t('leads.allStatuses')}
+              searchPlaceholder={t('leads.statusLabel')}
+              emptyLabel={t('leads.noMatches')}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {isPending ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
+            <SkeletonRows count={6} />
           ) : error ? (
             <p className="text-sm text-destructive p-6 text-center">
               {(error as Error).message}

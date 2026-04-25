@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, SkeletonRows } from '@spex/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,9 +62,7 @@ export function ConsultantsPage() {
         </CardHeader>
         <CardContent className="p-0">
           {isPending ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">
-              {t('common.loading')}
-            </p>
+            <SkeletonRows count={5} />
           ) : error ? (
             <p className="text-sm text-destructive p-6 text-center">
               {(error as Error).message}

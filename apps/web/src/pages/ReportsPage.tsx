@@ -208,54 +208,72 @@ export function ReportsPage() {
     icon: LucideIcon;
     iconTone: IconTone;
     value: string | number | undefined;
+    numericValue?: number;
+    format?: (n: number) => string;
   }> = [
     {
       label: t('reports.activeContractValue'),
       icon: CircleDollarSign,
       iconTone: 'success',
       value: data ? formatCurrencyILS(data.activeContractValue) : undefined,
+      numericValue: data?.activeContractValue,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.invoicedThisMonth'),
       icon: Receipt,
       iconTone: 'info',
       value: data ? formatCurrencyILS(data.invoicedThisMonth) : undefined,
+      numericValue: data?.invoicedThisMonth,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.receivedThisMonth'),
       icon: Banknote,
       iconTone: 'success',
       value: data ? formatCurrencyILS(data.receivedThisMonth) : undefined,
+      numericValue: data?.receivedThisMonth,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.outstanding'),
       icon: AlertCircle,
       iconTone: 'warning',
       value: data ? formatCurrencyILS(data.outstanding) : undefined,
+      numericValue: data?.outstanding,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.activeProjects'),
       icon: FolderKanban,
       iconTone: 'info',
       value: data?.activeProjects,
+      numericValue: data?.activeProjects,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.activeLeads'),
       icon: Target,
       iconTone: 'accent',
       value: data?.activeLeads,
+      numericValue: data?.activeLeads,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.wonLast30'),
       icon: CheckCircle2,
       iconTone: 'success',
       value: data?.wonLast30,
+      numericValue: data?.wonLast30,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.openTickets'),
       icon: Inbox,
       iconTone: 'warning',
       value: data?.openTickets,
+      numericValue: data?.openTickets,
+      format: (n) => Math.round(n).toLocaleString(),
     },
   ];
 
@@ -280,6 +298,8 @@ export function ReportsPage() {
             iconTone={tile.iconTone}
             label={tile.label}
             value={tile.value}
+            numericValue={tile.numericValue}
+            format={tile.format}
           />
         ))}
       </div>
