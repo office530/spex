@@ -43,6 +43,9 @@ const LeadsPage = lazy(() =>
 const MilestoneTemplatesPage = lazy(() =>
   import('./pages/MilestoneTemplatesPage').then((m) => ({ default: m.MilestoneTemplatesPage })),
 );
+const MyTasksPage = lazy(() =>
+  import('./pages/MyTasksPage').then((m) => ({ default: m.MyTasksPage })),
+);
 const NotificationPreferencesPage = lazy(() =>
   import('./pages/NotificationPreferencesPage').then((m) => ({
     default: m.NotificationPreferencesPage,
@@ -332,6 +335,14 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <CalendarPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/my-tasks"
+          element={
+            <AuthenticatedRoute>
+              <MyTasksPage />
             </AuthenticatedRoute>
           }
         />

@@ -6,6 +6,7 @@ import {
   History,
   Inbox,
   LayoutDashboard,
+  ListChecks,
   LogOut,
   Settings as SettingsIcon,
   Target,
@@ -36,6 +37,7 @@ interface NavItem {
 const WORKSPACE: NavItem[] = [
   { to: '/', end: true, icon: LayoutDashboard, key: 'nav.dashboard' },
   { to: '/projects', icon: FolderKanban, key: 'nav.projects' },
+  { to: '/my-tasks', icon: ListChecks, key: 'nav.myTasks' },
   { to: '/leads', icon: Target, key: 'nav.leads' },
   { to: '/calendar', icon: CalendarDays, key: 'nav.calendar' },
   { to: '/tickets', icon: Inbox, key: 'nav.tickets' },
