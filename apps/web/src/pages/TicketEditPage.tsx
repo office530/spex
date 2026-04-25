@@ -9,10 +9,12 @@ import {
   Label,
   StatusBadge,
 } from '@spex/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { Image as ImageIcon } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 
 interface TicketAttachment {
@@ -75,6 +77,7 @@ export function TicketEditPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isCreate = !id;
 
   const [form, setForm] = useState<TicketForm>(emptyForm);
@@ -182,12 +185,24 @@ export function TicketEditPage() {
     if (isCreate) {
       const { data, error } = await supabase.from('tickets').insert(payload).select('id').single();
       setSaving(false);
-      if (error) setError(error.message);
-      else navigate(`/tickets/${data.id}`, { replace: true });
+      if (error) {
+        setError(error.message);
+        toast.error(t('common.errorToast'), { description: error.message });
+      } else {
+        toast.success(t('common.createdToast'));
+        await queryClient.invalidateQueries({ queryKey: ['tickets'] });
+        navigate(`/tickets/${data.id}`, { replace: true });
+      }
     } else {
       const { error } = await supabase.from('tickets').update(payload).eq('id', id);
       setSaving(false);
-      if (error) setError(error.message);
+      if (error) {
+        setError(error.message);
+        toast.error(t('common.errorToast'), { description: error.message });
+      } else {
+        toast.success(t('common.savedToast'));
+        await queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      }
     }
   }
 
