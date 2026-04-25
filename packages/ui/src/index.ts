@@ -30,6 +30,11 @@ export {
   type DateRange,
 } from './components/date-range-picker';
 export { Breadcrumb, BreadcrumbItem, type BreadcrumbItemProps } from './components/breadcrumb';
+export {
+  SegmentedControl,
+  type SegmentedControlOption,
+  type SegmentedControlProps,
+} from './components/segmented-control';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs';
 export {
   Table,

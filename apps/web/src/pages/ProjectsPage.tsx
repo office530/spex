@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  EmptyState,
   formatCurrencyILS,
   HoverCard,
   HoverCardContent,
@@ -279,9 +280,14 @@ export function ProjectsPage() {
               {(error as Error).message}
             </p>
           ) : table.getRowModel().rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground p-6">
-              {globalFilter || statusFilter ? t('projects.noMatches') : t('projects.empty')}
-            </p>
+            <EmptyState
+              icon={ClipboardList}
+              title={
+                globalFilter || statusFilter
+                  ? t('projects.noMatches')
+                  : t('projects.empty')
+              }
+            />
           ) : (
             <Table>
               <TableHeader>
