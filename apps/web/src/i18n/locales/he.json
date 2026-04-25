@@ -774,6 +774,10 @@
     "back": "חזרה",
     "add": "הוסף",
     "remove": "הסר",
-    "notes": "הערות"
+    "notes": "הערות",
+    "savedToast": "השינויים נשמרו",
+    "createdToast": "נוצר בהצלחה",
+    "deletedToast": "נמחק",
+    "errorToast": "שגיאה בשמירה"
   }
 }

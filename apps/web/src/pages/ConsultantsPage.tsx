@@ -1,5 +1,6 @@
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -12,24 +13,23 @@ interface ConsultantRow {
   email: string | null;
 }
 
+async function fetchConsultants(): Promise<ConsultantRow[]> {
+  const { data, error } = await supabase
+    .from('consultants')
+    .select('id, name, specialty, phone, email')
+    .order('name');
+  if (error) throw error;
+  return (data as ConsultantRow[]) ?? [];
+}
+
 export function ConsultantsPage() {
   const { t } = useTranslation();
-  const [rows, setRows] = useState<ConsultantRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    void (async () => {
-      const { data, error: dbErr } = await supabase
-        .from('consultants')
-        .select('id, name, specialty, phone, email')
-        .order('name');
-      if (dbErr) setError(dbErr.message);
-      else setRows((data as ConsultantRow[]) ?? []);
-      setLoading(false);
-    })();
-  }, []);
+  const { data: rows = [], isPending, error } = useQuery({
+    queryKey: ['consultants'],
+    queryFn: fetchConsultants,
+  });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -61,12 +61,14 @@ export function ConsultantsPage() {
           />
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
+          {isPending ? (
             <p className="text-sm text-muted-foreground p-6 text-center">
               {t('common.loading')}
             </p>
           ) : error ? (
-            <p className="text-sm text-destructive p-6 text-center">{error}</p>
+            <p className="text-sm text-destructive p-6 text-center">
+              {(error as Error).message}
+            </p>
           ) : filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground p-6">
               {query ? t('consultants.noMatches') : t('consultants.empty')}

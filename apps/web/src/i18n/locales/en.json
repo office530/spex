@@ -774,6 +774,10 @@
     "back": "Back",
     "add": "Add",
     "remove": "Remove",
-    "notes": "Notes"
+    "notes": "Notes",
+    "savedToast": "Changes saved",
+    "createdToast": "Created",
+    "deletedToast": "Deleted",
+    "errorToast": "Save failed"
   }
 }
