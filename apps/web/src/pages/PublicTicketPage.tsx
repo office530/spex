@@ -9,8 +9,8 @@ import {
   Input,
   Label,
 } from '@spex/ui';
-import { CheckCircle2, Hammer } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { CheckCircle2, Hammer, Paperclip, X } from 'lucide-react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 
@@ -21,19 +21,107 @@ interface TicketInput {
   opener_contact: string;
 }
 
+interface PendingFile {
+  file: File;
+  previewUrl: string;
+}
+
 const EMPTY: TicketInput = { subject: '', body: '', opener_name: '', opener_contact: '' };
+const MAX_FILES = 4;
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const COOLDOWN_KEY = 'spex.ticket.lastSubmit';
+const COOLDOWN_MS = 30_000;
+
+function makeFolderId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
 export function PublicTicketPage() {
   const { t } = useTranslation();
   const [form, setForm] = useState<TicketInput>(EMPTY);
+  const [files, setFiles] = useState<PendingFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function addFiles(e: ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    if (picked.length === 0) return;
+    setError(null);
+
+    let next = [...files];
+    for (const f of picked) {
+      if (!f.type.startsWith('image/')) {
+        setError(t('tickets.publicAttachmentInvalidType'));
+        continue;
+      }
+      if (f.size > MAX_FILE_BYTES) {
+        setError(t('tickets.publicAttachmentTooLarge', { name: f.name }));
+        continue;
+      }
+      if (next.length >= MAX_FILES) {
+        setError(t('tickets.publicAttachmentLimit'));
+        break;
+      }
+      next.push({ file: f, previewUrl: URL.createObjectURL(f) });
+    }
+    setFiles(next);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function removeFile(index: number) {
+    setFiles((prev) => {
+      const item = prev[index];
+      if (item) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
+  async function uploadAttachments() {
+    if (files.length === 0) return [];
+    const folder = makeFolderId();
+    const uploaded: { path: string; name: string; size: number; mime: string }[] = [];
+    for (const item of files) {
+      const ext = item.file.name.includes('.') ? item.file.name.split('.').pop() : '';
+      const safeName = `${makeFolderId()}${ext ? `.${ext}` : ''}`;
+      const path = `public/${folder}/${safeName}`;
+      const { error: upErr } = await supabase.storage
+        .from('ticket-uploads')
+        .upload(path, item.file, { contentType: item.file.type, upsert: false });
+      if (upErr) throw upErr;
+      uploaded.push({
+        path,
+        name: item.file.name,
+        size: item.file.size,
+        mime: item.file.type,
+      });
+    }
+    return uploaded;
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
     setError(null);
+
+    const last = Number(localStorage.getItem(COOLDOWN_KEY) ?? '0');
+    if (Date.now() - last < COOLDOWN_MS) {
+      setError(t('tickets.publicCooldown'));
+      return;
+    }
+
+    setSubmitting(true);
+
+    let attachments: Awaited<ReturnType<typeof uploadAttachments>> = [];
+    try {
+      attachments = await uploadAttachments();
+    } catch {
+      setSubmitting(false);
+      setError(t('tickets.publicAttachmentUploadFailed'));
+      return;
+    }
+
     const { error: insertError } = await supabase.from('tickets').insert({
       subject: form.subject,
       body: form.body,
@@ -41,14 +129,22 @@ export function PublicTicketPage() {
       opener_name: form.opener_name || null,
       opener_contact: form.opener_contact || null,
       status: 'new',
+      attachments: attachments.length > 0 ? attachments : null,
     });
     setSubmitting(false);
     if (insertError) {
-      setError(insertError.message);
+      if (insertError.message.includes('rate_limit_exceeded')) {
+        setError(t('tickets.publicRateLimited'));
+      } else {
+        setError(insertError.message);
+      }
       return;
     }
+    localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+    files.forEach((f) => URL.revokeObjectURL(f.previewUrl));
     setSubmitted(true);
     setForm(EMPTY);
+    setFiles([]);
   }
 
   return (
@@ -130,6 +226,58 @@ export function PublicTicketPage() {
                     onChange={(e) => setForm((f) => ({ ...f, opener_contact: e.target.value }))}
                     disabled={submitting}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('tickets.publicAttachments')}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t('tickets.publicAttachmentsHint')}
+                  </p>
+                  <input
+                    ref={fileInputRef}
+                    id="ticket-attachments"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={addFiles}
+                    disabled={submitting || files.length >= MAX_FILES}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={submitting || files.length >= MAX_FILES}
+                    className="gap-2"
+                  >
+                    <Paperclip className="h-4 w-4" />
+                    {t('tickets.publicAttachmentsAdd')}
+                  </Button>
+                  {files.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2 pt-2">
+                      {files.map((f, i) => (
+                        <div
+                          key={f.previewUrl}
+                          className="relative group rounded-md overflow-hidden border bg-muted"
+                        >
+                          <img
+                            src={f.previewUrl}
+                            alt={f.file.name}
+                            className="aspect-square object-cover w-full"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeFile(i)}
+                            disabled={submitting}
+                            aria-label={t('tickets.publicAttachmentsRemove')}
+                            className="absolute top-1 end-1 h-6 w-6 rounded-full bg-background/90 text-foreground flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {error && (
                   <p className="text-sm text-destructive" role="alert">
