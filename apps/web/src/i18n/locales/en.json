@@ -76,6 +76,39 @@
     "workLogShortcutDescription": "Daily on-site logging of hours, crew, and tasks.",
     "workLogShortcutComingSoon": "Coming in next phase"
   },
+  "financials": {
+    "title": "Financials",
+    "subtitle": "Cash overview across all projects",
+    "totalAr": "Open AR",
+    "overdueAr": "Overdue AR",
+    "cashPosition": "Estimated cash position",
+    "arMinusAp": "AR minus AP",
+    "pendingPayouts": "Pending payouts",
+    "overdueTitle": "Overdue invoices",
+    "agingTitle": "AR aging",
+    "payoutQueueTitle": "Awaiting back-office approval",
+    "noOverdue": "No overdue invoices",
+    "noAging": "No open receivables",
+    "noPending": "No pending requests",
+    "invoicesCount_one": "{{count}} invoice",
+    "invoicesCount_other": "{{count}} invoices",
+    "requestsCount_one": "{{count}} request",
+    "requestsCount_other": "{{count}} requests",
+    "days_one": "1 day",
+    "days_other": "{{count}} days",
+    "aging": {
+      "current": "0–30 days",
+      "past30": "31–60 days",
+      "past60": "61+ days"
+    },
+    "col": {
+      "project": "Project",
+      "client": "Client",
+      "supplier": "Supplier",
+      "amount": "Amount",
+      "daysOverdue": "Days overdue"
+    }
+  },
   "myTasks": {
     "title": "My tasks",
     "subtitle": "All tasks assigned to you, across every project",

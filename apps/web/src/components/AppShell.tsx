@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOut,
+  Receipt,
   Settings as SettingsIcon,
   Target,
   Truck,
@@ -44,6 +45,7 @@ const WORKSPACE: NavItem[] = [
 ];
 
 const DIRECTORY: NavItem[] = [
+  { to: '/financials', icon: Receipt, key: 'nav.financials' },
   { to: '/reports', icon: BarChart3, key: 'nav.reports' },
   { to: '/activity', icon: History, key: 'nav.activity' },
   { to: '/clients', icon: Building2, key: 'nav.clients' },

@@ -46,6 +46,9 @@ const MilestoneTemplatesPage = lazy(() =>
 const MyTasksPage = lazy(() =>
   import('./pages/MyTasksPage').then((m) => ({ default: m.MyTasksPage })),
 );
+const FinancialsPage = lazy(() =>
+  import('./pages/FinancialsPage').then((m) => ({ default: m.FinancialsPage })),
+);
 const NotificationPreferencesPage = lazy(() =>
   import('./pages/NotificationPreferencesPage').then((m) => ({
     default: m.NotificationPreferencesPage,
@@ -344,6 +347,14 @@ export function App() {
             <AuthenticatedRoute>
               <MyTasksPage />
             </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/financials"
+          element={
+            <BackOfficeRoute>
+              <FinancialsPage />
+            </BackOfficeRoute>
           }
         />
           <Route path="*" element={<Navigate to="/" replace />} />

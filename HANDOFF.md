@@ -176,8 +176,10 @@ Post-Phase-6 polish sweep (Miro catch-up):
 | 62 | Drag-and-drop kanban on Tasks via `@dnd-kit/core` | 🟡 on branch (draft PR pending) |
 | 63 | Gantt schedule tab via `gantt-task-react` | 🟡 on branch (draft PR pending) |
 | 64 | PDF export for `HandoverProtocol` + `MeetingMinutes` via `@react-pdf/renderer` | 🟡 on branch (draft PR pending) |
-| 65 | hCaptcha widget on public ticket form (env-gated via `VITE_HCAPTCHA_SITEKEY`) | 🟡 on branch (draft PR pending) |
-| — | Install `.claude/skills/ui-ux-pro-max/` skill (design intelligence: 67 styles, 96 palettes, 57 font pairings) | 🟡 on branch (draft PR pending) |
+| 65 | hCaptcha widget on public ticket form (env-gated via `VITE_HCAPTCHA_SITEKEY`) | ✅ shipped in PR #63 |
+| — | Install `.claude/skills/ui-ux-pro-max/` skill (design intelligence: 67 styles, 96 palettes, 57 font pairings) | ✅ shipped in PR #63 |
+| 66 | UX redesign foundations — A v1 token swap (slate + safety orange) + 6 new primitives (PageHeader, MoneyInput, FieldGroup, SideDrawer, DateRangePicker, Breadcrumb) + 4 extended (StatusBadge audit_action/automation_rule/flag, Tabs count-badge, Card variants, Button loading) + 4 hand-rolled status pills retired + Skeleton sweep (ActivityLog/AutomationRules/Reports) + Dashboard scaffoldNotice removed | ✅ shipped in PR #63 |
+| 67 | Dashboard role variants (BackOffice / PM / Foreman) via `useRoleGroup()` + `/my-tasks` cross-project queue + Login mesh re-tinted from teal → orange/slate | ✅ shipped in PR #64 |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
@@ -203,6 +205,22 @@ Migrations (in `supabase/migrations/`):
 - `0011_consultants_entity.sql` — consultants table + RLS (back-office write)
 - `0012_ticket_attachments_storage.sql` — `ticket-uploads` storage bucket + anon-insert policy + soft anon rate-limit trigger on tickets
 - `0013_chashbashvat_jobs_policy_tighten.sql` — narrowed RLS on `chashbashvat_sync_jobs` (applied to remote 2026-04-25)
+
+Active phases roadmap (UX redesign post-PR #63):
+
+| # | What | Status |
+|---|---|---|
+| 66 | Design system foundations + A v1 token swap | ✅ |
+| 67 | Dashboard role variants + /my-tasks | ✅ |
+| 68 | /financials global view (back-office) | 🚧 in flight |
+| 69 | ProjectEditPage IA refactor (PM bug fix, sub-tabbed Financials, breadcrumbs, decompose 1503 LOC) | ⬜ |
+| 70 | List-page polish sweep (KPI banners, EmptyState fixes, SegmentedControl) | ⬜ |
+| 71 | ActivityTimeline + CommentThread primitives + retrofits | ⬜ |
+| 72 | Work Log entity (migration 0014 + project tab + foreman dashboard tile) | ⬜ |
+| 73 | BoQ + Procurement polish | ⬜ |
+| 74 | Settings consolidation under one /settings hub | ⬜ |
+| 75 | Foreman + mobile pass | ⬜ |
+| 76 | Motion + visual depth | ⬜ |
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 
