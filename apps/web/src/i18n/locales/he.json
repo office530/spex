@@ -888,6 +888,8 @@
     "deletedToast": "נמחק",
     "errorToast": "שגיאה בשמירה",
     "actions": "פעולות",
-    "view": "צפייה"
+    "view": "צפייה",
+    "today": "היום",
+    "yesterday": "אתמול"
   }
 }
