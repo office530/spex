@@ -305,6 +305,7 @@
     "publicAttachmentUploadFailed": "Upload failed. Please try again.",
     "publicCooldown": "Please wait a moment before submitting again.",
     "publicRateLimited": "Too many submissions. Please try again in a few minutes.",
+    "publicCaptchaRequired": "Please complete the captcha challenge.",
     "attachmentsLabel": "Attachments",
     "attachmentsCount": "{{count}} attachments",
     "attachmentsCount_one": "1 attachment",

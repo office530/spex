@@ -305,6 +305,7 @@
     "publicAttachmentUploadFailed": "העלאת קבצים נכשלה. נסה שוב.",
     "publicCooldown": "המתן רגע לפני שליחה נוספת.",
     "publicRateLimited": "שלחת פניות רבות מדי. נסה שוב בעוד מספר דקות.",
+    "publicCaptchaRequired": "אנא השלם את אימות ה-captcha.",
     "attachmentsLabel": "קבצים מצורפים",
     "attachmentsCount": "{{count}} קבצים מצורפים",
     "attachmentsCount_one": "קובץ מצורף אחד",

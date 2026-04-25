@@ -9,10 +9,13 @@ import {
   Input,
   Label,
 } from '@spex/ui';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { CheckCircle2, Hammer, Paperclip, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
+
+const HCAPTCHA_SITEKEY = import.meta.env.VITE_HCAPTCHA_SITEKEY as string | undefined;
 
 interface TicketInput {
   subject: string;
@@ -44,6 +47,7 @@ export function PublicTicketPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function addFiles(e: ChangeEvent<HTMLInputElement>) {
@@ -104,6 +108,11 @@ export function PublicTicketPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (HCAPTCHA_SITEKEY && !captchaToken) {
+      setError(t('tickets.publicCaptchaRequired'));
+      return;
+    }
 
     const last = Number(localStorage.getItem(COOLDOWN_KEY) ?? '0');
     if (Date.now() - last < COOLDOWN_MS) {
@@ -279,6 +288,16 @@ export function PublicTicketPage() {
                     </div>
                   )}
                 </div>
+                {HCAPTCHA_SITEKEY && (
+                  <div className="flex justify-center">
+                    <HCaptcha
+                      sitekey={HCAPTCHA_SITEKEY}
+                      onVerify={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                      onError={() => setCaptchaToken(null)}
+                    />
+                  </div>
+                )}
                 {error && (
                   <p className="text-sm text-destructive" role="alert">
                     {error}
@@ -286,7 +305,11 @@ export function PublicTicketPage() {
                 )}
               </CardContent>
               <CardFooter>
-                <Button type="submit" className="w-full" disabled={submitting}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={submitting || (Boolean(HCAPTCHA_SITEKEY) && !captchaToken)}
+                >
                   {submitting ? t('tickets.publicSubmitting') : t('tickets.publicSubmit')}
                 </Button>
               </CardFooter>
