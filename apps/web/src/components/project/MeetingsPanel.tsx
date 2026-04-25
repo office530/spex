@@ -8,9 +8,11 @@ import {
   Input,
   Label,
 } from '@spex/ui';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Download } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import type { MeetingPdfActionItem } from '../../lib/pdf/MeetingPdf';
 import { supabase } from '../../lib/supabase';
 import { toDatetimeInput, fromDatetimeInput } from './format';
 
@@ -153,6 +155,43 @@ export function MeetingsPanel({ projectId, canWrite }: { projectId: string; canW
     else await refresh();
   }
 
+  async function exportPdf(r: MeetingRow) {
+    const { data: project } = await supabase
+      .from('projects')
+      .select('name')
+      .eq('id', projectId)
+      .maybeSingle();
+    const projName = (project as { name: string } | null)?.name ?? '—';
+    const items: MeetingPdfActionItem[] = r.action_items.map((a) => ({
+      id: a.id,
+      description: a.summary,
+      assignee: a.assignee?.full_name ?? null,
+      due_date: a.due_date,
+    }));
+    try {
+      const [{ MeetingPdf }, { downloadPdf }] = await Promise.all([
+        import('../../lib/pdf/MeetingPdf'),
+        import('../../lib/pdf/download'),
+      ]);
+      await downloadPdf(
+        <MeetingPdf
+          projectName={projName}
+          meetingTitle={r.title}
+          meetingDate={r.held_at}
+          attendeesText={null}
+          bodyText={r.decisions}
+          actionItems={items}
+          generatedAtLabel={t('meetings.generatedAt', { defaultValue: 'הופק על ידי Spex' })}
+        />,
+        `meeting-${r.title.replace(/\s+/g, '-')}-${r.held_at.slice(0, 10)}.pdf`,
+      );
+    } catch (e) {
+      toast.error(t('common.errorToast'), {
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
   const dateFormat = new Intl.DateTimeFormat(i18n.language, {
     dateStyle: 'short',
     timeStyle: 'short',
@@ -257,21 +296,32 @@ export function MeetingsPanel({ projectId, canWrite }: { projectId: string; canW
                           {t(`meetings.type.${r.type}`)} · {dateFormat.format(new Date(r.held_at))}
                         </div>
                       </div>
-                      {canWrite && (
-                        <div className="shrink-0 flex items-center gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>
-                            {t('common.edit')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => void remove(r)}
-                          >
-                            {t('common.delete')}
-                          </Button>
-                        </div>
-                      )}
+                      <div className="shrink-0 flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => void exportPdf(r)}
+                          className="gap-1"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          {t('meetings.exportPdf')}
+                        </Button>
+                        {canWrite && (
+                          <>
+                            <Button size="sm" variant="ghost" onClick={() => startEdit(r)}>
+                              {t('common.edit')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => void remove(r)}
+                            >
+                              {t('common.delete')}
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                     {r.decisions && (
                       <p className="text-sm text-muted-foreground whitespace-pre-line">
