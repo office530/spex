@@ -136,6 +136,8 @@ Post-Phase-6 polish sweep (Miro catch-up):
 | 43 | Consultants entity (list + edit, back-office CRUD) | ✅ |
 | 44 | Public ticket image attachments + soft anon rate-limit | ✅ (captcha + IP rate-limit — pending hCaptcha account + edge function) |
 | 45 | Vitest scaffolding + first 23 business-logic tests | ✅ (Phase 7 hardening — Playwright E2E / Sentry / a11y still pending) |
+| 46 | BoQ aggregation helpers (`computeLineTotal` / `computeChapterTotal` / `computeProjectTotal`) + 10 tests | ✅ |
+| 47 | A11y polish: skip-to-content link, mobile sign-out aria-label, `<main>` landmark id | ✅ |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)

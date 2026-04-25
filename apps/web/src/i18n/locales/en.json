@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "login": "Log in",
     "logout": "Log out",
+    "skipToContent": "Skip to main content",
     "users": "Users",
     "clients": "Clients",
     "suppliers": "Suppliers",
@@ -763,6 +764,15 @@
       "note": "Note"
     }
   },
+  "cmdk": {
+    "title": "Quick search",
+    "placeholder": "Search projects, leads, clients…",
+    "startTyping": "Start typing to search",
+    "noResults": "No results",
+    "entitiesHeading": "Results",
+    "navHeading": "Navigation",
+    "toggle": "open / close"
+  },
   "common": {
     "loading": "Loading…",
     "edit": "Edit",
@@ -773,6 +783,12 @@
     "back": "Back",
     "add": "Add",
     "remove": "Remove",
-    "notes": "Notes"
+    "notes": "Notes",
+    "savedToast": "Changes saved",
+    "createdToast": "Created",
+    "deletedToast": "Deleted",
+    "errorToast": "Save failed",
+    "actions": "Actions",
+    "view": "View"
   }
 }

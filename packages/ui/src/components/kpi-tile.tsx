@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { AnimatedNumber } from './animated-number';
 import { cn } from '../lib/utils';
 import { Card, CardContent } from './card';
 
@@ -27,6 +28,10 @@ export interface KpiTileProps {
   iconTone?: IconTone;
   label: string;
   value: string | number | null | undefined;
+  /** When provided, the displayed `value` is animated as a rolling number. */
+  numericValue?: number;
+  /** Required formatter when `numericValue` is provided. */
+  format?: (n: number) => string;
   footer?: ReactNode;
   className?: string;
 }
@@ -36,9 +41,12 @@ export function KpiTile({
   iconTone = 'neutral',
   label,
   value,
+  numericValue,
+  format,
   footer,
   className,
 }: KpiTileProps) {
+  const animated = numericValue != null && format != null;
   return (
     <Card className={cn('h-full', className)}>
       <CardContent className="p-4 space-y-3">
@@ -53,7 +61,13 @@ export function KpiTile({
             <Icon />
           </div>
         </div>
-        <div className="text-2xl font-semibold">{value ?? '—'}</div>
+        <div className="text-2xl font-semibold">
+          {animated ? (
+            <AnimatedNumber value={numericValue!} format={format!} />
+          ) : (
+            (value ?? '—')
+          )}
+        </div>
         {footer && <div className="text-xs text-muted-foreground">{footer}</div>}
       </CardContent>
     </Card>

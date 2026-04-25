@@ -7,6 +7,7 @@
     "dashboard": "לוח בקרה",
     "login": "התחברות",
     "logout": "התנתקות",
+    "skipToContent": "דלג לתוכן הראשי",
     "users": "משתמשים",
     "clients": "לקוחות",
     "suppliers": "ספקים",
@@ -763,6 +764,15 @@
       "note": "הערה"
     }
   },
+  "cmdk": {
+    "title": "חיפוש מהיר",
+    "placeholder": "חפש פרויקט, ליד, לקוח…",
+    "startTyping": "התחל להקליד כדי לחפש",
+    "noResults": "לא נמצאו תוצאות",
+    "entitiesHeading": "תוצאות חיפוש",
+    "navHeading": "ניווט מהיר",
+    "toggle": "פתח / סגור"
+  },
   "common": {
     "loading": "טוען…",
     "edit": "עריכה",
@@ -773,6 +783,12 @@
     "back": "חזרה",
     "add": "הוסף",
     "remove": "הסר",
-    "notes": "הערות"
+    "notes": "הערות",
+    "savedToast": "השינויים נשמרו",
+    "createdToast": "נוצר בהצלחה",
+    "deletedToast": "נמחק",
+    "errorToast": "שגיאה בשמירה",
+    "actions": "פעולות",
+    "view": "צפייה"
   }
 }

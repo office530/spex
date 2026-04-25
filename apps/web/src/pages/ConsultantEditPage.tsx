@@ -8,9 +8,11 @@ import {
   Input,
   Label,
 } from '@spex/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 
 interface ConsultantForm {
@@ -33,6 +35,7 @@ export function ConsultantEditPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isCreate = !id;
 
   const [form, setForm] = useState<ConsultantForm>(emptyForm);
@@ -88,12 +91,24 @@ export function ConsultantEditPage() {
         .select('id')
         .single();
       setSaving(false);
-      if (dbErr) setError(dbErr.message);
-      else navigate(`/consultants/${data.id}`, { replace: true });
+      if (dbErr) {
+        setError(dbErr.message);
+        toast.error(t('common.errorToast'), { description: dbErr.message });
+      } else {
+        toast.success(t('common.createdToast'));
+        await queryClient.invalidateQueries({ queryKey: ['consultants'] });
+        navigate(`/consultants/${data.id}`, { replace: true });
+      }
     } else {
       const { error: dbErr } = await supabase.from('consultants').update(payload).eq('id', id);
       setSaving(false);
-      if (dbErr) setError(dbErr.message);
+      if (dbErr) {
+        setError(dbErr.message);
+        toast.error(t('common.errorToast'), { description: dbErr.message });
+      } else {
+        toast.success(t('common.savedToast'));
+        await queryClient.invalidateQueries({ queryKey: ['consultants'] });
+      }
     }
   }
 

@@ -4,13 +4,41 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Combobox,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   formatCurrencyILS,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   Input,
+  SkeletonRows,
   StatusBadge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@spex/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnFiltersState,
+  type SortingState,
+} from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 type LeadStatus =
@@ -55,43 +83,189 @@ interface LeadRow {
   owner: { full_name: string } | null;
 }
 
+async function fetchLeads(): Promise<LeadRow[]> {
+  const { data, error } = await supabase
+    .from('leads')
+    .select(
+      'id, full_name, phone, status, source, estimated_value, last_contact_at, owner:user_profiles(full_name)',
+    )
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as unknown as LeadRow[]) ?? [];
+}
+
+const columnHelper = createColumnHelper<LeadRow>();
+
 export function LeadsPage() {
   const { t, i18n } = useTranslation();
-  const [leads, setLeads] = useState<LeadRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+  const [globalFilter, setGlobalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<LeadStatus | ''>('');
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  useEffect(() => {
-    void (async () => {
-      const { data, error } = await supabase
-        .from('leads')
-        .select(
-          'id, full_name, phone, status, source, estimated_value, last_contact_at, owner:user_profiles(full_name)',
-        )
-        .order('created_at', { ascending: false });
-      if (error) {
-        setError(error.message);
-      } else {
-        setLeads((data as unknown as LeadRow[]) ?? []);
-      }
-      setLoading(false);
-    })();
-  }, []);
+  const { data: leads = [], isPending, error } = useQuery({
+    queryKey: ['leads'],
+    queryFn: fetchLeads,
+  });
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return leads.filter((l) => {
-      if (statusFilter && l.status !== statusFilter) return false;
-      if (!q) return true;
+  const dateFmt = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' }),
+    [i18n.language],
+  );
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('full_name', {
+        header: t('leads.fullName') as string,
+        cell: (info) => {
+          const lead = info.row.original;
+          return (
+            <HoverCard openDelay={200}>
+              <HoverCardTrigger asChild>
+                <span className="font-medium hover:underline cursor-default">
+                  {lead.full_name}
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent align="start" className="space-y-2">
+                <div className="font-semibold">{lead.full_name}</div>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <div>{lead.phone}</div>
+                  {lead.owner?.full_name && (
+                    <div>
+                      {t('leads.owner')}: {lead.owner.full_name}
+                    </div>
+                  )}
+                  <div>
+                    {t('leads.sourceLabel')}: {t(`leads.source.${lead.source}`)}
+                  </div>
+                  {lead.estimated_value != null && (
+                    <div>
+                      {t('leads.estimatedValue')}: {formatCurrencyILS(lead.estimated_value)}
+                    </div>
+                  )}
+                </div>
+                <StatusBadge
+                  family="lead"
+                  value={lead.status}
+                  label={t(`leads.status.${lead.status}`)}
+                />
+              </HoverCardContent>
+            </HoverCard>
+          );
+        },
+      }),
+      columnHelper.accessor('phone', {
+        header: t('leads.phone') as string,
+        cell: (info) => <span className="text-muted-foreground">{info.getValue()}</span>,
+      }),
+      columnHelper.accessor('source', {
+        header: t('leads.sourceLabel') as string,
+        cell: (info) => (
+          <span className="text-muted-foreground">{t(`leads.source.${info.getValue()}`)}</span>
+        ),
+      }),
+      columnHelper.accessor((row) => row.owner?.full_name ?? '', {
+        id: 'owner',
+        header: t('leads.owner') as string,
+        cell: (info) => <span className="text-muted-foreground">{info.getValue() || '—'}</span>,
+      }),
+      columnHelper.accessor('estimated_value', {
+        header: t('leads.estimatedValue') as string,
+        cell: (info) => {
+          const v = info.getValue();
+          return v == null ? '—' : formatCurrencyILS(v);
+        },
+      }),
+      columnHelper.accessor('last_contact_at', {
+        header: t('leads.lastContactAt') as string,
+        cell: (info) => {
+          const v = info.getValue();
+          return v ? dateFmt.format(new Date(v)) : '—';
+        },
+      }),
+      columnHelper.accessor('status', {
+        header: t('leads.statusLabel') as string,
+        filterFn: (row, columnId, filterValue) =>
+          !filterValue || row.getValue(columnId) === filterValue,
+        cell: (info) => (
+          <StatusBadge
+            family="lead"
+            value={info.getValue()}
+            label={t(`leads.status.${info.getValue()}`)}
+          />
+        ),
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: () => <span className="sr-only">{t('common.actions')}</span>,
+        cell: (info) => {
+          const lead = info.row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                onClick={(e) => e.stopPropagation()}
+                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label={t('common.actions')}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/leads/${lead.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Eye className="h-4 w-4" />
+                  {t('common.view')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/leads/${lead.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Pencil className="h-4 w-4" />
+                  {t('common.edit')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled>{lead.phone}</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      }),
+    ],
+    [dateFmt, navigate, t],
+  );
+
+  const columnFilters: ColumnFiltersState = useMemo(
+    () => (statusFilter ? [{ id: 'status', value: statusFilter }] : []),
+    [statusFilter],
+  );
+
+  const table = useReactTable({
+    data: leads,
+    columns,
+    state: { sorting, globalFilter, columnFilters },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const v = String(filterValue).trim().toLowerCase();
+      if (!v) return true;
+      const r = row.original;
       return (
-        l.full_name.toLowerCase().includes(q) ||
-        l.phone.toLowerCase().includes(q) ||
-        (l.owner?.full_name.toLowerCase().includes(q) ?? false)
+        r.full_name.toLowerCase().includes(v) ||
+        r.phone.toLowerCase().includes(v) ||
+        (r.owner?.full_name.toLowerCase().includes(v) ?? false)
       );
-    });
-  }, [leads, query, statusFilter]);
+    },
+  });
+
+  const sortIcon = (state: false | 'asc' | 'desc') => {
+    if (state === 'asc') return <ArrowUp className="h-3 w-3" />;
+    if (state === 'desc') return <ArrowDown className="h-3 w-3" />;
+    return <ArrowUpDown className="h-3 w-3 text-muted-foreground/60" />;
+  };
 
   return (
     <div className="space-y-6">
@@ -104,73 +278,75 @@ export function LeadsPage() {
       <Card>
         <CardHeader className="gap-3">
           <CardTitle className="text-base">{t('leads.listTitle')}</CardTitle>
-          <div className="grid gap-2 sm:grid-cols-[1fr_12rem]">
+          <div className="grid gap-2 sm:grid-cols-[1fr_14rem]">
             <Input
               placeholder={t('leads.searchPlaceholder')}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
             />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as LeadStatus | '')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-            >
-              <option value="">{t('leads.allStatuses')}</option>
-              {ALL_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {t(`leads.status.${s}`)}
-                </option>
-              ))}
-            </select>
+            <Combobox
+              value={statusFilter || null}
+              onChange={(v) => setStatusFilter((v as LeadStatus | null) ?? '')}
+              placeholder={t('leads.allStatuses')}
+              options={ALL_STATUSES.map((s) => ({
+                value: s,
+                label: t(`leads.status.${s}`),
+              }))}
+              clearLabel={t('leads.allStatuses')}
+              searchPlaceholder={t('leads.statusLabel')}
+              emptyLabel={t('leads.noMatches')}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">
-              {t('common.loading')}
-            </p>
+          {isPending ? (
+            <SkeletonRows count={6} />
           ) : error ? (
-            <p className="text-sm text-destructive p-6 text-center">{error}</p>
-          ) : filtered.length === 0 ? (
+            <p className="text-sm text-destructive p-6 text-center">
+              {(error as Error).message}
+            </p>
+          ) : table.getRowModel().rows.length === 0 ? (
             <p className="text-sm text-muted-foreground p-6">
-              {query || statusFilter ? t('leads.noMatches') : t('leads.empty')}
+              {globalFilter || statusFilter ? t('leads.noMatches') : t('leads.empty')}
             </p>
           ) : (
-            <div className="divide-y">
-              {filtered.map((l) => {
-                const dateFmt = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'short' });
-                return (
-                  <Link
-                    key={l.id}
-                    to={`/leads/${l.id}`}
-                    className="flex items-center justify-between px-6 py-3 gap-4 hover:bg-muted/60 transition-colors"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate">{l.full_name}</div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {l.phone}
-                        <span> · {t(`leads.source.${l.source}`)}</span>
-                        {l.owner && <span> · {l.owner.full_name}</span>}
-                        {l.last_contact_at && (
-                          <span> · {dateFmt.format(new Date(l.last_contact_at))}</span>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((hg) => (
+                  <TableRow key={hg.id}>
+                    {hg.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ? null : (
+                          <button
+                            type="button"
+                            onClick={header.column.getToggleSortingHandler()}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {sortIcon(header.column.getIsSorted())}
+                          </button>
                         )}
-                      </div>
-                    </div>
-                    {l.estimated_value != null && (
-                      <div className="shrink-0 text-sm font-medium hidden sm:block">
-                        {formatCurrencyILS(l.estimated_value)}
-                      </div>
-                    )}
-                    <StatusBadge
-                      family="lead"
-                      value={l.status}
-                      label={t(`leads.status.${l.status}`)}
-                      className="shrink-0"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    onClick={() => navigate(`/leads/${row.original.id}`)}
+                    className="cursor-pointer"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

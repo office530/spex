@@ -5,9 +5,9 @@ import {
   CardTitle,
   formatCurrencyILS,
   KpiTile,
-  StatusBadge,
   type IconTone,
 } from '@spex/ui';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import {
   AlertCircle,
   Banknote,
@@ -208,54 +208,72 @@ export function ReportsPage() {
     icon: LucideIcon;
     iconTone: IconTone;
     value: string | number | undefined;
+    numericValue?: number;
+    format?: (n: number) => string;
   }> = [
     {
       label: t('reports.activeContractValue'),
       icon: CircleDollarSign,
       iconTone: 'success',
       value: data ? formatCurrencyILS(data.activeContractValue) : undefined,
+      numericValue: data?.activeContractValue,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.invoicedThisMonth'),
       icon: Receipt,
       iconTone: 'info',
       value: data ? formatCurrencyILS(data.invoicedThisMonth) : undefined,
+      numericValue: data?.invoicedThisMonth,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.receivedThisMonth'),
       icon: Banknote,
       iconTone: 'success',
       value: data ? formatCurrencyILS(data.receivedThisMonth) : undefined,
+      numericValue: data?.receivedThisMonth,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.outstanding'),
       icon: AlertCircle,
       iconTone: 'warning',
       value: data ? formatCurrencyILS(data.outstanding) : undefined,
+      numericValue: data?.outstanding,
+      format: (n) => formatCurrencyILS(n),
     },
     {
       label: t('reports.activeProjects'),
       icon: FolderKanban,
       iconTone: 'info',
       value: data?.activeProjects,
+      numericValue: data?.activeProjects,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.activeLeads'),
       icon: Target,
       iconTone: 'accent',
       value: data?.activeLeads,
+      numericValue: data?.activeLeads,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.wonLast30'),
       icon: CheckCircle2,
       iconTone: 'success',
       value: data?.wonLast30,
+      numericValue: data?.wonLast30,
+      format: (n) => Math.round(n).toLocaleString(),
     },
     {
       label: t('reports.openTickets'),
       icon: Inbox,
       iconTone: 'warning',
       value: data?.openTickets,
+      numericValue: data?.openTickets,
+      format: (n) => Math.round(n).toLocaleString(),
     },
   ];
 
@@ -280,6 +298,8 @@ export function ReportsPage() {
             iconTone={tile.iconTone}
             label={tile.label}
             value={tile.value}
+            numericValue={tile.numericValue}
+            format={tile.format}
           />
         ))}
       </div>
@@ -289,19 +309,21 @@ export function ReportsPage() {
           <CardHeader>
             <CardTitle className="text-base">{t('reports.projectsByStatus')}</CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            {data ? (
-              <div className="divide-y">
-                {PROJECT_STATUSES.map((s) => (
-                  <div key={s} className="flex items-center justify-between px-6 py-3">
-                    <StatusBadge family="project" value={s} label={t(`projects.status.${s}`)} />
-                    <span className="text-sm font-medium">{data.projectsByStatus[s] ?? 0}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
-            )}
+          <CardContent>
+            <StatusDonut
+              loading={!data}
+              chartData={
+                data
+                  ? PROJECT_STATUSES.map((s) => ({
+                      name: t(`projects.status.${s}`),
+                      value: data.projectsByStatus[s] ?? 0,
+                    })).filter((d) => d.value > 0)
+                  : []
+              }
+              palette={['#10b981', '#f59e0b', '#94a3b8', '#f43f5e']}
+              loadingLabel={t('common.loading')}
+              emptyLabel={t('reports.noData')}
+            />
           </CardContent>
         </Card>
 
@@ -309,24 +331,34 @@ export function ReportsPage() {
           <CardHeader>
             <CardTitle className="text-base">{t('reports.leadsByStatus')}</CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
-            {data ? (
-              <div className="divide-y">
-                {LEAD_STATUSES.filter((s) => (data.leadsByStatus[s] ?? 0) > 0).map((s) => (
-                  <div key={s} className="flex items-center justify-between px-6 py-3">
-                    <StatusBadge family="lead" value={s} label={t(`leads.status.${s}`)} />
-                    <span className="text-sm font-medium">{data.leadsByStatus[s] ?? 0}</span>
-                  </div>
-                ))}
-                {LEAD_STATUSES.every((s) => (data.leadsByStatus[s] ?? 0) === 0) && (
-                  <p className="text-sm text-muted-foreground p-6 text-center">
-                    {t('reports.noData')}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
-            )}
+          <CardContent>
+            <StatusDonut
+              loading={!data}
+              chartData={
+                data
+                  ? LEAD_STATUSES.map((s) => ({
+                      name: t(`leads.status.${s}`),
+                      value: data.leadsByStatus[s] ?? 0,
+                    })).filter((d) => d.value > 0)
+                  : []
+              }
+              palette={[
+                '#3b82f6',
+                '#f59e0b',
+                '#f97316',
+                '#ef4444',
+                '#8b5cf6',
+                '#6366f1',
+                '#06b6d4',
+                '#14b8a6',
+                '#84cc16',
+                '#10b981',
+                '#f43f5e',
+                '#94a3b8',
+              ]}
+              loadingLabel={t('common.loading')}
+              emptyLabel={t('reports.noData')}
+            />
           </CardContent>
         </Card>
       </div>
@@ -404,6 +436,56 @@ export function ReportsPage() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+interface StatusDonutProps {
+  chartData: Array<{ name: string; value: number }>;
+  palette: string[];
+  loading: boolean;
+  loadingLabel: string;
+  emptyLabel: string;
+}
+
+function StatusDonut({ chartData, palette, loading, loadingLabel, emptyLabel }: StatusDonutProps) {
+  if (loading) {
+    return <p className="text-sm text-muted-foreground p-6 text-center">{loadingLabel}</p>;
+  }
+  if (chartData.length === 0) {
+    return <p className="text-sm text-muted-foreground p-6 text-center">{emptyLabel}</p>;
+  }
+  return (
+    <div className="h-64">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={chartData}
+            dataKey="value"
+            nameKey="name"
+            innerRadius="55%"
+            outerRadius="80%"
+            paddingAngle={2}
+            stroke="hsl(var(--background))"
+            strokeWidth={2}
+          >
+            {chartData.map((_, i) => (
+              <Cell key={i} fill={palette[i % palette.length]} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              borderRadius: '0.5rem',
+              border: '1px solid hsl(var(--border))',
+              fontSize: '0.875rem',
+            }}
+          />
+          <Legend
+            verticalAlign="bottom"
+            wrapperStyle={{ fontSize: '0.75rem', paddingTop: '0.5rem' }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
   );
 }
