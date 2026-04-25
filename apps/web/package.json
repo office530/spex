@@ -15,6 +15,9 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@spex/ui": "workspace:*",
     "@supabase/supabase-js": "^2.104.0",
     "@tanstack/react-query": "^5.100.2",
