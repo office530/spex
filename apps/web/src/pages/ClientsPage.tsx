@@ -1,7 +1,36 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@spex/ui';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+  SkeletonRows,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@spex/ui';
+import { useQuery } from '@tanstack/react-query';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type SortingState,
+} from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 interface ClientRow {
@@ -12,39 +41,113 @@ interface ClientRow {
   email: string | null;
 }
 
+async function fetchClients(): Promise<ClientRow[]> {
+  const { data, error } = await supabase
+    .from('clients')
+    .select('id, company_name, primary_contact_name, phone, email')
+    .order('company_name');
+  if (error) throw error;
+  return (data as ClientRow[]) ?? [];
+}
+
+const columnHelper = createColumnHelper<ClientRow>();
+
 export function ClientsPage() {
   const { t } = useTranslation();
-  const [clients, setClients] = useState<ClientRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  useEffect(() => {
-    void (async () => {
-      const { data, error } = await supabase
-        .from('clients')
-        .select('id, company_name, primary_contact_name, phone, email')
-        .order('company_name');
-      if (error) {
-        setError(error.message);
-      } else {
-        setClients((data as ClientRow[]) ?? []);
-      }
-      setLoading(false);
-    })();
-  }, []);
+  const { data: clients = [], isPending, error } = useQuery({
+    queryKey: ['clients'],
+    queryFn: fetchClients,
+  });
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return clients;
-    return clients.filter(
-      (c) =>
-        c.company_name.toLowerCase().includes(q) ||
-        c.primary_contact_name.toLowerCase().includes(q) ||
-        (c.phone?.toLowerCase().includes(q) ?? false) ||
-        (c.email?.toLowerCase().includes(q) ?? false),
-    );
-  }, [clients, query]);
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('company_name', {
+        header: t('clients.companyName') as string,
+        cell: (info) => <div className="font-medium">{info.getValue()}</div>,
+      }),
+      columnHelper.accessor('primary_contact_name', {
+        header: t('clients.primaryContactName') as string,
+        cell: (info) => <span className="text-muted-foreground">{info.getValue()}</span>,
+      }),
+      columnHelper.accessor('phone', {
+        header: t('clients.phone') as string,
+        cell: (info) => <span className="text-muted-foreground">{info.getValue() ?? '—'}</span>,
+      }),
+      columnHelper.accessor('email', {
+        header: t('clients.email') as string,
+        cell: (info) => (
+          <span className="text-muted-foreground text-xs">{info.getValue() ?? '—'}</span>
+        ),
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: () => <span className="sr-only">{t('common.actions')}</span>,
+        cell: (info) => {
+          const c = info.row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                onClick={(e) => e.stopPropagation()}
+                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label={t('common.actions')}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/clients/${c.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Eye className="h-4 w-4" />
+                  {t('common.view')}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => navigate(`/clients/${c.id}`)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Pencil className="h-4 w-4" />
+                  {t('common.edit')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      }),
+    ],
+    [navigate, t],
+  );
+
+  const table = useReactTable({
+    data: clients,
+    columns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const v = String(filterValue).trim().toLowerCase();
+      if (!v) return true;
+      const r = row.original;
+      return (
+        r.company_name.toLowerCase().includes(v) ||
+        r.primary_contact_name.toLowerCase().includes(v) ||
+        (r.phone?.toLowerCase().includes(v) ?? false) ||
+        (r.email?.toLowerCase().includes(v) ?? false)
+      );
+    },
+  });
+
+  const sortIcon = (state: false | 'asc' | 'desc') => {
+    if (state === 'asc') return <ArrowUp className="h-3 w-3" />;
+    if (state === 'desc') return <ArrowDown className="h-3 w-3" />;
+    return <ArrowUpDown className="h-3 w-3 text-muted-foreground/60" />;
+  };
 
   return (
     <div className="space-y-6">
@@ -59,42 +162,59 @@ export function ClientsPage() {
           <CardTitle className="text-base">{t('clients.listTitle')}</CardTitle>
           <Input
             placeholder={t('clients.searchPlaceholder')}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
           />
         </CardHeader>
         <CardContent className="p-0">
-          {loading ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">
-              {t('common.loading')}
-            </p>
+          {isPending ? (
+            <SkeletonRows count={5} />
           ) : error ? (
-            <p className="text-sm text-destructive p-6 text-center">{error}</p>
-          ) : filtered.length === 0 ? (
+            <p className="text-sm text-destructive p-6 text-center">
+              {(error as Error).message}
+            </p>
+          ) : table.getRowModel().rows.length === 0 ? (
             <p className="text-sm text-muted-foreground p-6">
-              {query ? t('clients.noMatches') : t('clients.empty')}
+              {globalFilter ? t('clients.noMatches') : t('clients.empty')}
             </p>
           ) : (
-            <div className="divide-y">
-              {filtered.map((c) => (
-                <Link
-                  key={c.id}
-                  to={`/clients/${c.id}`}
-                  className="flex items-center justify-between px-6 py-3 gap-4 hover:bg-muted/60 transition-colors"
-                >
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">{c.company_name}</div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {c.primary_contact_name}
-                    </div>
-                  </div>
-                  <div className="shrink-0 text-sm text-muted-foreground text-end hidden sm:block">
-                    {c.phone && <div>{c.phone}</div>}
-                    {c.email && <div className="text-xs truncate max-w-[16rem]">{c.email}</div>}
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((hg) => (
+                  <TableRow key={hg.id}>
+                    {hg.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ? null : (
+                          <button
+                            type="button"
+                            onClick={header.column.getToggleSortingHandler()}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {sortIcon(header.column.getIsSorted())}
+                          </button>
+                        )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    onClick={() => navigate(`/clients/${row.original.id}`)}
+                    className="cursor-pointer"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

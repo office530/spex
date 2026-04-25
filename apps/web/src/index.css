@@ -73,3 +73,97 @@
       sans-serif;
   }
 }
+
+@layer utilities {
+  /* Mesh gradient — layered radial blobs, used on hero / login panels.
+     Falls back to the existing hero-from/to linear gradient on browsers
+     without radial-gradient (none in our matrix). */
+  .bg-mesh-hero {
+    background-color: hsl(var(--hero-from));
+    background-image:
+      radial-gradient(
+        circle at 18% 20%,
+        hsl(173 80% 38% / 0.55) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 85% 12%,
+        hsl(165 70% 50% / 0.35) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 75% 90%,
+        hsl(180 80% 40% / 0.45) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 25% 80%,
+        hsl(200 75% 35% / 0.35) 0%,
+        transparent 45%
+      ),
+      linear-gradient(
+        135deg,
+        hsl(var(--hero-from)) 0%,
+        hsl(var(--hero-to)) 100%
+      );
+  }
+
+  /* Soft glow halo behind a card — pair with `relative` parent. */
+  .glow-halo::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      hsl(173 77% 50% / 0.7),
+      hsl(195 80% 60% / 0.5),
+      hsl(220 70% 55% / 0.4)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Animated gradient border — used on highlight KPI tiles. */
+  @keyframes spex-shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+
+  .gradient-border-animated {
+    position: relative;
+    isolation: isolate;
+  }
+  .gradient-border-animated::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      90deg,
+      hsl(173 77% 45%),
+      hsl(195 90% 55%),
+      hsl(220 80% 60%),
+      hsl(173 77% 45%)
+    );
+    background-size: 200% 100%;
+    animation: spex-shimmer 4s linear infinite;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+}

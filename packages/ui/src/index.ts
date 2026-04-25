@@ -75,6 +75,7 @@ export {
 export { HoverCard, HoverCardContent, HoverCardTrigger } from './components/hover-card';
 export { Combobox, type ComboboxProps, type ComboboxOption } from './components/combobox';
 export { AnimatedNumber, type AnimatedNumberProps } from './components/animated-number';
+export { ProgressRing, type ProgressRingProps } from './components/progress-ring';
 export {
   formatCurrencyILS,
   toDatetimeInput,

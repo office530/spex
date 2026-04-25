@@ -300,6 +300,10 @@ export function ReportsPage() {
             value={tile.value}
             numericValue={tile.numericValue}
             format={tile.format}
+            highlight={
+              tile.label === t('reports.outstanding') &&
+              (tile.numericValue ?? 0) > 0
+            }
           />
         ))}
       </div>

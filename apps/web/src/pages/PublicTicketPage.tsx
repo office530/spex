@@ -149,7 +149,7 @@ export function PublicTicketPage() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-10">
+      <div className="hidden lg:flex flex-col justify-between bg-mesh-hero text-primary-foreground p-10">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-foreground/15 backdrop-blur">
             <Hammer className="h-5 w-5" />

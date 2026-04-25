@@ -9,9 +9,11 @@ import {
   Label,
   StatusBadge,
 } from '@spex/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 
 type SupplierStatus = 'pending_approval' | 'active' | 'blocked';
@@ -42,6 +44,7 @@ export function SupplierEditPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isCreate = !id;
 
   const [form, setForm] = useState<SupplierForm>(emptyForm);
@@ -103,12 +106,24 @@ export function SupplierEditPage() {
         .select('id')
         .single();
       setSaving(false);
-      if (error) setError(error.message);
-      else navigate(`/suppliers/${data.id}`, { replace: true });
+      if (error) {
+        setError(error.message);
+        toast.error(t('common.errorToast'), { description: error.message });
+      } else {
+        toast.success(t('common.createdToast'));
+        await queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+        navigate(`/suppliers/${data.id}`, { replace: true });
+      }
     } else {
       const { error } = await supabase.from('suppliers').update(payload).eq('id', id);
       setSaving(false);
-      if (error) setError(error.message);
+      if (error) {
+        setError(error.message);
+        toast.error(t('common.errorToast'), { description: error.message });
+      } else {
+        toast.success(t('common.savedToast'));
+        await queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      }
     }
   }
 
@@ -128,7 +143,7 @@ export function SupplierEditPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+        <div className="rounded-2xl bg-mesh-hero text-primary-foreground p-6 sm:p-8 shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="space-y-2 min-w-0">
               <div className="text-xs font-medium text-primary-foreground/70">

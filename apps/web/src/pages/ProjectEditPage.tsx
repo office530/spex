@@ -9,9 +9,11 @@ import {
   CardHeader,
   CardTitle,
   EmptyState,
+  DatePicker,
   Input,
   KpiTile,
   Label,
+  ProgressRing,
   StatusBadge,
   Tabs,
   TabsContent,
@@ -310,7 +312,7 @@ export function ProjectEditPage() {
           </Button>
         </div>
       ) : (
-        <div className="rounded-2xl bg-gradient-to-br from-hero-from to-hero-to text-primary-foreground p-6 sm:p-8 shadow-md">
+        <div className="rounded-2xl bg-mesh-hero text-primary-foreground p-6 sm:p-8 shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="space-y-2 min-w-0">
               <div className="text-xs font-medium text-primary-foreground/70">
@@ -387,7 +389,7 @@ export function ProjectEditPage() {
         (() => {
           const canWrite = isAdmin || (form.pm_id !== '' && form.pm_id === user?.id);
           return (
-            <Tabs defaultValue="general">
+            <Tabs defaultValue="general" variant="underline">
               <TabsList>
                 <TabsTrigger value="general">
                   <SlidersHorizontal />
@@ -568,26 +570,26 @@ function ProjectForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="start_date">{t('projects.startDate')}</Label>
-                <Input
+                <DatePicker
                   id="start_date"
-                  type="date"
-                  value={form.start_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, start_date: e.target.value }))
-                  }
+                  value={form.start_date || null}
+                  onChange={(v) => setForm((f) => ({ ...f, start_date: v ?? '' }))}
                   disabled={saving || readOnly}
+                  triggerLabel={t('projects.startDate')}
+                  clearLabel={t('common.remove')}
+                  doneLabel={t('common.save')}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="target_end_date">{t('projects.targetEndDate')}</Label>
-                <Input
+                <DatePicker
                   id="target_end_date"
-                  type="date"
-                  value={form.target_end_date}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, target_end_date: e.target.value }))
-                  }
+                  value={form.target_end_date || null}
+                  onChange={(v) => setForm((f) => ({ ...f, target_end_date: v ?? '' }))}
                   disabled={saving || readOnly}
+                  triggerLabel={t('projects.targetEndDate')}
+                  clearLabel={t('common.remove')}
+                  doneLabel={t('common.save')}
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
@@ -965,6 +967,28 @@ function MilestonesPanel({ projectId, isAdmin }: { projectId: string; isAdmin: b
           </Button>
         )}
       </CardHeader>
+      {milestones.length > 0 && !loading && (
+        <div className="px-6 pb-3">
+          <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
+            {milestones.map((m) => {
+              const tone =
+                m.execution_status === 'done'
+                  ? 'bg-emerald-500'
+                  : m.execution_status === 'in_progress'
+                    ? 'bg-blue-500'
+                    : 'bg-muted-foreground/30';
+              return (
+                <div
+                  key={m.id}
+                  className={tone}
+                  title={`${m.name} — ${t(`milestones.execution.${m.execution_status}`)}`}
+                  style={{ flex: m.billing_pct || 1 }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
       <CardContent className="p-0">
         {loading ? (
           <p className="text-sm text-muted-foreground p-6 text-center">{t('common.loading')}</p>
@@ -1396,37 +1420,37 @@ function ProjectOverviewCard({ projectId, contractValue }: ProjectOverviewCardPr
     label: string;
     icon: LucideIcon;
     iconTone: IconTone;
-    value: string;
-    footer?: string;
+    numericValue?: number;
+    format?: (n: number) => string;
+    fallback: string;
   }> = [
     {
       label: t('projects.contractValue'),
       icon: Wallet,
       iconTone: 'success',
-      value: formatCurrencyILS(contractValue),
+      numericValue: contractValue ?? undefined,
+      format: (n) => formatCurrencyILS(n),
+      fallback: formatCurrencyILS(contractValue),
     },
     {
       label: t('projects.overview.boqTotal'),
       icon: ClipboardList,
       iconTone: 'info',
-      value: data ? formatCurrencyILS(data.boqTotal) : '—',
+      numericValue: data?.boqTotal,
+      format: (n) => formatCurrencyILS(n),
+      fallback: data ? formatCurrencyILS(data.boqTotal) : '—',
     },
     {
       label: t('projects.overview.variationsTotal'),
       icon: SlidersHorizontal,
       iconTone: 'warning',
-      value: data ? formatCurrencyILS(data.variationsTotal) : '—',
-    },
-    {
-      label: t('projects.overview.milestones'),
-      icon: Milestone,
-      iconTone: 'accent',
-      value: data ? `${data.milestonesDone}/${data.milestonesTotal}` : '—',
-      footer: data
-        ? `${data.milestonesBilledPct}% ${t('projects.overview.billedShort')}`
-        : undefined,
+      numericValue: data?.variationsTotal,
+      format: (n) => formatCurrencyILS(n),
+      fallback: data ? formatCurrencyILS(data.variationsTotal) : '—',
     },
   ];
+
+  const billedPct = data ? Math.round(data.milestonesBilledPct) : 0;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1436,10 +1460,32 @@ function ProjectOverviewCard({ projectId, contractValue }: ProjectOverviewCardPr
           icon={tile.icon}
           iconTone={tile.iconTone}
           label={tile.label}
-          value={tile.value}
-          footer={tile.footer}
+          value={tile.fallback}
+          numericValue={tile.numericValue}
+          format={tile.format}
         />
       ))}
+      <div className="rounded-2xl border bg-card text-card-foreground shadow-sm h-full p-4 flex items-center gap-4">
+        <ProgressRing
+          value={billedPct}
+          size={64}
+          strokeWidth={6}
+          progressClassName="text-primary"
+          trackClassName="text-muted/60"
+          ariaLabel={t('projects.overview.milestones')}
+        >
+          <span className="text-xs font-semibold">{billedPct}%</span>
+        </ProgressRing>
+        <div className="min-w-0">
+          <div className="text-xs text-muted-foreground">{t('projects.overview.milestones')}</div>
+          <div className="text-2xl font-semibold">
+            {data ? `${data.milestonesDone}/${data.milestonesTotal}` : '—'}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {t('projects.overview.billedShort')}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

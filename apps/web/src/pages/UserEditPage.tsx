@@ -8,9 +8,11 @@ import {
   Input,
   Label,
 } from '@spex/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -22,6 +24,7 @@ export function UserEditPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { profile: myProfile } = useAuth();
   const isAdmin = myProfile ? BACK_OFFICE.includes(myProfile.role) : false;
 
@@ -70,7 +73,10 @@ export function UserEditPage() {
     setSaving(false);
     if (error) {
       setError(error.message);
+      toast.error(t('common.errorToast'), { description: error.message });
     } else {
+      toast.success(t('common.savedToast'));
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
       navigate(isAdmin ? '/users' : '/');
     }
   }

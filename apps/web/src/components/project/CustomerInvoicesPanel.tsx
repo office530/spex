@@ -628,13 +628,14 @@ function ReceiptsList({
             <Label htmlFor={`rec_at_${invoiceId}`} className="text-xs">
               {t('customerInvoices.receivedAt')} *
             </Label>
-            <Input
+            <DatePicker
               id={`rec_at_${invoiceId}`}
-              type="date"
-              value={receivedAt}
-              onChange={(e) => setReceivedAt(e.target.value)}
-              required
+              value={receivedAt || null}
+              onChange={(v) => setReceivedAt(v ?? '')}
               disabled={saving}
+              triggerLabel={t('customerInvoices.receivedAt')}
+              clearLabel={t('common.remove')}
+              doneLabel={t('common.save')}
             />
           </div>
           <div className="flex gap-1">
