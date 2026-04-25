@@ -132,7 +132,12 @@ export function ProjectEditPage() {
     operations: number;
     financials: number;
   } | null>(null);
-  const readOnly = !isAdmin;
+  // Edit gating per BLUEPRINT.md §7: back-office can edit any project, PM can edit
+  // their own project, Foreman is read-only. Foreman also doesn't see Financials.
+  const isForeman = profile?.role === 'foreman';
+  const isAssignedPm = !isCreate && form.pm_id !== '' && form.pm_id === user?.id;
+  const canEdit = isAdmin || isAssignedPm;
+  const readOnly = !canEdit;
 
   useEffect(() => {
     if (isCreate || !id) return;
@@ -387,89 +392,123 @@ export function ProjectEditPage() {
           onSubmit={handleSubmit}
         />
       ) : (
-        (() => {
-          const canWrite = isAdmin || (form.pm_id !== '' && form.pm_id === user?.id);
-          return (
-            <Tabs defaultValue="general" variant="underline">
-              <TabsList>
-                <TabsTrigger value="general">
-                  <SlidersHorizontal />
-                  {t('projects.tabs.general')}
-                </TabsTrigger>
-                <TabsTrigger value="team">
-                  <Users />
-                  {t('projects.tabs.team')}
-                  <TabCountBadge value={tabCounts?.team} />
-                </TabsTrigger>
-                <TabsTrigger value="milestones">
-                  <ClipboardList />
-                  {t('projects.tabs.milestones')}
-                  <TabCountBadge value={tabCounts?.milestones} />
-                </TabsTrigger>
-                <TabsTrigger value="schedule">
-                  <CalendarDays />
-                  {t('projects.tabs.schedule')}
-                </TabsTrigger>
-                <TabsTrigger value="financials">
-                  <Receipt />
-                  {t('projects.tabs.financials')}
-                  <TabCountBadge value={tabCounts?.financials} />
-                </TabsTrigger>
-                <TabsTrigger value="operations">
-                  <CalendarDays />
-                  {t('projects.tabs.operations')}
-                  <TabCountBadge value={tabCounts?.operations} />
-                </TabsTrigger>
-                <TabsTrigger value="documents">
-                  <FolderOpen />
-                  {t('projects.tabs.documents')}
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="general">
-                <ProjectForm
-                  form={form}
-                  setForm={setForm}
-                  clients={clients}
-                  users={users}
-                  error={error}
-                  saving={saving}
-                  readOnly={readOnly}
-                  isAdmin={isAdmin}
-                  onSubmit={handleSubmit}
-                />
-              </TabsContent>
-              <TabsContent value="team">
-                <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
-              </TabsContent>
-              <TabsContent value="milestones">
-                <MilestonesPanel projectId={id} isAdmin={isAdmin} />
-              </TabsContent>
-              <TabsContent value="schedule">
-                <SchedulePanel
-                  projectId={id}
-                  startDate={form.start_date || null}
-                  targetEndDate={form.target_end_date || null}
-                />
-              </TabsContent>
-              <TabsContent value="financials">
-                <CustomerInvoicesPanel projectId={id} canWrite={canWrite} />
-                <VariationsPanel projectId={id} canWrite={canWrite} />
-                <PurchaseOrdersPanel projectId={id} canWrite={canWrite} />
-                <SupplierInvoicesPanel projectId={id} canWrite={canWrite} />
-                <PaymentRequestsPanel projectId={id} canWrite={canWrite} />
-              </TabsContent>
-              <TabsContent value="operations">
-                <TasksPanel projectId={id} canWrite={canWrite} />
-                <RfiPanel projectId={id} canWrite={canWrite} />
-                <MeetingsPanel projectId={id} canWrite={canWrite} />
-                <HandoverPanel projectId={id} canWrite={canWrite} />
-              </TabsContent>
-              <TabsContent value="documents">
-                <DocumentsPanel projectId={id} canWrite={canWrite} />
-              </TabsContent>
-            </Tabs>
-          );
-        })()
+        <Tabs defaultValue="general" variant="underline">
+          <TabsList>
+            <TabsTrigger value="general">
+              <SlidersHorizontal />
+              {t('projects.tabs.general')}
+            </TabsTrigger>
+            <TabsTrigger value="team" count={tabCounts?.team}>
+              <Users />
+              {t('projects.tabs.team')}
+            </TabsTrigger>
+            <TabsTrigger value="milestones" count={tabCounts?.milestones}>
+              <ClipboardList />
+              {t('projects.tabs.milestones')}
+            </TabsTrigger>
+            <TabsTrigger value="schedule">
+              <CalendarDays />
+              {t('projects.tabs.schedule')}
+            </TabsTrigger>
+            {!isForeman && (
+              <TabsTrigger value="financials" count={tabCounts?.financials}>
+                <Receipt />
+                {t('projects.tabs.financials')}
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="operations" count={tabCounts?.operations}>
+              <CalendarDays />
+              {t('projects.tabs.operations')}
+            </TabsTrigger>
+            {!isForeman && (
+              <TabsTrigger value="documents">
+                <FolderOpen />
+                {t('projects.tabs.documents')}
+              </TabsTrigger>
+            )}
+          </TabsList>
+          <TabsContent value="general">
+            <ProjectForm
+              form={form}
+              setForm={setForm}
+              clients={clients}
+              users={users}
+              error={error}
+              saving={saving}
+              readOnly={readOnly}
+              isAdmin={isAdmin}
+              onSubmit={handleSubmit}
+            />
+          </TabsContent>
+          <TabsContent value="team">
+            <MembersPanel projectId={id} isAdmin={isAdmin} users={users} />
+          </TabsContent>
+          <TabsContent value="milestones">
+            <MilestonesPanel projectId={id} isAdmin={isAdmin} />
+          </TabsContent>
+          <TabsContent value="schedule">
+            <SchedulePanel
+              projectId={id}
+              startDate={form.start_date || null}
+              targetEndDate={form.target_end_date || null}
+            />
+          </TabsContent>
+          {!isForeman && (
+            <TabsContent value="financials">
+              {/* Phase 69: Financials sub-tabbed (was 5 stacked panels — DESIGN.md §7.3 violation). */}
+              <Tabs defaultValue="customer-invoices" variant="pill">
+                <TabsList>
+                  <TabsTrigger value="customer-invoices">
+                    <Receipt />
+                    {t('projects.financials.customerInvoices')}
+                  </TabsTrigger>
+                  <TabsTrigger value="variations">
+                    <SlidersHorizontal />
+                    {t('projects.financials.variations')}
+                  </TabsTrigger>
+                  <TabsTrigger value="purchase-orders">
+                    <ClipboardList />
+                    {t('projects.financials.purchaseOrders')}
+                  </TabsTrigger>
+                  <TabsTrigger value="supplier-invoices">
+                    <Receipt />
+                    {t('projects.financials.supplierInvoices')}
+                  </TabsTrigger>
+                  <TabsTrigger value="payment-requests">
+                    <CalendarDays />
+                    {t('projects.financials.paymentRequests')}
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="customer-invoices">
+                  <CustomerInvoicesPanel projectId={id} canWrite={canEdit} />
+                </TabsContent>
+                <TabsContent value="variations">
+                  <VariationsPanel projectId={id} canWrite={canEdit} />
+                </TabsContent>
+                <TabsContent value="purchase-orders">
+                  <PurchaseOrdersPanel projectId={id} canWrite={canEdit} />
+                </TabsContent>
+                <TabsContent value="supplier-invoices">
+                  <SupplierInvoicesPanel projectId={id} canWrite={canEdit} />
+                </TabsContent>
+                <TabsContent value="payment-requests">
+                  <PaymentRequestsPanel projectId={id} canWrite={canEdit} />
+                </TabsContent>
+              </Tabs>
+            </TabsContent>
+          )}
+          <TabsContent value="operations">
+            <TasksPanel projectId={id} canWrite={canEdit} />
+            <RfiPanel projectId={id} canWrite={canEdit} />
+            <MeetingsPanel projectId={id} canWrite={canEdit} />
+            <HandoverPanel projectId={id} canWrite={canEdit} />
+          </TabsContent>
+          {!isForeman && (
+            <TabsContent value="documents">
+              <DocumentsPanel projectId={id} canWrite={canEdit} />
+            </TabsContent>
+          )}
+        </Tabs>
       )}
     </div>
   );
@@ -644,15 +683,6 @@ function ProjectForm({
           )}
         </form>
       </Card>
-  );
-}
-
-function TabCountBadge({ value }: { value: number | undefined }) {
-  if (value == null || value === 0) return null;
-  return (
-    <span className="ms-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:text-primary">
-      {value}
-    </span>
   );
 }
 

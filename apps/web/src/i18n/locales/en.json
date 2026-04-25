@@ -483,6 +483,13 @@
       "operations": "Operations",
       "documents": "Documents"
     },
+    "financials": {
+      "customerInvoices": "Customer invoices",
+      "variations": "Variations",
+      "purchaseOrders": "Purchase orders",
+      "supplierInvoices": "Supplier invoices",
+      "paymentRequests": "Payment requests"
+    },
     "types": {
       "execution": "Execution only",
       "planning_execution": "Planning + execution"
