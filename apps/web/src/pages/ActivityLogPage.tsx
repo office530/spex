@@ -1,14 +1,18 @@
 import {
+  ActivityTimeline,
+  ActivityTimelineGroup,
+  ActivityTimelineItem,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   EmptyState,
+  PageHeader,
   SkeletonRows,
-  StatusBadge,
+  type TimelineIconTone,
 } from '@spex/ui';
-import { History } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { History, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 
@@ -24,6 +28,31 @@ interface ActivityRow {
   user: { full_name: string } | null;
 }
 
+const ACTION_ICON: Record<Action, typeof Plus> = {
+  insert: Plus,
+  update: Pencil,
+  delete: Trash2,
+};
+
+const ACTION_TONE: Record<Action, TimelineIconTone> = {
+  insert: 'success',
+  update: 'info',
+  delete: 'danger',
+};
+
+function dateGroupKey(iso: string, locale: string): string {
+  const d = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date(today.getTime() - 86_400_000);
+  const isSameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
+  if (isSameDay(d, today)) return 'today';
+  if (isSameDay(d, yesterday)) return 'yesterday';
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(d);
+}
+
 export function ActivityLogPage() {
   const { t, i18n } = useTranslation();
   const [rows, setRows] = useState<ActivityRow[]>([]);
@@ -35,7 +64,9 @@ export function ActivityLogPage() {
     void (async () => {
       const { data, error: dbErr } = await supabase
         .from('activity_logs')
-        .select('id, entity_type, entity_id, action, user_id, occurred_at, user:user_profiles(full_name)')
+        .select(
+          'id, entity_type, entity_id, action, user_id, occurred_at, user:user_profiles(full_name)',
+        )
         .order('occurred_at', { ascending: false })
         .limit(100);
       if (cancelled) return;
@@ -48,66 +79,74 @@ export function ActivityLogPage() {
     };
   }, []);
 
-  const dateFmt = new Intl.DateTimeFormat(i18n.language, {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit' }),
+    [i18n.language],
+  );
+
+  const grouped = useMemo(() => {
+    const buckets = new Map<string, ActivityRow[]>();
+    for (const r of rows) {
+      const key = dateGroupKey(r.occurred_at, i18n.language);
+      const existing = buckets.get(key);
+      if (existing) existing.push(r);
+      else buckets.set(key, [r]);
+    }
+    return Array.from(buckets.entries());
+  }, [rows, i18n.language]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('activityLog.title')}</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">{t('activityLog.subtitle')}</p>
-      </div>
+      <PageHeader title={t('activityLog.title')} subtitle={t('activityLog.subtitle')} />
 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t('activityLog.title')}</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SkeletonRows count={8} />
           ) : error ? (
-            <p className="text-sm text-destructive p-6 text-center">{error}</p>
+            <p className="text-sm text-destructive p-2">{error}</p>
           ) : rows.length === 0 ? (
             <EmptyState icon={History} title={t('activityLog.empty')} />
           ) : (
-            <div className="divide-y">
-              {rows.map((r) => {
-                const entityLabel = t(`activityLog.entity.${r.entity_type}`, {
-                  defaultValue: r.entity_type,
-                });
-                const actionLabel = t(`activityLog.action.${r.action}`);
+            <ActivityTimeline>
+              {grouped.map(([groupKey, items]) => {
+                const groupLabel =
+                  groupKey === 'today'
+                    ? t('common.today')
+                    : groupKey === 'yesterday'
+                      ? t('common.yesterday')
+                      : groupKey;
                 return (
-                  <div
-                    key={r.id}
-                    className="flex items-center justify-between px-6 py-3 gap-4 flex-wrap"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm">
-                        <span className="font-medium">{r.user?.full_name ?? '—'}</span>
-                        <span className="text-muted-foreground"> · </span>
-                        <span>{actionLabel}</span>
-                        <span className="text-muted-foreground"> · </span>
-                        <span className="font-medium">{entityLabel}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground font-mono truncate mt-0.5">
-                        {r.entity_id}
-                      </div>
-                    </div>
-                    <StatusBadge
-                      family="audit_action"
-                      value={r.action}
-                      label={actionLabel}
-                      className="shrink-0"
-                    />
-                    <div className="text-xs text-muted-foreground shrink-0">
-                      {dateFmt.format(new Date(r.occurred_at))}
-                    </div>
-                  </div>
+                  <ActivityTimelineGroup key={groupKey} label={groupLabel}>
+                    {items.map((r, idx) => {
+                      const Icon = ACTION_ICON[r.action];
+                      const entityLabel = t(`activityLog.entity.${r.entity_type}`, {
+                        defaultValue: r.entity_type,
+                      });
+                      const actionLabel = t(`activityLog.action.${r.action}`);
+                      return (
+                        <ActivityTimelineItem
+                          key={r.id}
+                          icon={Icon}
+                          iconTone={ACTION_TONE[r.action]}
+                          last={idx === items.length - 1}
+                          timestamp={timeFmt.format(new Date(r.occurred_at))}
+                        >
+                          <span className="font-medium">{r.user?.full_name ?? '—'}</span>
+                          <span className="text-muted-foreground"> · </span>
+                          <span>{actionLabel}</span>
+                          <span className="text-muted-foreground"> · </span>
+                          <span className="font-medium">{entityLabel}</span>
+                        </ActivityTimelineItem>
+                      );
+                    })}
+                  </ActivityTimelineGroup>
                 );
               })}
-            </div>
+            </ActivityTimeline>
           )}
         </CardContent>
       </Card>

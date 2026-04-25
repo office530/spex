@@ -884,6 +884,8 @@
     "deletedToast": "Deleted",
     "errorToast": "Save failed",
     "actions": "Actions",
-    "view": "View"
+    "view": "View",
+    "today": "Today",
+    "yesterday": "Yesterday"
   }
 }

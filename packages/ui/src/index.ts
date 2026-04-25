@@ -35,6 +35,19 @@ export {
   type SegmentedControlOption,
   type SegmentedControlProps,
 } from './components/segmented-control';
+export {
+  ActivityTimeline,
+  ActivityTimelineGroup,
+  ActivityTimelineItem,
+  type ActivityTimelineGroupProps,
+  type ActivityTimelineItemProps,
+  type TimelineIconTone,
+} from './components/activity-timeline';
+export {
+  CommentThread,
+  Comment,
+  type CommentProps,
+} from './components/comment-thread';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs';
 export {
   Table,
