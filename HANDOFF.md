@@ -2,8 +2,28 @@
 
 One-page handoff for a fresh Claude Code CLI session in the `office530/spex` repo.
 
+---
+
+## ⚡ Resume in Antigravity (added 2026-04-25)
+
+The previous Claude Code session ran on a different host. To continue here:
+
+1. You are on branch `claude/start-spex-rebuild-ZiKng`. There are **5 unmerged commits ahead of `main`** (Phases 62–65 + the `ui-ux-pro-max` skill install). A draft PR has been opened — merge it (or keep building on top) before opening anything new.
+2. Read these files in order: **`CLAUDE.md` → this file → `BLUEPRINT.md` §10 → `DESIGN.md` → `PATTERNS.md`**.
+3. The most recent **in-flight work** (not yet shipped) was a system-wide **UX/UI redesign analysis** Shay requested. Three Explore-agent audits (page-level, primitive-level, IA/flow-level) were completed but the synthesizing **`UX_REDESIGN_PLAN.md`** was never written. Top findings:
+   - **Visual layer**: Dashboard sparse/generic, list pages flat & monotone, several `@spex/ui` primitives (ProgressRing, AnimatedNumber, HoverCard, Combobox) underadopted.
+   - **IA layer**: No global financial-risk view (CEO), no global task queue (PM/Foreman), Financials tab overloaded with 5 stacked panels, foreman sees Finance/General tabs they can't actually access. "View All Tasks" on Dashboard links to `/projects` (wrong — should go to a `/my-tasks` page that doesn't exist yet).
+   - **Missing primitives**: breadcrumbs, side drawer, stepper, date-range picker, inline edit, segmented control, notification stack, activity timeline, comment thread, tag input, file dropzone, page header.
+   - **Missing data layer**: Work Log (Miro Board 9) was never implemented — no schema for it.
+4. Shay's stated goal: redesign so the system "feels intuitive" and not "too simple". After writing `UX_REDESIGN_PLAN.md`, implement in phases — Dashboard first, then ProjectEditPage tab restructure, then list-page polish, then missing primitives, then IA fixes (role-based tab hiding, global queues, Work Log).
+5. **`.claude/skills/ui-ux-pro-max/`** is installed — useful for the redesign work. Invoke via the Skill tool.
+
+**Next concrete action a fresh session should take**: write `UX_REDESIGN_PLAN.md` synthesizing the three audits above, propose Phase 66+ in BLUEPRINT.md numbering, then ask Shay which page to redesign first.
+
+---
+
 **📍 Current state (§ Progress log below for the detailed phase-by-phase):**
-Phase 0–5 complete, Phase 6 mostly complete, Phase 3/4 Chashbashvat-runtime and all WA/email/Drive/Calendar integrations are blocked waiting on external setup. Design language (DESIGN.md) and sidebar layout + teal palette shipped; 34 feature / polish phases merged as of 2026-04-24.
+Phase 0–5 complete, Phase 6 complete, Phase 7 (hardening) partially complete via Phases 45–47 (Vitest + a11y polish) and Phase 60 (security audit). Phase 3/4 Chashbashvat-runtime and all WA/email/Drive/Calendar integrations remain blocked on external setup. Design language (DESIGN.md) + sidebar layout + dark-teal palette shipped. **65 feature/polish phases merged through 2026-04-25** (Phases 62–65 sitting on the branch in a draft PR).
 
 What's live: auth + roles, dashboard with KPIs + recent projects + my tasks, leads (interactions, events, pre-deal quotes, convert-to-project), clients, suppliers, users, projects with 6 tabs (General / Team / Milestones / Financials / Operations / Documents), BoQ with chapters + line items + supplier quotes + RFQ grouper + comments + cheapest highlight, milestones auto-seed, customer invoices + receipts (with milestone auto-trigger), supplier invoices + payment requests + POs, Chashbashvat sync queue infrastructure, variations, tasks with parent/child + checklists + dependencies, RFI, meetings + action items, handover protocol, documents via Supabase Storage, tickets (public + internal), reports, settings/milestones.
 
@@ -138,6 +158,26 @@ Post-Phase-6 polish sweep (Miro catch-up):
 | 45 | Vitest scaffolding + first 23 business-logic tests | ✅ (Phase 7 hardening — Playwright E2E / Sentry / a11y still pending) |
 | 46 | BoQ aggregation helpers (`computeLineTotal` / `computeChapterTotal` / `computeProjectTotal`) + 10 tests | ✅ |
 | 47 | A11y polish: skip-to-content link, mobile sign-out aria-label, `<main>` landmark id | ✅ |
+| 48 | Route-level code splitting via `React.lazy` | ✅ |
+| 49 | TanStack Query + Sonner toast foundation | ✅ |
+| 50 | Donut charts on Reports page (Recharts) | ✅ |
+| 51 | `Dialog` + `DatePicker` primitives in `@spex/ui` | ✅ |
+| 52 | TanStack Table on `LeadsPage` (sortable + filterable) | ✅ |
+| 53 | `cmdk` Cmd+K command palette | ✅ |
+| 54 | DatePicker adoption in `CustomerInvoicesPanel` | ✅ |
+| 55 | Polish primitives — `KpiTile` icon-chip + `ProgressRing` + `AnimatedNumber` + `HoverCard` + `Combobox` + `DropdownMenu` + `Skeleton` | ✅ |
+| 56 | Visual flair — `bg-mesh-hero` + `gradient-border-animated` + `glow-halo` utilities | ✅ |
+| 57 | Project page polish — underline tabs + `ProgressRing` on milestone bar | ✅ |
+| 58 | Projects + Tickets pages on TanStack Table | ✅ |
+| 59a | Suppliers + Clients + Users pages on TanStack Table | ✅ |
+| 59b | Sonner toasts on every edit page | ✅ |
+| 59c | `DatePicker` on every remaining date input system-wide | ✅ |
+| 60 | Security audit + `SECURITY.md` (XSS / CSP / RLS / dependency review) | ✅ |
+| 62 | Drag-and-drop kanban on Tasks via `@dnd-kit/core` | 🟡 on branch (draft PR pending) |
+| 63 | Gantt schedule tab via `gantt-task-react` | 🟡 on branch (draft PR pending) |
+| 64 | PDF export for `HandoverProtocol` + `MeetingMinutes` via `@react-pdf/renderer` | 🟡 on branch (draft PR pending) |
+| 65 | hCaptcha widget on public ticket form (env-gated via `VITE_HCAPTCHA_SITEKEY`) | 🟡 on branch (draft PR pending) |
+| — | Install `.claude/skills/ui-ux-pro-max/` skill (design intelligence: 67 styles, 96 palettes, 57 font pairings) | 🟡 on branch (draft PR pending) |
 
 Design:
 - DESIGN.md written (17-section spec: brand, tokens, typography, layout, tabs, components, motion, RTL, a11y)
@@ -162,6 +202,7 @@ Migrations (in `supabase/migrations/`):
 - `0010_notification_preferences_rls.sql` — RLS + UNIQUE(user_id, event_type, channel)
 - `0011_consultants_entity.sql` — consultants table + RLS (back-office write)
 - `0012_ticket_attachments_storage.sql` — `ticket-uploads` storage bucket + anon-insert policy + soft anon rate-limit trigger on tickets
+- `0013_chashbashvat_jobs_policy_tighten.sql` — narrowed RLS on `chashbashvat_sync_jobs` (applied to remote 2026-04-25)
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 

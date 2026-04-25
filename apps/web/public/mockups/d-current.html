@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spex · Direction D — Evolve Current (Dark Teal)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Rubik','system-ui','sans-serif'] },
+        colors: {
+          /* hsl(173 77% 32%) = #126C66 primary teal from current DESIGN.md */
+          teal: {
+            50:  '#ECFDFA',
+            100: '#D1FAF1',
+            500: '#14B8A6',
+            600: '#0F9387',
+            700: '#126C66', /* current --primary */
+            800: '#0E5851',
+            900: '#0B3F3B', /* current --sidebar */
+          }
+        }
+      }
+    }
+  };
+</script>
+<style>
+  body { font-family: 'Rubik', system-ui, sans-serif; }
+  .nums { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .hero-gradient { background: linear-gradient(135deg, #0B3F3B 0%, #126C66 100%); }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex">
+
+<!-- Sidebar -->
+<aside class="w-60 shrink-0 bg-teal-900 text-slate-100 flex flex-col">
+  <div class="px-5 py-5">
+    <div class="text-base font-bold tracking-tight text-white">Spex</div>
+    <div class="text-[11px] text-teal-100/60 mt-0.5">מערכת ניהול פרויקטים לקבלני שיפוצים</div>
+  </div>
+
+  <nav class="flex-1 px-3 space-y-6 overflow-y-auto">
+    <div class="space-y-1">
+      <div class="px-3 text-xs font-medium text-teal-100/60 uppercase tracking-wider">סביבת עבודה</div>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm bg-teal-800 text-teal-300 font-medium"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>לוח בקרה</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="folder-kanban" class="w-4 h-4"></i>פרויקטים</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="target" class="w-4 h-4"></i>לידים</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="list-checks" class="w-4 h-4"></i>המשימות שלי <span class="ms-auto text-[10px] bg-teal-700 text-teal-100 rounded px-1.5 py-0.5">7</span></a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="calendar-days" class="w-4 h-4"></i>יומן</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="inbox" class="w-4 h-4"></i>פניות</a>
+    </div>
+    <div class="space-y-1">
+      <div class="px-3 text-xs font-medium text-teal-100/60 uppercase tracking-wider">משרד</div>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="bar-chart-3" class="w-4 h-4"></i>דוחות</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="receipt" class="w-4 h-4"></i>פיננסים</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="building-2" class="w-4 h-4"></i>לקוחות</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="truck" class="w-4 h-4"></i>ספקים</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="users" class="w-4 h-4"></i>משתמשים</a>
+      <a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-teal-100/70 hover:bg-teal-800/60 hover:text-white"><i data-lucide="settings" class="w-4 h-4"></i>הגדרות</a>
+    </div>
+  </nav>
+
+  <div class="p-3 border-t border-teal-800/50">
+    <div class="flex items-center gap-3 rounded-md px-2 py-2">
+      <div class="h-8 w-8 rounded-full bg-teal-800 grid place-items-center text-sm font-medium text-white">שכ</div>
+      <div class="min-w-0 flex-1">
+        <div class="text-sm font-medium truncate text-white">שי כהן</div>
+        <div class="text-xs text-teal-100/60 truncate">מנכ״ל</div>
+      </div>
+      <button class="p-1.5 rounded text-teal-100/60 hover:text-white hover:bg-teal-800"><i data-lucide="bell" class="w-4 h-4"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 min-w-0 bg-slate-50 overflow-x-hidden">
+  <div class="max-w-6xl mx-auto px-6 py-6 space-y-6">
+
+    <!-- Hero banner -->
+    <div class="rounded-2xl hero-gradient text-white p-6 sm:p-8 shadow-md">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div class="space-y-2 min-w-0">
+          <div class="text-xs font-medium text-teal-100/70">לוח בקרה</div>
+          <h1 class="text-2xl sm:text-3xl font-bold">סקירת מנכ״ל · רבעון שני 2026</h1>
+          <div class="flex items-center gap-3 text-sm text-teal-100/80 flex-wrap">
+            <span class="flex items-center gap-1.5"><i data-lucide="calendar-days" class="w-4 h-4"></i>25 באפריל 2026</span>
+            <span>·</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="folder-kanban" class="w-4 h-4"></i>11 פרויקטים פעילים</span>
+            <span class="bg-white/15 text-white text-xs px-2 py-0.5 rounded">פעיל</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button class="bg-white/15 hover:bg-white/25 text-white text-sm font-medium px-3 py-2 rounded-md flex items-center gap-2"><i data-lucide="search" class="w-4 h-4"></i>חיפוש</button>
+          <button class="bg-white text-teal-900 hover:bg-teal-50 text-sm font-medium px-4 py-2 rounded-md flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i>פרויקט חדש</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4 hover:-translate-y-0.5 transition-transform">
+        <div class="flex items-start justify-between">
+          <div class="text-xs font-medium text-slate-500">חייבים פתוחים</div>
+          <div class="h-8 w-8 rounded-md bg-emerald-100 grid place-items-center"><i data-lucide="trending-up" class="w-4 h-4 text-emerald-700"></i></div>
+        </div>
+        <div class="mt-3 nums text-2xl font-semibold">₪1,210,000</div>
+        <div class="mt-1 flex items-center gap-1 text-xs"><span class="text-emerald-600 font-medium">+5%</span><span class="text-slate-500">השבוע</span></div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-rose-200 shadow-sm p-4">
+        <div class="flex items-start justify-between">
+          <div class="text-xs font-medium text-rose-700">באיחור</div>
+          <div class="h-8 w-8 rounded-md bg-rose-100 grid place-items-center"><i data-lucide="alarm-clock" class="w-4 h-4 text-rose-700"></i></div>
+        </div>
+        <div class="mt-3 nums text-2xl font-semibold text-rose-700">₪84,000</div>
+        <div class="mt-1 text-xs text-slate-500">2 חשבוניות · 12 ימים</div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4 hover:-translate-y-0.5 transition-transform">
+        <div class="flex items-start justify-between">
+          <div class="text-xs font-medium text-slate-500">מזומן זמין</div>
+          <div class="h-8 w-8 rounded-md bg-blue-100 grid place-items-center"><i data-lucide="wallet" class="w-4 h-4 text-blue-700"></i></div>
+        </div>
+        <div class="mt-3 nums text-2xl font-semibold">₪460,000</div>
+        <div class="mt-1 text-xs text-slate-500">צפי שבוע: -₪120,000</div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-4 hover:-translate-y-0.5 transition-transform">
+        <div class="flex items-start justify-between">
+          <div class="text-xs font-medium text-slate-500">פרויקטים פעילים</div>
+          <div class="h-8 w-8 rounded-md bg-teal-100 grid place-items-center"><i data-lucide="folder-kanban" class="w-4 h-4 text-teal-700"></i></div>
+        </div>
+        <div class="mt-3 nums text-2xl font-semibold">11</div>
+        <div class="mt-1 flex items-center gap-1 text-xs"><span class="text-emerald-600 font-medium">+2</span><span class="text-slate-500">השבוע</span></div>
+      </div>
+    </div>
+
+    <!-- Two-up: Projects + Tasks -->
+    <div class="grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <h2 class="text-base font-semibold">פרויקטים אחרונים</h2>
+          <a class="text-xs font-medium text-teal-700 hover:text-teal-800">לכל הפרויקטים ←</a>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 p-4">
+          <a class="rounded-lg border bg-background hover:border-teal-700/50 hover:shadow-sm p-4 space-y-2 transition-all">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="font-medium text-sm truncate">דירת גני תקווה</div>
+                <div class="text-xs text-muted-foreground text-slate-500 truncate">משפחת לוי</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">פעיל</span>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-teal-700" style="width:72%"></div></div>
+              <span class="nums text-xs font-medium">72%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t">
+              <div class="text-xs text-slate-500 truncate">שי כהן</div>
+              <div class="text-sm font-medium nums shrink-0">₪890,000</div>
+            </div>
+          </a>
+          <a class="rounded-lg border bg-background hover:border-teal-700/50 hover:shadow-sm p-4 space-y-2 transition-all">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="font-medium text-sm truncate">משרד כפר סבא</div>
+                <div class="text-xs text-slate-500 truncate">אורון בע״מ</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">פעיל</span>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-teal-700" style="width:35%"></div></div>
+              <span class="nums text-xs font-medium">35%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t">
+              <div class="text-xs text-slate-500 truncate">רוני אבני</div>
+              <div class="text-sm font-medium nums shrink-0">₪1,250,000</div>
+            </div>
+          </a>
+          <a class="rounded-lg border bg-background hover:border-teal-700/50 hover:shadow-sm p-4 space-y-2 transition-all">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="font-medium text-sm truncate">קוטג׳ הוד השרון</div>
+                <div class="text-xs text-slate-500 truncate">משפחת ברק</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">פעיל</span>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-teal-700" style="width:84%"></div></div>
+              <span class="nums text-xs font-medium">84%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t">
+              <div class="text-xs text-slate-500 truncate">שי כהן</div>
+              <div class="text-sm font-medium nums shrink-0">₪2,100,000</div>
+            </div>
+          </a>
+          <a class="rounded-lg border bg-background hover:border-teal-700/50 hover:shadow-sm p-4 space-y-2 transition-all">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="font-medium text-sm truncate">וילה ראש העין</div>
+                <div class="text-xs text-slate-500 truncate">משפחת בן־דוד</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">פעיל</span>
+            </div>
+            <div class="flex items-center gap-2 pt-1">
+              <div class="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-teal-700" style="width:12%"></div></div>
+              <span class="nums text-xs font-medium">12%</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 pt-2 border-t">
+              <div class="text-xs text-slate-500 truncate">דנה רביב</div>
+              <div class="text-sm font-medium nums shrink-0">₪3,400,000</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+          <h2 class="text-base font-semibold">המשימות שלי</h2>
+        </div>
+        <ul class="divide-y divide-slate-100">
+          <li class="px-4 py-3 hover:bg-slate-50">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-medium truncate">הוצאת חשבונית מס מקדמה</div>
+                <div class="text-xs text-slate-500 truncate">וילה ראש העין</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-rose-100 text-rose-800">דחוף</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-xs text-rose-600">
+              <i data-lucide="alarm-clock" class="w-3 h-3"></i>26/04 · 2 ימי איחור
+            </div>
+          </li>
+          <li class="px-4 py-3 hover:bg-slate-50">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-medium truncate">אישור הזמנת בלוקים</div>
+                <div class="text-xs text-slate-500 truncate">משרד כפר סבא</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-800">בינוני</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
+              <i data-lucide="calendar-days" class="w-3 h-3"></i>היום
+            </div>
+          </li>
+          <li class="px-4 py-3 hover:bg-slate-50">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-medium truncate">ביקורת אתר שבועית</div>
+                <div class="text-xs text-slate-500 truncate">דירת גני תקווה</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800">בעבודה</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
+              <i data-lucide="calendar-days" class="w-3 h-3"></i>26/04 14:00
+            </div>
+          </li>
+          <li class="px-4 py-3 hover:bg-slate-50">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-sm font-medium truncate">סיכום פגישה עם מהנדס</div>
+                <div class="text-xs text-slate-500 truncate">קוטג׳ הוד השרון</div>
+              </div>
+              <span class="shrink-0 inline-flex text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700">חדש</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
+              <i data-lucide="calendar-days" class="w-3 h-3"></i>28/04
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Activity + AR aging -->
+    <div class="grid gap-4 lg:grid-cols-[2fr_1fr]">
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-semibold">פעילות אחרונה</h2>
+          <a class="text-xs font-medium text-teal-700">יומן מלא ←</a>
+        </div>
+        <ol class="space-y-3">
+          <li class="flex gap-3 items-start">
+            <div class="h-7 w-7 rounded-full bg-emerald-100 grid place-items-center shrink-0"><i data-lucide="check" class="w-3.5 h-3.5 text-emerald-700"></i></div>
+            <div class="flex-1 text-sm">
+              <span class="font-medium">שי כהן</span>
+              <span class="text-slate-600"> עדכן אבן דרך </span>
+              <span class="font-medium">"שלד"</span>
+              <span class="text-slate-600"> ל</span>
+              <span class="text-emerald-700 font-medium">הושלם</span>
+              <span class="text-slate-600"> · קוטג׳ הוד השרון</span>
+              <div class="text-xs text-slate-500 mt-0.5">לפני 12 דקות</div>
+            </div>
+          </li>
+          <li class="flex gap-3 items-start">
+            <div class="h-7 w-7 rounded-full bg-teal-100 grid place-items-center shrink-0"><i data-lucide="thumbs-up" class="w-3.5 h-3.5 text-teal-700"></i></div>
+            <div class="flex-1 text-sm">
+              <span class="font-medium">רוני אבני</span>
+              <span class="text-slate-600"> אישר הצעת מחיר ספק </span>
+              <span class="font-medium">צבע ריצוף 80m²</span>
+              <span class="text-slate-600"> · </span>
+              <span class="nums">₪48,200</span>
+              <div class="text-xs text-slate-500 mt-0.5">לפני שעה</div>
+            </div>
+          </li>
+          <li class="flex gap-3 items-start">
+            <div class="h-7 w-7 rounded-full bg-blue-100 grid place-items-center shrink-0"><i data-lucide="receipt" class="w-3.5 h-3.5 text-blue-700"></i></div>
+            <div class="flex-1 text-sm">
+              <span class="font-medium">אורית מזרחי</span>
+              <span class="text-slate-600"> הוציאה חשבונית מס </span>
+              <span class="font-medium nums">#2026/0084</span>
+              <span class="text-slate-600"> · </span>
+              <span class="nums">₪264,000</span>
+              <span class="text-slate-600"> · משרד כפר סבא</span>
+              <div class="text-xs text-slate-500 mt-0.5">לפני שעתיים</div>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <h2 class="text-base font-semibold mb-3">חוב לפי גיל</h2>
+        <div class="space-y-2.5">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-600">0–30 ימים</span><span class="nums font-medium">₪756,000</span></div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:62%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-600">31–60 ימים</span><span class="nums font-medium">₪370,000</span></div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-amber-500" style="width:30%"></div></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1"><span class="text-rose-700 font-medium">61+ ימים</span><span class="nums font-medium text-rose-700">₪84,000</span></div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-rose-500" style="width:8%"></div></div>
+          </div>
+        </div>
+        <button class="mt-4 w-full text-sm font-medium text-white bg-teal-700 hover:bg-teal-800 py-2 rounded-md flex items-center justify-center gap-2"><i data-lucide="message-circle" class="w-4 h-4"></i>שלח תזכורת</button>
+      </div>
+    </div>
+
+    <div class="text-center text-xs text-slate-400 pt-2 pb-6">Direction D · Evolve Current · dark teal preserved · soft cards · max-w-6xl + hero gradient</div>
+  </div>
+</main>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

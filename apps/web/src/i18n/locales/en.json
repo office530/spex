@@ -35,8 +35,6 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome to Spex",
-    "scaffoldNotice": "Shell only — features land in subsequent phases",
     "activeProjects": "Active projects",
     "activeLeads": "Active leads",
     "openTasks": "My open tasks",

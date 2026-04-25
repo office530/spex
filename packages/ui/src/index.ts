@@ -8,7 +8,28 @@ export {
   CardDescription,
   CardContent,
   CardFooter,
+  type CardProps,
 } from './components/card';
+export { PageHeader, type PageHeaderProps } from './components/page-header';
+export { MoneyInput, type MoneyInputProps } from './components/money-input';
+export { FieldGroup, type FieldGroupProps } from './components/field-group';
+export {
+  SideDrawer,
+  SideDrawerTrigger,
+  SideDrawerClose,
+  SideDrawerContent,
+  SideDrawerHeader,
+  SideDrawerBody,
+  SideDrawerFooter,
+  SideDrawerTitle,
+  SideDrawerDescription,
+} from './components/side-drawer';
+export {
+  DateRangePicker,
+  type DateRangePickerProps,
+  type DateRange,
+} from './components/date-range-picker';
+export { Breadcrumb, BreadcrumbItem, type BreadcrumbItemProps } from './components/breadcrumb';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs';
 export {
   Table,

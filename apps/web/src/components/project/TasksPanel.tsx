@@ -443,9 +443,11 @@ export function TasksPanel({ projectId, canWrite }: { projectId: string; canWrit
                         </div>
                         <div className="shrink-0 flex items-center gap-1 flex-wrap">
                           {isTaskOverdue(r) && (
-                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-rose-100 text-rose-800">
-                              {t('tasks.overdue')}
-                            </span>
+                            <StatusBadge
+                              family="flag"
+                              value="overdue"
+                              label={t('tasks.overdue')}
+                            />
                           )}
                           <StatusBadge
                             family="task_priority"
