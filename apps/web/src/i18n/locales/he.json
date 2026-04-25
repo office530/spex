@@ -77,6 +77,42 @@
     "workLogShortcutDescription": "תיעוד יומי של שעות, צוות ומשימות בשטח.",
     "workLogShortcutComingSoon": "יושק בשלב הבא"
   },
+  "financials": {
+    "title": "פיננסים",
+    "subtitle": "מבט-על תזרימי לכלל הפרויקטים",
+    "totalAr": "חייבים פתוחים",
+    "overdueAr": "חוב באיחור",
+    "cashPosition": "מזומן צפוי",
+    "arMinusAp": "AR פחות AP",
+    "pendingPayouts": "תשלומים ממתינים",
+    "overdueTitle": "חשבוניות באיחור",
+    "agingTitle": "חוב לפי גיל",
+    "payoutQueueTitle": "ממתין לאישור משרד",
+    "noOverdue": "אין חשבוניות באיחור",
+    "noAging": "אין חייבים פתוחים",
+    "noPending": "אין בקשות ממתינות",
+    "invoicesCount_one": "{{count}} חשבונית",
+    "invoicesCount_two": "{{count}} חשבוניות",
+    "invoicesCount_other": "{{count}} חשבוניות",
+    "requestsCount_one": "{{count}} בקשה",
+    "requestsCount_two": "{{count}} בקשות",
+    "requestsCount_other": "{{count}} בקשות",
+    "days_one": "יום אחד",
+    "days_two": "יומיים",
+    "days_other": "{{count}} ימים",
+    "aging": {
+      "current": "0–30 ימים",
+      "past30": "31–60 ימים",
+      "past60": "61+ ימים"
+    },
+    "col": {
+      "project": "פרויקט",
+      "client": "לקוח",
+      "supplier": "ספק",
+      "amount": "סכום",
+      "daysOverdue": "ימי איחור"
+    }
+  },
   "myTasks": {
     "title": "המשימות שלי",
     "subtitle": "כל המשימות שמוקצות לך, בכל הפרויקטים",
