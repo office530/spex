@@ -40,6 +40,7 @@ import { CustomerInvoicesPanel } from '../components/project/CustomerInvoicesPan
 import { DocumentsPanel } from '../components/project/DocumentsPanel';
 import { HandoverPanel } from '../components/project/HandoverPanel';
 import { MeetingsPanel } from '../components/project/MeetingsPanel';
+import { WorkLogPanel } from '../components/project/WorkLogPanel';
 import { PaymentRequestsPanel } from '../components/project/PaymentRequestsPanel';
 import { PurchaseOrdersPanel } from '../components/project/PurchaseOrdersPanel';
 import { RfiPanel } from '../components/project/RfiPanel';
@@ -499,6 +500,7 @@ export function ProjectEditPage() {
           )}
           <TabsContent value="operations">
             <TasksPanel projectId={id} canWrite={canEdit} />
+            <WorkLogPanel projectId={id} canWrite={canEdit} />
             <RfiPanel projectId={id} canWrite={canEdit} />
             <MeetingsPanel projectId={id} canWrite={canEdit} />
             <HandoverPanel projectId={id} canWrite={canEdit} />
