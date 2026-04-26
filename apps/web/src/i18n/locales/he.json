@@ -577,6 +577,8 @@
     "emptyLineItems": "אין פריטים בפרק",
     "projectTotal": "סה\"כ פרויקט",
     "chapterTotal": "סה\"כ פרק",
+    "chaptersCount": "פרקים",
+    "lineItemsCount": "פריטים",
     "addChapter": "הוסף פרק",
     "chapterName": "שם פרק",
     "confirmDeleteChapter": "למחוק את הפרק וכל הפריטים?",

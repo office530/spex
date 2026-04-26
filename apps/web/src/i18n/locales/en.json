@@ -573,6 +573,8 @@
     "emptyLineItems": "No items in this chapter",
     "projectTotal": "Project total",
     "chapterTotal": "Chapter total",
+    "chaptersCount": "Chapters",
+    "lineItemsCount": "Line items",
     "addChapter": "Add chapter",
     "chapterName": "Chapter name",
     "confirmDeleteChapter": "Delete this chapter and all its items?",
