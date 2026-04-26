@@ -210,17 +210,20 @@ Active phases roadmap (UX redesign post-PR #63):
 
 | # | What | Status |
 |---|---|---|
-| 66 | Design system foundations + A v1 token swap | ✅ |
-| 67 | Dashboard role variants + /my-tasks | ✅ |
-| 68 | /financials global view (back-office) | 🚧 in flight |
-| 69 | ProjectEditPage IA refactor (PM bug fix, sub-tabbed Financials, breadcrumbs, decompose 1503 LOC) | ⬜ |
-| 70 | List-page polish sweep (KPI banners, EmptyState fixes, SegmentedControl) | ⬜ |
-| 71 | ActivityTimeline + CommentThread primitives + retrofits | ⬜ |
-| 72 | Work Log entity (migration 0014 + project tab + foreman dashboard tile) | ⬜ |
-| 73 | BoQ + Procurement polish | ⬜ |
-| 74 | Settings consolidation under one /settings hub | ⬜ |
-| 75 | Foreman + mobile pass | ⬜ |
-| 76 | Motion + visual depth | ⬜ |
+| 66 | Design system foundations + A v1 token swap | ✅ PR #63 |
+| 67 | Dashboard role variants (BackOffice/PM/Foreman) + /my-tasks + Login mesh | ✅ PR #64 |
+| 68 | /financials global view (back-office) | ✅ PR #65 |
+| 69 | ProjectEditPage IA refactor — PM edit bug fix + Financials sub-tabbed + foreman tab visibility | ✅ PR #66 |
+| 70 | SegmentedControl primitive + bare-empty-state sweep on Leads/Projects | ✅ PR #67 |
+| 71 | ActivityTimeline + CommentThread primitives + ActivityLog retrofit | ✅ PR #68 |
+| 72 | Work Log entity (migration 0014 + WorkLogPanel + StatusBadge work_log family) | ✅ PR #69 |
+| 73 | BoQ polish — PageHeader + 3-tile KPI banner + Skeleton/EmptyState | ✅ PR #70 |
+| 74 | Settings consolidation under /settings hub + breadcrumbs on sub-pages | ✅ PR #71 |
+| 75 | Foreman scope (no /leads in nav) + mobile nav touch targets + bell on mobile | ✅ PR #72 |
+| 76 | Motion + visual depth — Skeleton shimmer + page-fade-in + DESIGN.md §10 codified | 🚧 in flight |
+
+Migrations applied to remote since 0013:
+- `0014_work_logs_entity.sql` — work_log_status enum + work_logs table + 4 RLS policies (Phase 72)
 
 Shipped in this long session: PRs #6 through #43 on `main` via `claude/start-spex-rebuild-ZiKng` branch.
 

@@ -225,11 +225,17 @@ Horizontal progress bars on per-entity headers (milestones `3/11`, handover `4/5
 
 ## 10. Motion
 
-- Hover: colors transition in 150ms (`transition-colors`), position in 150ms (`transition-transform`)
-- KPI tile hover: `hover:-translate-y-0.5`
-- List row hover: `bg-muted/60`
-- Nav link hover: bg darkens one step; active gets brand teal
-- Modals / detail panes (planned): slide-in-from-end 200ms
+Conventions codified in Phase 76. All motion respects `prefers-reduced-motion: reduce` (no animation when set).
+
+- **Hover**: colors transition in 150ms (`transition-colors`), position in 150ms (`transition-transform`)
+- **KPI tile hover**: `hover:-translate-y-0.5` (also for `<Card variant="interactive">`)
+- **List row hover**: `bg-muted/60`
+- **Nav link hover**: bg darkens one step; active gets `bg-sidebar-accent`
+- **Modals**: zoom-in-95 + fade-in 200ms (Radix data-attrs in `<Dialog>`)
+- **Side drawer** (`<SideDrawer>`): slide-in-from-end 200ms
+- **Skeleton**: linear shimmer 1.6s ease-in-out via `.skeleton-shimmer` utility (Phase 76 — replaces `animate-pulse`)
+- **Page transitions**: 200ms fade + 2px translate on route change via `.page-fade-in` (Phase 76)
+- **Number tween**: use `<AnimatedNumber value={n} format={fn} />` for KPI updates that change in real-time
 - No bounce, no easing cutesy-ness. Cubic-bezier default.
 
 ## 11. Forms
