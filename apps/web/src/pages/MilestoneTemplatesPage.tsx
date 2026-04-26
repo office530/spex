@@ -1,4 +1,6 @@
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   Card,
   CardContent,
@@ -171,12 +173,22 @@ export function MilestoneTemplatesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t('settings.milestoneTemplates.description')}
-          </p>
+      <div className="space-y-2">
+        <Breadcrumb>
+          <BreadcrumbItem href="/settings">{t('nav.settings')}</BreadcrumbItem>
+          <BreadcrumbItem current>
+            {t('settings.hub.milestones.title')}
+          </BreadcrumbItem>
+        </Breadcrumb>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {t('settings.hub.milestones.title')}
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t('settings.milestoneTemplates.description')}
+            </p>
+          </div>
         </div>
       </div>
 

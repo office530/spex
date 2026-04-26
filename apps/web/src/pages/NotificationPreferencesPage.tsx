@@ -1,4 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState } from '@spex/ui';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+} from '@spex/ui';
 import { BellRing } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -91,11 +100,17 @@ export function NotificationPreferencesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {t('settings.notifications.description')}
-        </p>
+      <div className="space-y-2">
+        <Breadcrumb>
+          <BreadcrumbItem href="/settings">{t('nav.settings')}</BreadcrumbItem>
+          <BreadcrumbItem current>{t('settings.hub.notifications.title')}</BreadcrumbItem>
+        </Breadcrumb>
+        <div>
+          <h1 className="text-2xl font-bold">{t('settings.hub.notifications.title')}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {t('settings.notifications.description')}
+          </p>
+        </div>
       </div>
 
       <Card>

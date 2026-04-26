@@ -49,6 +49,9 @@ const MyTasksPage = lazy(() =>
 const FinancialsPage = lazy(() =>
   import('./pages/FinancialsPage').then((m) => ({ default: m.FinancialsPage })),
 );
+const SettingsPage = lazy(() =>
+  import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
+);
 const NotificationPreferencesPage = lazy(() =>
   import('./pages/NotificationPreferencesPage').then((m) => ({
     default: m.NotificationPreferencesPage,
@@ -291,6 +294,14 @@ export function App() {
             <AuthenticatedRoute>
               <TicketEditPage />
             </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <BackOfficeRoute>
+              <SettingsPage />
+            </BackOfficeRoute>
           }
         />
         <Route

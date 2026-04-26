@@ -1,4 +1,6 @@
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   Card,
   CardContent,
@@ -60,11 +62,17 @@ export function AutomationRulesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {t('settings.automations.description')}
-        </p>
+      <div className="space-y-2">
+        <Breadcrumb>
+          <BreadcrumbItem href="/settings">{t('nav.settings')}</BreadcrumbItem>
+          <BreadcrumbItem current>{t('settings.hub.automations.title')}</BreadcrumbItem>
+        </Breadcrumb>
+        <div>
+          <h1 className="text-2xl font-bold">{t('settings.hub.automations.title')}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {t('settings.automations.description')}
+          </p>
+        </div>
       </div>
 
       <Card>
