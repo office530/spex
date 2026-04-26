@@ -162,7 +162,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <main id="main-content" className="flex-1 min-w-0 pt-12 md:pt-0">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">{children}</div>
+        {/* Phase 76: page-fade-in keyed on route swaps via React Router's
+           remount-on-key pattern — handled implicitly because each page
+           component remounts when the URL changes. */}
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 page-fade-in">
+          {children}
+        </div>
       </main>
       <CommandPalette />
     </div>

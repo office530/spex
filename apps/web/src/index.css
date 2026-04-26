@@ -152,6 +152,41 @@
     }
   }
 
+  /* Skeleton shimmer — Phase 76 polish. Replaces the plain animate-pulse on
+     <Skeleton> for a richer first-paint feel. Respects prefers-reduced-motion. */
+  @keyframes spex-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: spex-skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-shimmer {
+      animation: none;
+    }
+  }
+
+  /* Page-transition fade — applied via .page-fade-in on the root of each
+     route. Subtle (200ms) so it doesn't slow the user down. */
+  @keyframes spex-fade-in {
+    from { opacity: 0; transform: translateY(2px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .page-fade-in {
+    animation: spex-fade-in 200ms ease-out both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page-fade-in { animation: none; }
+  }
+
   .gradient-border-animated {
     position: relative;
     isolation: isolate;
