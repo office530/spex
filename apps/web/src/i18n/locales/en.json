@@ -868,6 +868,30 @@
     "title": "Schedule",
     "empty": "No milestones to display"
   },
+  "workLog": {
+    "title": "Work log",
+    "subtitle": "Daily on-site logging of hours, crew, and tasks",
+    "add": "New entry",
+    "empty": "No log entries yet",
+    "notesPlaceholder": "What was done, materials received, on-site issues…",
+    "field": {
+      "date": "Date",
+      "hours": "Hours",
+      "crewSize": "Crew size",
+      "status": "Status",
+      "notes": "Notes"
+    },
+    "status": {
+      "planned": "Planned",
+      "in_progress": "In progress",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "hoursValue_one": "1 hour",
+    "hoursValue_other": "{{count}} hours",
+    "crewValue_one": "1 crew member",
+    "crewValue_other": "{{count}} crew members"
+  },
   "common": {
     "loading": "Loading…",
     "edit": "Edit",

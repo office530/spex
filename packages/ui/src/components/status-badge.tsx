@@ -48,7 +48,8 @@ type StatusFamily =
   | 'rfq'
   | 'audit_action'
   | 'automation_rule'
-  | 'flag';
+  | 'flag'
+  | 'work_log';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -197,6 +198,14 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     cheapest: 'success',
     new: 'info',
     pinned: 'accent',
+  },
+  // Work Log status enum from migration 0014_work_logs_entity.sql.
+  // Mirrors Miro Board 9: תואם / בעבודה / בוצע / בוטל.
+  work_log: {
+    planned: 'neutral',
+    in_progress: 'info',
+    done: 'success',
+    cancelled: 'muted',
   },
 };
 

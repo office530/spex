@@ -872,6 +872,32 @@
     "title": "לוח זמנים",
     "empty": "אין אבני דרך להצגה"
   },
+  "workLog": {
+    "title": "יומן עבודה",
+    "subtitle": "תיעוד יומי של שעות, צוות ומשימות בשטח",
+    "add": "רישום חדש",
+    "empty": "אין רישומים ביומן",
+    "notesPlaceholder": "מה בוצע, חומרים שהתקבלו, סוגיות בשטח…",
+    "field": {
+      "date": "תאריך",
+      "hours": "שעות",
+      "crewSize": "גודל צוות",
+      "status": "סטטוס",
+      "notes": "הערות"
+    },
+    "status": {
+      "planned": "מתוכנן",
+      "in_progress": "בעבודה",
+      "done": "בוצע",
+      "cancelled": "בוטל"
+    },
+    "hoursValue_one": "שעה אחת",
+    "hoursValue_two": "שעתיים",
+    "hoursValue_other": "{{count}} שעות",
+    "crewValue_one": "איש צוות אחד",
+    "crewValue_two": "2 אנשי צוות",
+    "crewValue_other": "{{count}} אנשי צוות"
+  },
   "common": {
     "loading": "טוען…",
     "edit": "עריכה",
