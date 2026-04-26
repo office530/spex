@@ -4,11 +4,15 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
+  KpiTile,
   Label,
+  PageHeader,
+  SkeletonRows,
   StatusBadge,
 } from '@spex/ui';
-import { Award } from 'lucide-react';
+import { Award, ClipboardList, Layers, Wallet } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -142,38 +146,55 @@ export function BoqPage() {
   }
 
   const projectTotal = computeProjectTotal(chapters);
+  const lineItemCount = chapters.reduce((acc, c) => acc + (c.items?.length ?? 0), 0);
 
   if (loading) {
     return (
-      <p className="text-sm text-muted-foreground py-8 text-center">{t('common.loading')}</p>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <PageHeader title={t('boq.title')} />
+        <SkeletonRows count={6} />
+      </div>
     );
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold">{t('boq.title')}</h1>
-          {project && <p className="text-sm text-muted-foreground">{project.name}</p>}
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="text-sm text-muted-foreground">
-            {t('boq.projectTotal')}: <span className="font-semibold text-foreground">{formatCurrency(projectTotal)}</span>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/projects/${id}`)}>
-            {t('common.back')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('boq.title')}
+        subtitle={project?.name}
+        back={{ onClick: () => navigate(`/projects/${id}`) }}
+      />
 
       {error && (
         <p className="text-sm text-destructive" role="alert">{error}</p>
       )}
 
+      {/* Phase 73: project-total / chapters / line-items KPI banner */}
+      <div className="grid grid-cols-3 gap-3">
+        <KpiTile
+          icon={Wallet}
+          iconTone="success"
+          label={t('boq.projectTotal')}
+          value={formatCurrency(projectTotal)}
+        />
+        <KpiTile
+          icon={Layers}
+          iconTone="info"
+          label={t('boq.chaptersCount')}
+          value={chapters.length}
+        />
+        <KpiTile
+          icon={ClipboardList}
+          iconTone="accent"
+          label={t('boq.lineItemsCount')}
+          value={lineItemCount}
+        />
+      </div>
+
       {chapters.length === 0 && !addingChapter ? (
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground">{t('boq.empty')}</p>
+            <EmptyState icon={Layers} title={t('boq.empty')} />
           </CardContent>
         </Card>
       ) : (
