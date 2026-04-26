@@ -167,6 +167,22 @@
   },
   "settings": {
     "title": "Settings",
+    "hub": {
+      "title": "Settings",
+      "subtitle": "Manage templates, automations, and notification preferences",
+      "milestones": {
+        "title": "Milestone templates",
+        "description": "Standard milestones auto-seeded into every new project."
+      },
+      "automations": {
+        "title": "Automations",
+        "description": "Rules fired on system events — e.g. WhatsApp customer notifications."
+      },
+      "notifications": {
+        "title": "Notification preferences",
+        "description": "Choose which channel you receive notifications on for each event."
+      }
+    },
     "automations": {
       "title": "Automation rules",
       "description": "Rules fired on system events. Some wait on external integrations.",
