@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
+import { useRoleGroup } from '../auth/useRoleGroup';
 import { CommandPalette } from './CommandPalette';
 import { NotificationBell } from './NotificationBell';
 
@@ -73,6 +74,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     .join('')
     .toUpperCase();
   const isAdmin = profile ? BACK_OFFICE.includes(profile.role) : false;
+  const roleGroup = useRoleGroup();
+  // Foreman doesn't have CRM/Leads access per BLUEPRINT.md §7. Filter the
+  // workspace nav so only items the foreman can act on appear.
+  const workspaceItems =
+    roleGroup === 'foreman'
+      ? WORKSPACE.filter((item) => item.to !== '/leads')
+      : WORKSPACE;
 
   return (
     <div className="min-h-screen flex bg-muted/40">
@@ -90,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
-          <NavSection label={t('nav.sections.workspace')} items={WORKSPACE} />
+          <NavSection label={t('nav.sections.workspace')} items={workspaceItems} />
           {isAdmin && (
             <NavSection label={t('nav.sections.directory')} items={DIRECTORY} />
           )}
@@ -118,20 +126,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-20 h-12 flex items-center justify-between bg-sidebar text-sidebar-foreground px-4">
-        <div className="font-bold">{t('app.name')}</div>
-        <div className="flex items-center gap-1 overflow-x-auto">
-          {[...WORKSPACE, ...(isAdmin ? DIRECTORY : [])].map((item) => (
+      {/* Mobile top bar — Phase 75 polish: bigger touch targets (h-11 / 44px+),
+         bell visible alongside nav, scrollable horizontal nav strip. */}
+      <div className="md:hidden fixed top-0 inset-x-0 z-20 h-12 flex items-center justify-between bg-sidebar text-sidebar-foreground px-3 gap-2">
+        <div className="font-bold shrink-0 text-base">{t('app.name')}</div>
+        <div className="flex items-center gap-0.5 overflow-x-auto flex-1 min-w-0">
+          {[...workspaceItems, ...(isAdmin ? DIRECTORY : [])].map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `rounded-md p-1.5 ${
+                `rounded-md min-w-[2.5rem] h-9 grid place-items-center transition-colors ${
                   isActive
                     ? 'text-sidebar-active bg-sidebar-accent'
-                    : 'text-sidebar-muted-foreground'
+                    : 'text-sidebar-muted-foreground hover:text-sidebar-foreground'
                 }`
               }
               aria-label={t(item.key)}
@@ -139,16 +148,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <item.icon className="h-5 w-5" />
             </NavLink>
           ))}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => void signOut()}
-            className="h-8 w-8 p-0 text-sidebar-muted-foreground"
-            aria-label={t('nav.logout')}
-          >
-            <LogOut className="h-4 w-4" />
-          </Button>
         </div>
+        <NotificationBell />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => void signOut()}
+          className="h-9 w-9 p-0 shrink-0 text-sidebar-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent"
+          aria-label={t('nav.logout')}
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
       </div>
 
       <main id="main-content" className="flex-1 min-w-0 pt-12 md:pt-0">
