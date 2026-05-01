@@ -188,8 +188,13 @@
       <li><strong>אל תבחר לפי "הכי יפה"</strong> — בחר לפי "מה שהצוות יסכים לפתוח כל בוקר במשך שנה".</li>
       <li>אפשר גם <strong>לשלב</strong> — למשל "A + Rubik מ־D + עיגולים מ־D". כתוב לי איזה אלמנטים אתה רוצה מאיפה.</li>
     </ul>
-    <div class="mt-5 pt-5 border-t border-slate-100 text-sm text-slate-700">
-      <strong class="text-emerald-700">🔒 נבחר 2026-04-25</strong>: <span class="text-orange-600 font-semibold">Direction A v1 (clean)</span> — ללא glass, ללא mesh gradient. הטוקנים נעולים ב־<a href="/UX_MOODBOARD.md" class="underline">UX_MOODBOARD.md</a>. הצעד הבא: PR של Phase 66 (foundations).
+    <div class="mt-5 pt-5 border-t border-slate-100 text-sm text-slate-700 space-y-2">
+      <div>
+        <strong class="text-sky-700">🔒 נעול 2026-05-01</strong>: <span class="text-sky-700 font-semibold">Direction A v2 (Bento Blue)</span> — מבוסס על Bento layout עם accent כחול (sky-600 #0284c7) במקום כתום. נעול במוקאפ ה־<a href="./workspace.html" class="underline">workspace</a> דרך ה־theme switcher. הצעד הבא: Phase 66.5 token swap → Phase 77 (workspace + QC).
+      </div>
+      <div class="text-xs text-slate-500">
+        <strong>היסטוריה</strong>: A v1 (Site Foreman, כתום) נעל ב־2026-04-25 ושוחרר ב־2026-05-01 כש־A v2 החליף אותו. קלפי הכיוון למטה (A/B/C/D) מציגים את ההשוואה המקורית של 2026-04-25 — תיעוד בלבד.
+      </div>
     </div>
   </div>
 
@@ -203,6 +208,108 @@
       <div class="text-slate-500 mt-0.5">שמור לעיון: גרסת gradient + glass שדחית.</div>
     </a>
   </div>
+
+  <!-- ─────────── IA: Project Execution Workspace ─────────── -->
+  <section class="mt-12">
+    <div class="mb-3">
+      <div class="text-[10px] font-bold tracking-widest text-orange-600 uppercase mb-1">IA · Phase 77 prep</div>
+      <h2 class="text-xl font-bold text-slate-900">סביבת ביצוע פרויקט — מבנה חדש</h2>
+      <p class="text-sm text-slate-600 mt-1 max-w-3xl">
+        מוקאפ אינטראקטיבי של ה־workspace החדש שיחליף את ה־tab-hopping בין BoQ / Operations / Documents. שלוש עמודות:
+        ניווט פרקים בימין, פרטי שורת BoQ במרכז (4 טאבים), מאגר תוכניות בשמאל. הכל באותם טוקנים של A v1.
+        בחר פרק, בחר שורה, ראה הכל במקום אחד.
+      </p>
+    </div>
+
+    <a href="./workspace.html" class="group block bg-white rounded-xl border border-slate-200 hover:border-orange-400 hover:shadow-lg transition-all overflow-hidden">
+      <div class="h-44 relative overflow-hidden bg-slate-50 border-b border-slate-200">
+        <!-- mini preview: 3 columns + top bar -->
+        <div class="absolute inset-0 flex flex-col">
+          <div class="h-5 bg-white border-b border-slate-200 flex items-center px-2 gap-1.5">
+            <div class="h-1 w-12 bg-slate-300 rounded"></div>
+            <div class="ms-auto flex items-center gap-1">
+              <div class="h-3 w-8 bg-emerald-100 rounded"></div>
+              <div class="h-3 w-12 bg-slate-100 rounded"></div>
+              <div class="h-3 w-10 bg-orange-500 rounded"></div>
+            </div>
+          </div>
+          <div class="flex-1 flex">
+            <!-- right (navigator in RTL) -->
+            <div class="w-16 bg-slate-100 border-l border-slate-200 p-1.5 space-y-1">
+              <div class="h-2.5 bg-slate-300 rounded w-2/3"></div>
+              <div class="h-2 bg-slate-200 rounded ms-1.5"></div>
+              <div class="h-2 bg-rose-200 rounded ms-1.5"></div>
+              <div class="h-2 bg-slate-200 rounded ms-1.5"></div>
+              <div class="h-2.5 bg-slate-300 rounded w-1/2 mt-1"></div>
+              <div class="h-2 bg-slate-200 rounded ms-1.5"></div>
+            </div>
+            <!-- center -->
+            <div class="flex-1 bg-white p-2 space-y-1.5">
+              <div class="h-3 bg-slate-200 rounded w-2/3"></div>
+              <div class="grid grid-cols-4 gap-1">
+                <div class="h-3 bg-slate-100 rounded"></div>
+                <div class="h-3 bg-slate-100 rounded"></div>
+                <div class="h-3 bg-slate-100 rounded"></div>
+                <div class="h-3 bg-slate-100 rounded"></div>
+              </div>
+              <div class="flex gap-1 border-b border-slate-200 pb-1">
+                <div class="h-2 w-8 bg-orange-500 rounded"></div>
+                <div class="h-2 w-8 bg-slate-200 rounded"></div>
+                <div class="h-2 w-8 bg-slate-200 rounded"></div>
+                <div class="h-2 w-8 bg-slate-200 rounded"></div>
+              </div>
+              <div class="h-4 bg-rose-50 border border-rose-200 rounded"></div>
+              <div class="h-4 bg-slate-50 border border-slate-200 rounded"></div>
+              <div class="h-4 bg-slate-50 border border-slate-200 rounded"></div>
+            </div>
+            <!-- left (doc rail in RTL) -->
+            <div class="w-20 bg-slate-100 border-e border-slate-200 p-1.5 space-y-1">
+              <div class="h-2.5 bg-slate-300 rounded w-1/2"></div>
+              <div class="h-2 bg-orange-200 rounded"></div>
+              <div class="h-2 bg-slate-200 rounded"></div>
+              <div class="h-2 bg-slate-200 rounded"></div>
+              <div class="h-2 bg-slate-200 rounded"></div>
+              <div class="h-3 bg-white border border-slate-200 rounded mt-1"></div>
+              <div class="h-3 bg-white border border-slate-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-[10px] font-bold tracking-widest text-orange-600 uppercase">Workspace v1</span>
+          <span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">לבחינה</span>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900">3-Column Project Execution</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Chapter navigator · Line-item detail (4 tabs) · Document rail</p>
+        <p class="text-sm text-slate-700 mt-3">
+          BoQ הופך לעמוד-השדרה. בחר פרק → בחר שורה → ראה את הכל: סקירה, בקרת איכות, רכש, משימות. מסמכים מאורגנים לפי פרק בעמודה השמאלית (ניתן לכווץ).
+          <strong class="text-slate-900">לחץ לתצוגה אינטראקטיבית.</strong>
+        </p>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
+          <div class="bg-slate-50 border border-slate-200 rounded p-2">
+            <div class="font-semibold text-slate-700">מה לבדוק</div>
+            <ul class="text-slate-600 mt-1 space-y-0.5 list-disc ps-4">
+              <li>פתח/סגור פרקים</li>
+              <li>החלף טאבים במרכז</li>
+              <li>פתח שרשור הערות ב־QC</li>
+              <li>כווץ את עמודת המסמכים</li>
+            </ul>
+          </div>
+          <div class="bg-orange-50 border border-orange-200 rounded p-2">
+            <div class="font-semibold text-orange-800">הצעד הבא</div>
+            <p class="text-orange-700/90 mt-1">
+              נעל את ה־IA, אז נכנס לקוד ב־4 פאזות (77–80) שיממשו את הסכמה + הקומפוננטות מעל הפרימיטיבים הקיימים.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-slate-100 text-sm font-medium text-slate-900 group-hover:text-orange-600 flex items-center gap-1">
+          פתח תצוגה אינטראקטיבית
+          <span class="group-hover:-translate-x-1 transition-transform">←</span>
+        </div>
+      </div>
+    </a>
+  </section>
 
   <div class="text-center text-xs text-slate-400 py-8">
     Mockups served via Vite · ערכים מספריים זהים בכל הארבעה כדי שתשווה רק חתימה ויזואלית
