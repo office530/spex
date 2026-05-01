@@ -52,6 +52,9 @@ const FinancialsPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('./pages/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
+const ProjectWorkspacePage = lazy(() =>
+  import('./pages/ProjectWorkspacePage').then((m) => ({ default: m.ProjectWorkspacePage })),
+);
 const NotificationPreferencesPage = lazy(() =>
   import('./pages/NotificationPreferencesPage').then((m) => ({
     default: m.NotificationPreferencesPage,
@@ -245,6 +248,14 @@ export function App() {
           element={
             <AuthenticatedRoute>
               <BoqPage />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/projects/:id/workspace"
+          element={
+            <AuthenticatedRoute>
+              <ProjectWorkspacePage />
             </AuthenticatedRoute>
           }
         />

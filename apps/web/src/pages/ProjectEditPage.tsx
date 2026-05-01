@@ -350,14 +350,24 @@ export function ProjectEditPage() {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {id && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 text-primary-foreground border-white/20 hover:bg-white/20 hover:text-primary-foreground"
-                  onClick={() => navigate(`/projects/${id}/boq`)}
-                >
-                  {t('boq.manage')}
-                </Button>
+                <>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-white text-primary hover:bg-white/90 hover:text-primary"
+                    onClick={() => navigate(`/projects/${id}/workspace`)}
+                  >
+                    {t('workspace.openCta')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-white/10 text-primary-foreground border-white/20 hover:bg-white/20 hover:text-primary-foreground"
+                    onClick={() => navigate(`/projects/${id}/boq`)}
+                  >
+                    {t('boq.manage')}
+                  </Button>
+                </>
               )}
               <Button
                 variant="ghost"

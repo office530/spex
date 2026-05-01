@@ -886,6 +886,100 @@
     "title": "Schedule",
     "empty": "No milestones to display"
   },
+  "workspace": {
+    "title": "Execution workspace",
+    "openCta": "Open workspace",
+    "backToProject": "Back to project",
+    "chapters": "Chapters",
+    "addChapter": "Add chapter",
+    "searchPlaceholder": "Search chapter or line…",
+    "noMatches": "No matches",
+    "noChapters": "No chapters yet",
+    "noChaptersYet": "This project has no chapters yet",
+    "noChaptersHint": "Open the BoQ to add chapters and line items.",
+    "noLines": "No lines in this chapter",
+    "pickLine": "Pick a line item from the right panel",
+    "attentionFlag": "Open issues",
+    "notStarted": "Not started",
+    "invalid": "Invalid project",
+    "editLineComingSoon": "Inline line edit ships in Phase 78",
+    "tabs": {
+      "overview": "Overview",
+      "qc": "QC",
+      "procurement": "Procurement",
+      "tasks": "Tasks"
+    },
+    "meta": {
+      "quantity": "Quantity",
+      "unitPrice": "Unit price",
+      "total": "Estimated total",
+      "qcProgress": "QC progress"
+    },
+    "overview": {
+      "notes": "Notes",
+      "noNotes": "No notes for this line.",
+      "activity": "Recent activity",
+      "noActivity": "No recent activity for this line"
+    },
+    "procurement": {
+      "title": "Supplier quotes",
+      "summary_one": "1 quote",
+      "summary_other": "{{count}} quotes",
+      "summary_one_approved": "1 quote · approved",
+      "summary_other_approved": "{{count}} quotes · approved",
+      "empty": "No quotes yet",
+      "emptyHint": "Open an RFQ and approve a quote — go to the BoQ.",
+      "openInBoq": "Open in BoQ",
+      "col": {
+        "supplier": "Supplier",
+        "amount": "Amount",
+        "status": "Status",
+        "rank": "Rank"
+      }
+    },
+    "tasks": {
+      "placeholderTitle": "Linked tasks ship in Phase 80",
+      "placeholderDescription": "Linking tasks to BoQ lines requires a schema migration. For now, manage tasks from the Operations tab in /projects/:id."
+    },
+    "docrail": {
+      "title": "Documents",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "allDocs": "All documents",
+      "uncategorized": "Uncategorized",
+      "recent": "Recent",
+      "folderEmpty": "Folder empty",
+      "empty": "No documents",
+      "emptyHint": "Tag a document as belonging to this chapter via the project Documents tab.",
+      "upload": "Upload document",
+      "uploadComingSoon": "Document upload available via the project Documents tab"
+    }
+  },
+  "qc": {
+    "add": "Add QC check",
+    "empty": "No QC checks defined for this line",
+    "emptyHint": "Add a QC check to track build requirements, consultant approvals, and field tests.",
+    "newPlaceholder": "Check description (e.g. 'architect approval for location')",
+    "viewComments": "Comments",
+    "commentsCount_one": "1 comment",
+    "commentsCount_other": "{{count}} comments",
+    "commentEmpty": "No comments yet. Be the first.",
+    "commentPlaceholder": "Add a comment…",
+    "confirmDelete": "Delete this check?",
+    "field": {
+      "description": "Description",
+      "dueDate": "Due date",
+      "status": "Status",
+      "assignedTo": "Assigned to"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "done": "Done",
+      "failed": "Failed",
+      "waiting": "Waiting"
+    }
+  },
   "workLog": {
     "title": "Work log",
     "subtitle": "Daily on-site logging of hours, crew, and tasks",
@@ -927,6 +1021,7 @@
     "errorToast": "Save failed",
     "actions": "Actions",
     "view": "View",
+    "send": "Send",
     "today": "Today",
     "yesterday": "Yesterday"
   }
