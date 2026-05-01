@@ -49,7 +49,8 @@ type StatusFamily =
   | 'audit_action'
   | 'automation_rule'
   | 'flag'
-  | 'work_log';
+  | 'work_log'
+  | 'qc_check_status';
 
 const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
   project: {
@@ -206,6 +207,15 @@ const STATUS_TONES: Record<StatusFamily, Record<string, StatusTone>> = {
     in_progress: 'info',
     done: 'success',
     cancelled: 'muted',
+  },
+  // QC check status enum from migration 0015_boq_line_item_checks.sql.
+  // Per-line-item quality-control checklist statuses.
+  qc_check_status: {
+    pending: 'neutral',
+    in_progress: 'info',
+    done: 'success',
+    failed: 'danger',
+    waiting: 'warning',
   },
 };
 

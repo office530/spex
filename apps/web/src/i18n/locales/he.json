@@ -890,6 +890,102 @@
     "title": "לוח זמנים",
     "empty": "אין אבני דרך להצגה"
   },
+  "workspace": {
+    "title": "סביבת ביצוע",
+    "openCta": "פתח סביבת ביצוע",
+    "backToProject": "חזרה לפרויקט",
+    "chapters": "פרקים",
+    "addChapter": "הוסף פרק",
+    "searchPlaceholder": "חיפוש פרק או שורה…",
+    "noMatches": "לא נמצאו תוצאות",
+    "noChapters": "עדיין אין פרקים",
+    "noChaptersYet": "עדיין אין פרקים בפרויקט",
+    "noChaptersHint": "פתח את כתב הכמויות כדי להוסיף פרקים ושורות.",
+    "noLines": "אין שורות בפרק",
+    "pickLine": "בחר שורה מהפאנל מימין",
+    "attentionFlag": "ליקויים פתוחים",
+    "notStarted": "טרם החל",
+    "invalid": "פרויקט לא תקין",
+    "editLineComingSoon": "עריכת שורה זמינה ב־Phase 78",
+    "tabs": {
+      "overview": "סקירה",
+      "qc": "בקרת איכות",
+      "procurement": "רכש",
+      "tasks": "משימות"
+    },
+    "meta": {
+      "quantity": "כמות",
+      "unitPrice": "מחיר יחידה",
+      "total": "סך מוערך",
+      "qcProgress": "התקדמות בקרה"
+    },
+    "overview": {
+      "notes": "הערות",
+      "noNotes": "אין הערות לשורה זו.",
+      "activity": "פעילות אחרונה",
+      "noActivity": "אין פעילות אחרונה לשורה זו"
+    },
+    "procurement": {
+      "title": "הצעות מחיר ספקים",
+      "summary_one": "הצעה אחת",
+      "summary_two": "{{count}} הצעות",
+      "summary_other": "{{count}} הצעות",
+      "summary_one_approved": "הצעה אחת · אושרה",
+      "summary_other_approved": "{{count}} הצעות · אושרה",
+      "empty": "אין הצעות מחיר עדיין",
+      "emptyHint": "לפתיחת RFQ ואישור הצעה ראשית — עבור לכתב הכמויות.",
+      "openInBoq": "פתח בכתב הכמויות",
+      "col": {
+        "supplier": "ספק",
+        "amount": "סכום",
+        "status": "סטטוס",
+        "rank": "דירוג"
+      }
+    },
+    "tasks": {
+      "placeholderTitle": "משימות מקושרות יושקו ב־Phase 80",
+      "placeholderDescription": "הקישור בין משימות לשורות BoQ דורש מיגרציה נפרדת. בינתיים — צור משימות מהטאב 'תפעול' ב/projects/:id."
+    },
+    "docrail": {
+      "title": "מסמכים",
+      "expand": "הרחב",
+      "collapse": "צמצם",
+      "allDocs": "כל המסמכים",
+      "uncategorized": "ללא תיקייה",
+      "recent": "אחרונים",
+      "folderEmpty": "תיקייה ריקה",
+      "empty": "אין מסמכים",
+      "emptyHint": "סמן מסמך כשייך לפרק זה דרך טאב המסמכים בפרויקט.",
+      "upload": "העלה מסמך",
+      "uploadComingSoon": "העלאת מסמכים זמינה דרך טאב המסמכים בפרויקט"
+    }
+  },
+  "qc": {
+    "add": "הוסף בדיקת איכות",
+    "empty": "אין בדיקות איכות מוגדרות לשורה זו",
+    "emptyHint": "הוסף בדיקת איכות כדי לתעד דרישות ביצוע, אישורי יועצים, ובדיקות שדה.",
+    "newPlaceholder": "תיאור בדיקה (לדוגמה: 'אישור אדריכל למיקום')",
+    "viewComments": "הערות",
+    "commentsCount_one": "הערה אחת",
+    "commentsCount_two": "{{count}} הערות",
+    "commentsCount_other": "{{count}} הערות",
+    "commentEmpty": "אין הערות עדיין. כתוב את הראשונה.",
+    "commentPlaceholder": "הוסף הערה…",
+    "confirmDelete": "למחוק את הבדיקה הזו?",
+    "field": {
+      "description": "תיאור",
+      "dueDate": "תאריך יעד",
+      "status": "סטטוס",
+      "assignedTo": "משויך ל"
+    },
+    "status": {
+      "pending": "ממתין",
+      "in_progress": "בעבודה",
+      "done": "בוצע",
+      "failed": "נכשל",
+      "waiting": "ממתין למישהו"
+    }
+  },
   "workLog": {
     "title": "יומן עבודה",
     "subtitle": "תיעוד יומי של שעות, צוות ומשימות בשטח",
@@ -933,6 +1029,7 @@
     "errorToast": "שגיאה בשמירה",
     "actions": "פעולות",
     "view": "צפייה",
+    "send": "שלח",
     "today": "היום",
     "yesterday": "אתמול"
   }
