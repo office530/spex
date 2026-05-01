@@ -907,6 +907,17 @@
     "notStarted": "טרם החל",
     "invalid": "פרויקט לא תקין",
     "editLineComingSoon": "עריכת שורה זמינה ב־Phase 78",
+    "addLine": "הוסף שורה",
+    "chapterNamePlaceholder": "שם פרק (לדוגמה: בינוי)",
+    "confirmDeleteChapter": "למחוק את הפרק '{{name}}' וכל השורות שבו?",
+    "confirmDeleteLine": "למחוק את השורה '{{name}}'?",
+    "lineForm": {
+      "description": "תיאור",
+      "quantity": "כמות",
+      "unit": "יחידה",
+      "unitPlaceholder": "m²/יח׳/קומפ׳",
+      "unitPrice": "מחיר יחידה"
+    },
     "tabs": {
       "overview": "סקירה",
       "qc": "בקרת איכות",
