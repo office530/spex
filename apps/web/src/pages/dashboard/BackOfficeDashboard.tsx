@@ -91,7 +91,7 @@ export function BackOfficeDashboard() {
         supabase
           .from('projects')
           .select(
-            'id, name, status, contract_value, client:clients(company_name), pm:user_profiles!projects_pm_id_fkey(full_name)',
+            'id, name, status, contract_value, client:clients(company_name), pm:user_profiles!pm_id(full_name)',
           )
           .eq('status', 'active')
           .order('created_at', { ascending: false })

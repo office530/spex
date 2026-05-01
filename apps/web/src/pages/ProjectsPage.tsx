@@ -73,7 +73,7 @@ async function fetchProjects(): Promise<ProjectRow[]> {
   const { data, error } = await supabase
     .from('projects')
     .select(
-      'id, name, status, type, contract_value, client:clients(company_name), pm:user_profiles!projects_pm_id_fkey(full_name)',
+      'id, name, status, type, contract_value, client:clients(company_name), pm:user_profiles!pm_id(full_name)',
     )
     .order('name');
   if (error) throw error;
