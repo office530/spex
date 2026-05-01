@@ -6,10 +6,14 @@ import {
   Briefcase,
   Building2,
   CalendarDays,
+  ClipboardCheck,
+  FileText,
   FolderKanban,
   History,
   Inbox,
+  Layers,
   LayoutDashboard,
+  ListChecks,
   Search,
   Settings,
   Target,
@@ -41,18 +45,53 @@ const NAV_COMMANDS: NavCommand[] = [
   { to: '/settings/milestones', icon: Settings, labelKey: 'nav.settings' },
 ];
 
+type EntityKind =
+  | 'project'
+  | 'lead'
+  | 'client'
+  | 'chapter'
+  | 'line'
+  | 'qc'
+  | 'task'
+  | 'document';
+
 interface EntityHit {
-  kind: 'project' | 'lead' | 'client';
+  kind: EntityKind;
   id: string;
   label: string;
   sub?: string;
+  // Workspace navigation context
+  projectId?: string;
+  chapterId?: string;
+  lineId?: string;
 }
+
+const KIND_ICON: Record<EntityKind, LucideIcon> = {
+  project: FolderKanban,
+  lead: Target,
+  client: Building2,
+  chapter: Layers,
+  line: ListChecks,
+  qc: ClipboardCheck,
+  task: ListChecks,
+  document: FileText,
+};
 
 async function searchEntities(q: string): Promise<EntityHit[]> {
   const term = q.trim();
   if (term.length < 2) return [];
   const like = `%${term}%`;
-  const [projRes, leadRes, clientRes] = await Promise.all([
+
+  const [
+    projRes,
+    leadRes,
+    clientRes,
+    chapterRes,
+    lineRes,
+    qcRes,
+    taskRes,
+    docRes,
+  ] = await Promise.all([
     supabase.from('projects').select('id, name').ilike('name', like).limit(5),
     supabase
       .from('leads')
@@ -64,9 +103,40 @@ async function searchEntities(q: string): Promise<EntityHit[]> {
       .select('id, company_name, primary_contact_name')
       .or(`company_name.ilike.${like},primary_contact_name.ilike.${like}`)
       .limit(5),
+    // Phase 79: workspace entity searches
+    supabase
+      .from('boq_chapters')
+      .select('id, name, project_id, project:projects(name)')
+      .ilike('name', like)
+      .limit(5),
+    supabase
+      .from('boq_line_items')
+      .select(
+        'id, description, chapter_id, project_id, chapter:boq_chapters(name), project:projects(name)',
+      )
+      .ilike('description', like)
+      .limit(5),
+    supabase
+      .from('boq_line_item_checks')
+      .select(
+        'id, description, line_item_id, line:boq_line_items(id, description, chapter_id, project_id, project:projects(name))',
+      )
+      .ilike('description', like)
+      .limit(5),
+    supabase
+      .from('tasks')
+      .select('id, title, project_id, project:projects(name)')
+      .ilike('title', like)
+      .limit(5),
+    supabase
+      .from('documents')
+      .select('id, filename, project_id, project:projects(name)')
+      .ilike('filename', like)
+      .limit(5),
   ]);
 
   const hits: EntityHit[] = [];
+
   for (const p of (projRes.data as Array<{ id: string; name: string }> | null) ?? []) {
     hits.push({ kind: 'project', id: p.id, label: p.name });
   }
@@ -81,8 +151,143 @@ async function searchEntities(q: string): Promise<EntityHit[]> {
   }> | null) ?? []) {
     hits.push({ kind: 'client', id: c.id, label: c.company_name, sub: c.primary_contact_name });
   }
+
+  // Workspace entities
+  for (const ch of (chapterRes.data as Array<{
+    id: string;
+    name: string;
+    project_id: string;
+    project: { name: string } | null;
+  }> | null) ?? []) {
+    hits.push({
+      kind: 'chapter',
+      id: ch.id,
+      label: ch.name,
+      sub: ch.project?.name,
+      projectId: ch.project_id,
+      chapterId: ch.id,
+    });
+  }
+  for (const li of (lineRes.data as Array<{
+    id: string;
+    description: string;
+    chapter_id: string;
+    project_id: string;
+    chapter: { name: string } | null;
+    project: { name: string } | null;
+  }> | null) ?? []) {
+    hits.push({
+      kind: 'line',
+      id: li.id,
+      label: li.description,
+      sub: [li.project?.name, li.chapter?.name].filter(Boolean).join(' · '),
+      projectId: li.project_id,
+      chapterId: li.chapter_id,
+      lineId: li.id,
+    });
+  }
+  for (const q of (qcRes.data as Array<{
+    id: string;
+    description: string;
+    line_item_id: string;
+    line: {
+      id: string;
+      description: string;
+      chapter_id: string;
+      project_id: string;
+      project: { name: string } | null;
+    } | null;
+  }> | null) ?? []) {
+    if (!q.line) continue;
+    hits.push({
+      kind: 'qc',
+      id: q.id,
+      label: q.description,
+      sub: [q.line.project?.name, q.line.description].filter(Boolean).join(' · '),
+      projectId: q.line.project_id,
+      chapterId: q.line.chapter_id,
+      lineId: q.line.id,
+    });
+  }
+  for (const tk of (taskRes.data as Array<{
+    id: string;
+    title: string;
+    project_id: string | null;
+    project: { name: string } | null;
+  }> | null) ?? []) {
+    hits.push({
+      kind: 'task',
+      id: tk.id,
+      label: tk.title,
+      sub: tk.project?.name,
+      projectId: tk.project_id ?? undefined,
+    });
+  }
+  for (const d of (docRes.data as Array<{
+    id: string;
+    filename: string;
+    project_id: string;
+    project: { name: string } | null;
+  }> | null) ?? []) {
+    hits.push({
+      kind: 'document',
+      id: d.id,
+      label: d.filename,
+      sub: d.project?.name,
+      projectId: d.project_id,
+    });
+  }
+
   return hits;
 }
+
+function entityPath(hit: EntityHit): string {
+  switch (hit.kind) {
+    case 'project':
+      return `/projects/${hit.id}`;
+    case 'lead':
+      return `/leads/${hit.id}`;
+    case 'client':
+      return `/clients/${hit.id}`;
+    case 'chapter':
+      return `/projects/${hit.projectId}/workspace?chapter=${hit.chapterId}`;
+    case 'line':
+      return `/projects/${hit.projectId}/workspace?chapter=${hit.chapterId}&line=${hit.lineId}`;
+    case 'qc':
+      return `/projects/${hit.projectId}/workspace?chapter=${hit.chapterId}&line=${hit.lineId}&tab=qc`;
+    case 'task':
+      return hit.projectId ? `/projects/${hit.projectId}` : '/projects';
+    case 'document':
+      return hit.projectId ? `/projects/${hit.projectId}` : '/projects';
+  }
+}
+
+function entityKindLabel(kind: EntityKind, t: (key: string) => string): string {
+  switch (kind) {
+    case 'project':
+      return t('nav.projects');
+    case 'lead':
+      return t('nav.leads');
+    case 'client':
+      return t('nav.clients');
+    case 'chapter':
+      return t('cmdk.kind.chapter');
+    case 'line':
+      return t('cmdk.kind.line');
+    case 'qc':
+      return t('cmdk.kind.qc');
+    case 'task':
+      return t('cmdk.kind.task');
+    case 'document':
+      return t('cmdk.kind.document');
+  }
+}
+
+const ENTITY_GROUPS: Array<{ kinds: EntityKind[]; headingKey: string }> = [
+  { kinds: ['project', 'lead', 'client'], headingKey: 'cmdk.entitiesHeading' },
+  { kinds: ['chapter', 'line', 'qc'], headingKey: 'cmdk.workspaceHeading' },
+  { kinds: ['task', 'document'], headingKey: 'cmdk.otherHeading' },
+];
 
 export function CommandPalette() {
   const { t } = useTranslation();
@@ -113,18 +318,6 @@ export function CommandPalette() {
     navigate(path);
   }
 
-  function entityPath(kind: EntityHit['kind'], id: string) {
-    return kind === 'project' ? `/projects/${id}` : kind === 'lead' ? `/leads/${id}` : `/clients/${id}`;
-  }
-
-  function entityKindLabel(kind: EntityHit['kind']) {
-    return kind === 'project'
-      ? t('nav.projects')
-      : kind === 'lead'
-        ? t('nav.leads')
-        : t('nav.clients');
-  }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="overflow-hidden p-0 max-w-xl">
@@ -139,35 +332,52 @@ export function CommandPalette() {
               className="flex h-11 w-full bg-transparent text-sm focus:outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <Command.List className="max-h-80 overflow-y-auto p-1">
+          <Command.List className="max-h-96 overflow-y-auto p-1">
             <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
               {search.trim().length < 2 ? t('cmdk.startTyping') : t('cmdk.noResults')}
             </Command.Empty>
 
-            {hits.length > 0 && (
-              <Command.Group heading={t('cmdk.entitiesHeading')} className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                {hits.map((hit) => (
-                  <Command.Item
-                    key={`${hit.kind}-${hit.id}`}
-                    value={`${hit.kind}-${hit.id}-${hit.label}`}
-                    onSelect={() => go(entityPath(hit.kind, hit.id))}
-                    className="flex items-center justify-between gap-3 rounded-md px-2 py-2 text-sm cursor-pointer aria-selected:bg-muted"
-                  >
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{hit.label}</div>
-                      {hit.sub && (
-                        <div className="text-xs text-muted-foreground truncate">{hit.sub}</div>
-                      )}
-                    </div>
-                    <span className="text-xs text-muted-foreground shrink-0">
-                      {entityKindLabel(hit.kind)}
-                    </span>
-                  </Command.Item>
-                ))}
-              </Command.Group>
-            )}
+            {ENTITY_GROUPS.map((group) => {
+              const groupHits = hits.filter((h) => group.kinds.includes(h.kind));
+              if (groupHits.length === 0) return null;
+              return (
+                <Command.Group
+                  key={group.headingKey}
+                  heading={t(group.headingKey)}
+                  className="px-2 py-1.5 text-xs font-medium text-muted-foreground"
+                >
+                  {groupHits.map((hit) => {
+                    const Icon = KIND_ICON[hit.kind];
+                    return (
+                      <Command.Item
+                        key={`${hit.kind}-${hit.id}`}
+                        value={`${hit.kind}-${hit.id}-${hit.label}`}
+                        onSelect={() => go(entityPath(hit))}
+                        className="flex items-center justify-between gap-3 rounded-md px-2 py-2 text-sm cursor-pointer aria-selected:bg-muted"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-medium truncate">{hit.label}</div>
+                            {hit.sub && (
+                              <div className="text-xs text-muted-foreground truncate">{hit.sub}</div>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {entityKindLabel(hit.kind, t)}
+                        </span>
+                      </Command.Item>
+                    );
+                  })}
+                </Command.Group>
+              );
+            })}
 
-            <Command.Group heading={t('cmdk.navHeading')} className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+            <Command.Group
+              heading={t('cmdk.navHeading')}
+              className="px-2 py-1.5 text-xs font-medium text-muted-foreground"
+            >
               {NAV_COMMANDS.map((cmd) => {
                 const Icon = cmd.icon;
                 const label = t(cmd.labelKey);

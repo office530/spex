@@ -879,12 +879,21 @@
   },
   "cmdk": {
     "title": "חיפוש מהיר",
-    "placeholder": "חפש פרויקט, ליד, לקוח…",
+    "placeholder": "חפש פרויקט, ליד, לקוח, פרק BoQ, שורה, בדיקת איכות, משימה, מסמך…",
     "startTyping": "התחל להקליד כדי לחפש",
     "noResults": "לא נמצאו תוצאות",
     "entitiesHeading": "תוצאות חיפוש",
+    "workspaceHeading": "סביבת ביצוע",
+    "otherHeading": "משימות ומסמכים",
     "navHeading": "ניווט מהיר",
-    "toggle": "פתח / סגור"
+    "toggle": "פתח / סגור",
+    "kind": {
+      "chapter": "פרק BoQ",
+      "line": "שורת BoQ",
+      "qc": "בדיקת איכות",
+      "task": "משימה",
+      "document": "מסמך"
+    }
   },
   "schedule": {
     "title": "לוח זמנים",

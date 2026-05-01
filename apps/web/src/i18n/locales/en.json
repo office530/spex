@@ -875,12 +875,21 @@
   },
   "cmdk": {
     "title": "Quick search",
-    "placeholder": "Search projects, leads, clients…",
+    "placeholder": "Search projects, leads, clients, BoQ chapters, lines, QC checks, tasks, documents…",
     "startTyping": "Start typing to search",
     "noResults": "No results",
     "entitiesHeading": "Results",
+    "workspaceHeading": "Workspace",
+    "otherHeading": "Tasks & documents",
     "navHeading": "Navigation",
-    "toggle": "open / close"
+    "toggle": "open / close",
+    "kind": {
+      "chapter": "BoQ chapter",
+      "line": "BoQ line",
+      "qc": "QC check",
+      "task": "Task",
+      "document": "Document"
+    }
   },
   "schedule": {
     "title": "Schedule",
