@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { OverviewTab } from './tabs/OverviewTab';
 import { ProcurementTab } from './tabs/ProcurementTab';
 import { QcTab } from './tabs/QcTab';
-import { TasksPlaceholderTab } from './tabs/TasksPlaceholderTab';
+import { TasksTab } from './tabs/TasksTab';
 
 interface LineItem {
   id: string;
@@ -26,10 +26,12 @@ interface LineItemDetailProps {
   qcTotal: number;
   qcDone: number;
   procurementCount: number;
+  tasksOpenCount: number;
   activeTab: 'overview' | 'qc' | 'procurement' | 'tasks';
   onTabChange: (tab: 'overview' | 'qc' | 'procurement' | 'tasks') => void;
-  canCrud: boolean;     // can CRUD QC + edit BoQ line
+  canCrud: boolean;     // can CRUD QC + edit BoQ line + CRUD tasks
   canComment: boolean;  // can post QC comments
+  canEditOwnTasks: boolean; // foreman — status update on own tasks
 }
 
 export function LineItemDetail({
@@ -41,10 +43,12 @@ export function LineItemDetail({
   qcTotal,
   qcDone,
   procurementCount,
+  tasksOpenCount,
   activeTab,
   onTabChange,
   canCrud,
   canComment,
+  canEditOwnTasks,
 }: LineItemDetailProps) {
   const { t } = useTranslation();
   const progress = qcTotal > 0 ? Math.round((qcDone / qcTotal) * 100) : 0;
@@ -132,7 +136,7 @@ export function LineItemDetail({
               <Truck />
               {t('workspace.tabs.procurement')}
             </TabsTrigger>
-            <TabsTrigger value="tasks">
+            <TabsTrigger value="tasks" count={tasksOpenCount > 0 ? tasksOpenCount : undefined}>
               <ListChecks />
               {t('workspace.tabs.tasks')}
             </TabsTrigger>
@@ -149,7 +153,12 @@ export function LineItemDetail({
             <ProcurementTab lineId={line.id} projectId={projectId} />
           </TabsContent>
           <TabsContent value="tasks">
-            <TasksPlaceholderTab />
+            <TasksTab
+              lineId={line.id}
+              projectId={projectId}
+              canCrud={canCrud}
+              canEditOwn={canEditOwnTasks}
+            />
           </TabsContent>
         </div>
       </Tabs>
