@@ -223,7 +223,8 @@ Active phases roadmap (UX redesign post-PR #63):
 | 76 | Motion + visual depth — Skeleton shimmer + page-fade-in + DESIGN.md §10 codified | ✅ PR #73 |
 | 66.5 | A v1 → A v2 token swap (orange #f97316 → sky blue #0284c7) — whole-app palette change. Mesh hero blobs + gradient-border-animated re-tinted. UX_MOODBOARD A v2 amendment. | ✅ PR #75 |
 | 77 | Workspace shell `/projects/:id/workspace` (3-column: chapter navigator + line-item detail with 4 sub-tabs + collapsible doc rail). QC entity full: migration 0015 (`boq_line_item_checks` + `boq_qc_comments` + 5-status enum + RLS), CRUD, comment thread, status update via SegmentedControl. ProjectEditPage gets a "פתח סביבת ביצוע" CTA. ProcurementTab reads supplier_quotes for line; OverviewTab shows notes + activity timeline; TasksTab placeholder until Phase 80. | ✅ PR #76 |
-| 78 | Inline BoQ editing inside the workspace: pencil/trash icons reveal on hover for chapters + lines; "+ הוסף שורה" inline form per chapter; "+" in navigator header opens new-chapter form; full create/rename/delete via supabase mutations from `ProjectWorkspacePage` (canCrud-gated). No schema change. | 🚧 in flight |
+| 78 | Inline BoQ editing inside the workspace: pencil/trash icons reveal on hover for chapters + lines; "+ הוסף שורה" inline form per chapter; "+" in navigator header opens new-chapter form; full create/rename/delete via supabase mutations from `ProjectWorkspacePage` (canCrud-gated). No schema change. | ✅ PR #77 |
+| 79 | Global Ctrl+K search palette extended to workspace entities: BoQ chapters, line items, QC checks, tasks, documents — each result deep-links to `/projects/:id/workspace?chapter=&line=&tab=`. Three result groups (Entities / Workspace / Tasks & docs). 8 new i18n keys. | 🚧 in flight |
 
 Migrations applied to remote since 0013:
 - `0014_work_logs_entity.sql` — work_log_status enum + work_logs table + 4 RLS policies (Phase 72)
