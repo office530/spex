@@ -903,6 +903,17 @@
     "notStarted": "Not started",
     "invalid": "Invalid project",
     "editLineComingSoon": "Inline line edit ships in Phase 78",
+    "addLine": "Add line",
+    "chapterNamePlaceholder": "Chapter name (e.g. Construction)",
+    "confirmDeleteChapter": "Delete chapter '{{name}}' and all its lines?",
+    "confirmDeleteLine": "Delete line '{{name}}'?",
+    "lineForm": {
+      "description": "Description",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "unitPlaceholder": "m²/each/lot",
+      "unitPrice": "Unit price"
+    },
     "tabs": {
       "overview": "Overview",
       "qc": "QC",

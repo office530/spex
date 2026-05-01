@@ -4,15 +4,20 @@ import {
   EmptyState,
 } from '@spex/ui';
 import { FolderKanban } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { UserRole } from '../auth/AuthContext';
 import { useAuth } from '../auth/AuthContext';
 import { ChapterDocumentRail } from '../components/workspace/ChapterDocumentRail';
-import { ChapterNavigator } from '../components/workspace/ChapterNavigator';
+import {
+  ChapterNavigator,
+  type ChapterDraft,
+  type LineDraft,
+} from '../components/workspace/ChapterNavigator';
 import { LineItemDetail } from '../components/workspace/LineItemDetail';
-import { attentionCount as qcAttention, openCount as qcOpen, type QcCheckStatus } from '../lib/qcHelpers';
+import { type QcCheckStatus } from '../lib/qcHelpers';
 import { supabase } from '../lib/supabase';
 
 type Tab = 'overview' | 'qc' | 'procurement' | 'tasks';
@@ -73,65 +78,60 @@ export function ProjectWorkspacePage() {
   const tabParam = (searchParams.get('tab') as Tab) ?? 'overview';
   const activeTab = VALID_TABS.includes(tabParam) ? tabParam : 'overview';
 
+  const loadAll = useCallback(async () => {
+    if (!projectId) return;
+    const [projRes, chapRes, lineRes] = await Promise.all([
+      supabase
+        .from('projects')
+        .select('id, name, pm_id')
+        .eq('id', projectId)
+        .maybeSingle(),
+      supabase
+        .from('boq_chapters')
+        .select('id, name, sort_order')
+        .eq('project_id', projectId)
+        .order('sort_order', { ascending: true }),
+      supabase
+        .from('boq_line_items')
+        .select(
+          'id, chapter_id, description, unit, quantity, unit_price, estimated_total, notes, sort_order',
+        )
+        .eq('project_id', projectId)
+        .order('sort_order', { ascending: true }),
+    ]);
+    setProject((projRes.data as ProjectInfo | null) ?? null);
+    setChapters((chapRes.data as Chapter[]) ?? []);
+    setLineItems((lineRes.data as LineItem[]) ?? []);
+
+    const lineIds = (lineRes.data as LineItem[] | null)?.map((l) => l.id) ?? [];
+    if (lineIds.length > 0) {
+      const [qcRes, quoteRes] = await Promise.all([
+        supabase
+          .from('boq_line_item_checks')
+          .select('line_item_id, status, due_date')
+          .in('line_item_id', lineIds),
+        supabase
+          .from('supplier_quotes')
+          .select('boq_line_item_id')
+          .in('boq_line_item_id', lineIds),
+      ]);
+      setQcChecks((qcRes.data as unknown as QcCheckLite[]) ?? []);
+      setQuotes(
+        ((quoteRes.data as Array<{ boq_line_item_id: string }>) ?? []).map((q) => ({
+          line_item_id: q.boq_line_item_id,
+        })),
+      );
+    } else {
+      setQcChecks([]);
+      setQuotes([]);
+    }
+  }, [projectId]);
+
   useEffect(() => {
     if (!projectId) return;
-    let cancelled = false;
-    void (async () => {
-      setLoading(true);
-      const [projRes, chapRes, lineRes] = await Promise.all([
-        supabase
-          .from('projects')
-          .select('id, name, pm_id')
-          .eq('id', projectId)
-          .maybeSingle(),
-        supabase
-          .from('boq_chapters')
-          .select('id, name, sort_order')
-          .eq('project_id', projectId)
-          .order('sort_order', { ascending: true }),
-        supabase
-          .from('boq_line_items')
-          .select(
-            'id, chapter_id, description, unit, quantity, unit_price, estimated_total, notes, sort_order',
-          )
-          .eq('project_id', projectId)
-          .order('sort_order', { ascending: true }),
-      ]);
-      if (cancelled) return;
-      setProject((projRes.data as ProjectInfo | null) ?? null);
-      setChapters((chapRes.data as Chapter[]) ?? []);
-      setLineItems((lineRes.data as LineItem[]) ?? []);
-
-      const lineIds = (lineRes.data as LineItem[] | null)?.map((l) => l.id) ?? [];
-      if (lineIds.length > 0) {
-        const [qcRes, quoteRes] = await Promise.all([
-          supabase
-            .from('boq_line_item_checks')
-            .select('line_item_id, status, due_date')
-            .in('line_item_id', lineIds),
-          supabase
-            .from('supplier_quotes')
-            .select('boq_line_item_id')
-            .in('boq_line_item_id', lineIds),
-        ]);
-        if (!cancelled) {
-          setQcChecks((qcRes.data as unknown as QcCheckLite[]) ?? []);
-          setQuotes(
-            ((quoteRes.data as Array<{ boq_line_item_id: string }>) ?? []).map((q) => ({
-              line_item_id: q.boq_line_item_id,
-            })),
-          );
-        }
-      } else {
-        setQcChecks([]);
-        setQuotes([]);
-      }
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
+    setLoading(true);
+    void loadAll().finally(() => setLoading(false));
+  }, [projectId, loadAll]);
 
   // Aggregate QC + quotes per line for navigator + tab badges
   const qcByLine = useMemo(() => {
@@ -191,6 +191,118 @@ export function ProjectWorkspacePage() {
   const isAssignedPm = project?.pm_id != null && project.pm_id === user?.id;
   const canCrud = isAdmin || isAssignedPm;
   const canComment = true; // any project member who can read can comment (RLS enforces)
+
+  // Phase 78 mutation handlers — only wired when canCrud
+  const createChapter = useCallback(
+    async (draft: ChapterDraft) => {
+      if (!projectId) return;
+      const sortOrder = chapters.length + 1;
+      const { error } = await supabase
+        .from('boq_chapters')
+        .insert({ project_id: projectId, name: draft.name, sort_order: sortOrder });
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.createdToast'));
+      await loadAll();
+    },
+    [projectId, chapters.length, loadAll, t],
+  );
+
+  const renameChapter = useCallback(
+    async (id: string, draft: ChapterDraft) => {
+      const { error } = await supabase
+        .from('boq_chapters')
+        .update({ name: draft.name })
+        .eq('id', id);
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.savedToast'));
+      await loadAll();
+    },
+    [loadAll, t],
+  );
+
+  const deleteChapter = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from('boq_chapters').delete().eq('id', id);
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.deletedToast'));
+      await loadAll();
+    },
+    [loadAll, t],
+  );
+
+  const parseLineFields = (draft: LineDraft) => {
+    const qty = draft.quantity ? Number(draft.quantity) : null;
+    const price = draft.unit_price ? Number(draft.unit_price) : null;
+    return {
+      description: draft.description,
+      unit: draft.unit || null,
+      quantity: qty != null && Number.isFinite(qty) ? qty : null,
+      unit_price: price != null && Number.isFinite(price) ? price : null,
+      estimated_total:
+        qty != null && price != null && Number.isFinite(qty) && Number.isFinite(price)
+          ? Math.round(qty * price)
+          : null,
+    };
+  };
+
+  const createLine = useCallback(
+    async (chapterId: string, draft: LineDraft) => {
+      if (!projectId) return;
+      const sortOrder =
+        lineItems.filter((l) => l.chapter_id === chapterId).length + 1;
+      const { error } = await supabase.from('boq_line_items').insert({
+        chapter_id: chapterId,
+        project_id: projectId,
+        ...parseLineFields(draft),
+        sort_order: sortOrder,
+      });
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.createdToast'));
+      await loadAll();
+    },
+    [projectId, lineItems, loadAll, t],
+  );
+
+  const updateLine = useCallback(
+    async (id: string, draft: LineDraft) => {
+      const { error } = await supabase
+        .from('boq_line_items')
+        .update(parseLineFields(draft))
+        .eq('id', id);
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.savedToast'));
+      await loadAll();
+    },
+    [loadAll, t],
+  );
+
+  const deleteLine = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from('boq_line_items').delete().eq('id', id);
+      if (error) {
+        toast.error(t('common.errorToast'));
+        return;
+      }
+      toast.success(t('common.deletedToast'));
+      await loadAll();
+    },
+    [loadAll, t],
+  );
 
   function handleToggleChapter(chapterId: string) {
     setExpandedChapters((prev) => {
@@ -263,6 +375,12 @@ export function ProjectWorkspacePage() {
           onToggleChapter={handleToggleChapter}
           onSelectLine={handleSelectLine}
           canEdit={canCrud}
+          onCreateChapter={canCrud ? createChapter : undefined}
+          onRenameChapter={canCrud ? renameChapter : undefined}
+          onDeleteChapter={canCrud ? deleteChapter : undefined}
+          onCreateLine={canCrud ? createLine : undefined}
+          onUpdateLine={canCrud ? updateLine : undefined}
+          onDeleteLine={canCrud ? deleteLine : undefined}
         />
 
         {selectedLine && selectedChapter ? (
