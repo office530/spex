@@ -220,7 +220,8 @@ Active phases roadmap (UX redesign post-PR #63):
 | 73 | BoQ polish — PageHeader + 3-tile KPI banner + Skeleton/EmptyState | ✅ PR #70 |
 | 74 | Settings consolidation under /settings hub + breadcrumbs on sub-pages | ✅ PR #71 |
 | 75 | Foreman scope (no /leads in nav) + mobile nav touch targets + bell on mobile | ✅ PR #72 |
-| 76 | Motion + visual depth — Skeleton shimmer + page-fade-in + DESIGN.md §10 codified | 🚧 in flight |
+| 76 | Motion + visual depth — Skeleton shimmer + page-fade-in + DESIGN.md §10 codified | ✅ PR #73 |
+| 66.5 | A v1 → A v2 token swap (orange #f97316 → sky blue #0284c7) — whole-app palette change. Mesh hero blobs + gradient-border-animated re-tinted. UX_MOODBOARD A v2 amendment. | 🚧 in flight |
 
 Migrations applied to remote since 0013:
 - `0014_work_logs_entity.sql` — work_log_status enum + work_logs table + 4 RLS policies (Phase 72)

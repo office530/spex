@@ -1,9 +1,27 @@
 # Spex — Visual Moodboard (LOCKED)
 
-**Status**: 🔒 Locked 2026-04-25 by Shay
-**Direction**: A v1 — *Site Foreman* (clean — no glass, no mesh, no gradient cards)
+> ## 🔁 Amendment 2026-05-01 — Direction **A v2 (Bento Blue)** supersedes A v1
+>
+> Shay locked **Bento + Blue** (`מרווח+כחול`) after iterating on the workspace mockup with a 6-theme switcher. The locked direction now is:
+>
+> - **Action color**: sky blue `#0284c7` (HSL `199 89% 40%`) — replaces safety orange `#f97316`. The whole app moves to blue in Phase 66.5.
+> - **Layout**: white floating cards with soft shadow on slate-50 page (Bento). Replaces flush slate-100 panels.
+> - **Density**: same as A v1 (tight rows, generous on hero).
+> - **Sidebar chrome**: stays slate-800 (unchanged).
+> - **Status pills**: 8-tone pastel palette unchanged.
+>
+> **Reference mockup**: [apps/web/public/mockups/workspace.html](apps/web/public/mockups/workspace.html) — open and click the **מרווח+כחול** combination in the theme switcher.
+>
+> The original A v1 record below is kept for the audit trail. Phase 66.5 PR codifies the swap into [apps/web/src/index.css](apps/web/src/index.css) `:root` tokens. Everything else in this doc still applies — only the primary action color changed.
+
+---
+
+## A v1 — Site Foreman (superseded 2026-05-01, kept for history)
+
+**Status**: ⚠️ Superseded by A v2 (Bento Blue) — see amendment above.
+**Original lock date**: 2026-04-25 by Shay
 **Reference mockup**: [apps/web/public/mockups/a-foreman.html](apps/web/public/mockups/a-foreman.html) → http://localhost:5173/mockups/a-foreman.html
-**Companion docs**: [DESIGN.md](DESIGN.md) (full spec — to be amended in Phase 66) · [UX_REDESIGN_PLAN.md](UX_REDESIGN_PLAN.md) (phased work plan)
+**Companion docs**: [DESIGN.md](DESIGN.md) (full spec — amended in Phase 66 + 66.5) · [UX_REDESIGN_PLAN.md](UX_REDESIGN_PLAN.md) (phased work plan)
 
 ---
 

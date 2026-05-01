@@ -6,8 +6,10 @@
 
 @layer base {
   :root {
-    /* Spex tokens — Direction A v1 (Site Foreman). Source: UX_MOODBOARD.md.
-       Action color = safety orange. Chrome = slate. Background surfaces = white on slate-50. */
+    /* Spex tokens — Direction A v2 (Bento Blue). Source: UX_MOODBOARD.md.
+       Action color = sky blue. Chrome = slate. Background surfaces = white on slate-50.
+       Phase 66.5 swapped --primary from orange (25 95% 53%) → sky blue (199 89% 40%).
+       Workspace mockup at /mockups/workspace.html locked the direction. */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -15,11 +17,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary = safety orange #f97316 → HSL 25 95% 53% */
-    --primary: 25 95% 53%;
+    /* Primary = sky blue #0284c7 → HSL 199 89% 40% */
+    --primary: 199 89% 40%;
     --primary-foreground: 0 0% 100%;
     /* Focus ring matches primary */
-    --ring: 25 95% 53%;
+    --ring: 199 89% 40%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -89,14 +91,14 @@
 
 @layer utilities {
   /* Mesh gradient — layered radial blobs over the slate hero band.
-     Used on Login. Phase 66 swapped the blob hues from teal to slate + orange
-     to match the locked Direction A v1. */
+     Used on Login. Phase 66.5 re-tinted the accent blobs from safety orange
+     to sky blue to match Direction A v2 (Bento Blue). */
   .bg-mesh-hero {
     background-color: hsl(var(--hero-from));
     background-image:
       radial-gradient(
         circle at 18% 20%,
-        hsl(25 95% 53% / 0.32) 0%,
+        hsl(199 89% 48% / 0.32) 0%,
         transparent 45%
       ),
       radial-gradient(
@@ -106,7 +108,7 @@
       ),
       radial-gradient(
         circle at 75% 90%,
-        hsl(20 90% 48% / 0.28) 0%,
+        hsl(204 80% 40% / 0.28) 0%,
         transparent 50%
       ),
       radial-gradient(
@@ -199,10 +201,10 @@
     padding: 1px;
     background: linear-gradient(
       90deg,
-      hsl(25 95% 53%),
-      hsl(20 90% 48%),
-      hsl(35 95% 60%),
-      hsl(25 95% 53%)
+      hsl(199 89% 48%),
+      hsl(204 80% 40%),
+      hsl(195 95% 55%),
+      hsl(199 89% 48%)
     );
     background-size: 200% 100%;
     animation: spex-shimmer 4s linear infinite;

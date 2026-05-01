@@ -1,0 +1,1577 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spex · סביבת ביצוע פרויקט (interactive mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Rubik', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 500: '#475569', 600: '#334155', 700: '#1e293b', 900: '#0f172a' },
+          cta: { 50: '#fff7ed', 100: '#ffedd5', 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' }
+        }
+      }
+    }
+  };
+</script>
+<style>
+  body { font-family: 'Rubik', system-ui, sans-serif; }
+  .nums { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  .row-attention { background: linear-gradient(180deg, rgba(255,228,230,0.7) 0%, rgba(255,228,230,0.5) 100%); }
+
+  .docrail { transition: width 200ms ease; }
+  .docrail.is-collapsed { width: 3rem; }
+  .docrail.is-collapsed .rail-content { display: none; }
+  .docrail.is-collapsed .rail-toggle-icon { transform: rotate(180deg); }
+
+  .tab-trigger { position: relative; }
+  .tab-trigger[aria-selected="true"] { color: #c2410c; }
+  .tab-trigger[aria-selected="true"]::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 2px;
+    background: #f97316;
+  }
+
+  .line-row[aria-current="true"] {
+    background: rgba(249,115,22,0.06);
+    border-inline-end: 3px solid #f97316;
+    color: #0f172a;
+    font-weight: 500;
+  }
+
+  .chap-row[aria-expanded="true"] .chap-chev { transform: rotate(90deg); }
+  .chap-chev { transition: transform 150ms; }
+
+  .toast {
+    animation: toastSlide 200ms ease-out;
+  }
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Hide-while-collapsed */
+  .chap-items { display: block; }
+  .chap-row[aria-expanded="false"] + .chap-items { display: none; }
+
+  /* ─────────────────────────────────────────────────────────────
+     THEME OVERRIDES — same layout + functions, different visuals.
+     Toggle via the theme switcher in the top bar.
+     Default = "industrial" (no body class needed).
+     ───────────────────────────────────────────────────────────── */
+
+  /* ── BENTO: lighter, airy, floating cards on a soft canvas ── */
+  body.theme-bento { background: rgb(241,245,249); }
+  body.theme-bento header { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-color: transparent; box-shadow: 0 1px 0 rgba(15,23,42,0.04); }
+  body.theme-bento header h1 { font-size: 1.5rem; line-height: 2rem; letter-spacing: -0.01em; }
+  body.theme-bento aside { background: transparent !important; border-color: transparent !important; padding: 0.75rem; }
+  body.theme-bento aside > div:first-child { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); margin-bottom: 0.5rem; padding: 0.75rem; }
+  body.theme-bento #chap-tree { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); padding: 0.5rem; }
+  body.theme-bento .docrail #rail-body { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); margin: 0.5rem 0; padding: 0.5rem; }
+  body.theme-bento main { background: rgb(241,245,249); padding: 0.75rem; }
+  body.theme-bento #line-meta { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); border: none; margin-bottom: 0.75rem; }
+  body.theme-bento #line-meta h2 { font-size: 1.25rem; line-height: 1.75rem; letter-spacing: -0.01em; }
+  body.theme-bento main > div:nth-child(2) { background: white; border-radius: 1rem 1rem 0 0; padding: 0 1.5rem; box-shadow: 0 -1px 0 rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); border: none; position: static; margin-top: 0; }
+  body.theme-bento #tab-content { background: white; border-radius: 0 0 1rem 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(15,23,42,0.04), 0 0 0 1px rgba(15,23,42,0.04); border: none; }
+  body.theme-bento article.rounded-lg { border-radius: 1rem; box-shadow: 0 1px 2px rgba(15,23,42,0.04); }
+  body.theme-bento .rounded-lg.border.border-slate-200.overflow-hidden { border-radius: 1rem; box-shadow: 0 1px 2px rgba(15,23,42,0.04); }
+  body.theme-bento .rounded-md.border { border-radius: 0.75rem; }
+
+  /* ── DENSE: tight, professional, more data per screen ── */
+  body.theme-dense aside.w-64 { width: 14rem; }
+  body.theme-dense .docrail.w-72:not(.is-collapsed) { width: 16rem; }
+  body.theme-dense aside.bg-slate-100 { background: rgb(226,232,240); }
+  body.theme-dense header.py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  body.theme-dense header h1 { font-size: 0.95rem; line-height: 1.4rem; font-weight: 600; }
+  body.theme-dense header nav { font-size: 0.65rem; margin-bottom: 0.125rem; }
+  body.theme-dense #line-meta.px-6.py-4 { padding: 0.625rem 1.25rem; }
+  body.theme-dense #line-meta h2 { font-size: 0.95rem; line-height: 1.3rem; }
+  body.theme-dense #line-meta .grid.grid-cols-4 { gap: 0.5rem; margin-top: 0.5rem; }
+  body.theme-dense #line-meta .text-sm.nums { font-size: 0.75rem; }
+  body.theme-dense [role="tab"].py-3 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  body.theme-dense [role="tab"] { font-size: 0.75rem; }
+  body.theme-dense .px-6.py-5 { padding: 0.625rem 1rem; }
+  body.theme-dense article.p-4 { padding: 0.5rem 0.75rem; }
+  body.theme-dense article.p-3 { padding: 0.5rem 0.75rem; }
+  body.theme-dense #tab-content .text-sm.font-medium { font-size: 0.8125rem; }
+  body.theme-dense #tab-content .text-xs { font-size: 0.65rem; }
+  body.theme-dense article .h-7.w-7 { height: 1.25rem; width: 1.25rem; }
+  body.theme-dense article .h-7.w-7 i { width: 0.7rem; height: 0.7rem; }
+  body.theme-dense .px-3.py-2 { padding: 0.25rem 0.5rem; }
+  body.theme-dense .py-2.ps-8 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+  body.theme-dense thead .py-2\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+  body.theme-dense tbody .py-3 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+  body.theme-dense .px-2.py-1\.5 { padding: 0.2rem 0.4rem; }
+
+  /* ── GLOW: liquid-glass + gradients + soft glows ── */
+  body.theme-glow {
+    background:
+      radial-gradient(60% 50% at 90% -5%, rgba(249,115,22,0.12) 0%, transparent 55%),
+      radial-gradient(50% 40% at 0% 105%, rgba(51,65,85,0.10) 0%, transparent 55%),
+      radial-gradient(45% 35% at 50% 35%, rgba(255,255,255,0.5) 0%, transparent 70%),
+      radial-gradient(35% 30% at 110% 60%, rgba(244,63,94,0.06) 0%, transparent 60%),
+      rgb(241,245,249);
+    background-attachment: fixed;
+  }
+  /* Frosted top bar */
+  body.theme-glow header.bg-white {
+    background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.50) 100%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-color: transparent;
+    box-shadow: 0 1px 0 rgba(15,23,42,0.05), inset 0 1px 0 rgba(255,255,255,0.65);
+  }
+  /* Frosted side panels (no chrome bg) */
+  body.theme-glow aside { background: transparent !important; border-color: transparent !important; padding: 0.5rem; }
+  body.theme-glow aside > div:first-child {
+    background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 14px -8px rgba(15,23,42,0.12), 0 0 0 1px rgba(15,23,42,0.04);
+  }
+  body.theme-glow #chap-tree {
+    background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    padding: 0.5rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 14px -8px rgba(15,23,42,0.12), 0 0 0 1px rgba(15,23,42,0.04);
+  }
+  body.theme-glow .docrail #rail-body {
+    background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 14px -8px rgba(15,23,42,0.12), 0 0 0 1px rgba(15,23,42,0.04);
+  }
+  /* Center: floating glass panels */
+  body.theme-glow main { background: transparent; padding: 0.5rem; }
+  body.theme-glow #line-meta {
+    background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.6) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 16px -8px rgba(15,23,42,0.14), 0 0 0 1px rgba(15,23,42,0.04);
+    margin-bottom: 0.5rem;
+  }
+  body.theme-glow main > div:nth-child(2) {
+    background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 1rem 1rem 0 0;
+    padding: 0 1.5rem;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-bottom: none;
+    position: static;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  body.theme-glow #tab-content {
+    background: linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border-radius: 0 0 1rem 1rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-top: none;
+    box-shadow: 0 4px 16px -8px rgba(15,23,42,0.14), 0 0 0 1px rgba(15,23,42,0.04);
+  }
+  /* Selected line: orange glow halo */
+  body.theme-glow .line-row[aria-current="true"] {
+    background: linear-gradient(180deg, rgba(249,115,22,0.18) 0%, rgba(249,115,22,0.06) 100%);
+    box-shadow: 0 0 28px -8px rgba(249,115,22,0.5), inset 0 1px 0 rgba(255,255,255,0.6);
+    border-inline-end: 3px solid #f97316;
+  }
+  /* Attention rows with rose halo */
+  body.theme-glow .row-attention {
+    background: linear-gradient(180deg, rgba(255,228,230,0.85) 0%, rgba(255,228,230,0.4) 100%);
+    box-shadow: 0 0 18px -6px rgba(244,63,94,0.32), inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+  /* CTA: gradient + glow */
+  body.theme-glow .bg-cta-500 {
+    background-image: linear-gradient(180deg, #fb923c 0%, #f97316 55%, #ea580c 100%);
+    box-shadow: 0 6px 18px -6px rgba(249,115,22,0.6), 0 0 0 1px rgba(234,88,12,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  body.theme-glow .bg-cta-500.hover\:bg-cta-600:hover,
+  body.theme-glow .hover\:bg-cta-600:hover {
+    background-image: linear-gradient(180deg, #f97316 0%, #ea580c 55%, #c2410c 100%);
+    box-shadow: 0 8px 24px -6px rgba(249,115,22,0.75);
+  }
+  /* Active tab underline with glow */
+  body.theme-glow .tab-trigger[aria-selected="true"]::after {
+    height: 3px;
+    border-radius: 1.5px;
+    box-shadow: 0 0 14px rgba(249,115,22,0.7);
+    background: linear-gradient(90deg, #fb923c, #f97316, #ea580c);
+  }
+  /* QC failed card with rose glow */
+  body.theme-glow article.bg-rose-50\/40,
+  body.theme-glow article.border-rose-200 {
+    background: linear-gradient(180deg, rgba(255,241,242,0.85) 0%, rgba(255,255,255,0.55) 100%) !important;
+    border-color: rgba(244,63,94,0.32) !important;
+    box-shadow: 0 0 28px -8px rgba(244,63,94,0.32), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+    backdrop-filter: blur(8px);
+  }
+  /* QC card baseline (glassy) */
+  body.theme-glow article.rounded-lg.border-slate-200,
+  body.theme-glow article.bg-white {
+    background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 2px 10px -6px rgba(15,23,42,0.1);
+  }
+  /* Status pill gradients */
+  body.theme-glow .bg-emerald-100 { background-image: linear-gradient(180deg, rgb(220,252,231), rgb(187,247,208)); }
+  body.theme-glow .bg-rose-100 { background-image: linear-gradient(180deg, rgb(255,228,230), rgb(254,205,211)); }
+  body.theme-glow .bg-amber-100 { background-image: linear-gradient(180deg, rgb(254,243,199), rgb(253,230,138)); }
+  body.theme-glow .bg-blue-100 { background-image: linear-gradient(180deg, rgb(219,234,254), rgb(191,219,254)); }
+  body.theme-glow .bg-violet-100 { background-image: linear-gradient(180deg, rgb(237,233,254), rgb(221,214,254)); }
+  body.theme-glow .bg-cta-100 { background-image: linear-gradient(180deg, rgb(255,237,213), rgb(254,215,170)); }
+  body.theme-glow .bg-slate-100:not(aside):not(header *) { background-image: linear-gradient(180deg, rgb(241,245,249), rgb(226,232,240)); }
+  /* Approved-PO callout — emerald glow */
+  body.theme-glow .bg-emerald-50.border-emerald-200 {
+    background: linear-gradient(180deg, rgba(236,253,245,0.85), rgba(220,252,231,0.6));
+    box-shadow: 0 0 24px -8px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.7);
+    border-color: rgba(16,185,129,0.35);
+    backdrop-filter: blur(8px);
+  }
+  /* Avatar tones — subtle glow */
+  body.theme-glow [class*="rounded-full"][class*="bg-cta-100"],
+  body.theme-glow [class*="rounded-full"][class*="bg-violet-100"],
+  body.theme-glow [class*="rounded-full"][class*="bg-blue-100"],
+  body.theme-glow [class*="rounded-full"][class*="bg-emerald-100"],
+  body.theme-glow [class*="rounded-full"][class*="bg-rose-100"],
+  body.theme-glow [class*="rounded-full"][class*="bg-amber-100"] {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 0 12px -4px currentColor;
+  }
+  /* Folder tree — glassy hover */
+  body.theme-glow .docrail [data-action="folder"]:not(.bg-cta-100):hover { background: rgba(255,255,255,0.5) !important; }
+  /* Toast — glassy dark */
+  body.theme-glow #toast-stack > div {
+    background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(15,23,42,0.65));
+    backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  /* Plan cards in rail — frosted */
+  body.theme-glow .docrail article {
+    background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  /* Inputs frosted */
+  body.theme-glow input[type="text"],
+  body.theme-glow input:not([type]),
+  body.theme-glow #chap-search {
+    background: rgba(255,255,255,0.7) !important;
+    backdrop-filter: blur(6px);
+    border-color: rgba(255,255,255,0.8) !important;
+  }
+  /* Sticky chapter header (kept frosted via the wrapper rule above) */
+  body.theme-glow .sticky.bg-slate-100\/95 { background: transparent !important; backdrop-filter: none; }
+  body.theme-glow .sticky.bg-white { background: transparent !important; }
+
+  /* ── BLUE: color swap. Sky-600 replaces safety orange. Stacks on top of Bento. ── */
+  body.theme-blue .bg-cta-500 { background-color: #0284c7 !important; background-image: none !important; }
+  body.theme-blue .bg-cta-500.hover\:bg-cta-600:hover, body.theme-blue .hover\:bg-cta-600:hover { background-color: #0369a1 !important; }
+  body.theme-blue .bg-cta-100 { background-color: #e0f2fe !important; background-image: none !important; }
+  body.theme-blue .bg-cta-50, body.theme-blue .hover\:bg-cta-50:hover { background-color: #f0f9ff !important; }
+  body.theme-blue .text-cta-500 { color: #0284c7 !important; }
+  body.theme-blue .text-cta-600 { color: #0369a1 !important; }
+  body.theme-blue .text-cta-700, body.theme-blue .text-cta-800 { color: #075985 !important; }
+  body.theme-blue .border-cta-300 { border-color: #7dd3fc !important; }
+  body.theme-blue .border-cta-500 { border-color: #0284c7 !important; }
+  body.theme-blue .focus\:ring-cta-500:focus { --tw-ring-color: #0284c7 !important; }
+  body.theme-blue .focus\:border-cta-500:focus { border-color: #0284c7 !important; }
+  body.theme-blue [style*="#f97316"] { background: #0284c7 !important; }
+  /* Selected line orange → blue */
+  body.theme-blue .line-row[aria-current="true"] {
+    background: rgba(2,132,199,0.08);
+    border-inline-end: 3px solid #0284c7;
+  }
+  /* Active tab underline orange → blue */
+  body.theme-blue .tab-trigger[aria-selected="true"] { color: #075985; }
+  body.theme-blue .tab-trigger[aria-selected="true"]::after { background: #0284c7; }
+  /* Tab count badges that used cta */
+  body.theme-blue [style*="background:linear-gradient(180deg,#fb923c"] { background: linear-gradient(180deg,#38bdf8 0%,#0284c7 100%) !important; }
+  /* Progress bar — also blue */
+  body.theme-blue [style*="width:"] .h-full.bg-cta-500,
+  body.theme-blue .h-full.bg-cta-500 { background-color: #0284c7 !important; }
+
+  /* ── VERTICAL: tabs move from horizontal-top to vertical side rail ── */
+  body.theme-vertical main {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "meta meta"
+      "tabs content";
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgb(241,245,249);
+  }
+  body.theme-vertical #line-meta { grid-area: meta; margin: 0; }
+  body.theme-vertical main > div:nth-child(2) {
+    grid-area: tabs;
+    background: white;
+    border: 1px solid rgba(15,23,42,0.05);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    margin: 0;
+    align-self: start;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    position: static;
+  }
+  body.theme-vertical #tab-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.125rem;
+  }
+  body.theme-vertical .tab-trigger {
+    justify-content: flex-start;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    text-align: start;
+    font-size: 0.85rem;
+  }
+  body.theme-vertical .tab-trigger[aria-selected="true"] {
+    background: rgba(249,115,22,0.1);
+    color: #c2410c;
+  }
+  body.theme-vertical .tab-trigger[aria-selected="true"]::after {
+    display: none;
+  }
+  body.theme-vertical #tab-content {
+    grid-area: content;
+    margin: 0;
+    border-radius: 1rem;
+    background: white;
+    border: 1px solid rgba(15,23,42,0.05);
+    box-shadow: 0 1px 3px rgba(15,23,42,0.04);
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+
+  /* Theme switcher pill */
+  #theme-switcher button[aria-pressed="true"] { background: white; box-shadow: 0 1px 2px rgba(15,23,42,0.08); color: rgb(15,23,42); }
+  #theme-switcher button[aria-pressed="false"] { color: rgb(100,116,139); }
+  #theme-switcher button:hover { color: rgb(15,23,42); }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased h-screen flex flex-col overflow-hidden">
+
+<!-- Top bar (static) -->
+<header class="bg-white border-b border-slate-200 px-6 py-3 shrink-0">
+  <div class="flex items-center justify-between gap-4">
+    <div class="min-w-0 flex-1">
+      <nav aria-label="ניווט שולי" class="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
+        <a class="hover:text-slate-900 cursor-pointer">פרויקטים</a>
+        <i data-lucide="chevron-left" class="w-3 h-3 text-slate-400"></i>
+        <a class="hover:text-slate-900 cursor-pointer">דירת גני תקווה</a>
+        <i data-lucide="chevron-left" class="w-3 h-3 text-slate-400"></i>
+        <span class="text-slate-900 font-medium">סביבת ביצוע</span>
+      </nav>
+      <h1 class="text-xl font-bold text-slate-900">דירת גני תקווה — סביבת ביצוע</h1>
+    </div>
+    <div class="flex items-center gap-3 shrink-0">
+      <div id="theme-switcher" class="inline-flex items-center gap-0.5 p-0.5 rounded-md bg-slate-100 border border-slate-200 flex-wrap" role="radiogroup" aria-label="כיוון עיצוב">
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="industrial" aria-pressed="true">תעשייתי</button>
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="bento" aria-pressed="false">מרווח</button>
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="dense" aria-pressed="false">צפוף</button>
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="glow" aria-pressed="false">זוהר</button>
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="blue" aria-pressed="false">כחול</button>
+        <button class="text-[10px] font-medium px-2 py-0.5 rounded transition-colors" data-theme="vertical" aria-pressed="false">אנכי</button>
+      </div>
+      <span class="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+        פעיל
+      </span>
+      <div class="text-xs">
+        <span class="text-slate-500">חוזה:</span>
+        <span class="nums font-semibold text-slate-900">₪890,000</span>
+      </div>
+      <div class="text-xs flex items-center gap-1.5">
+        <span class="text-slate-500">הושלם:</span>
+        <span class="nums font-semibold text-slate-900" id="kpi-progress">72%</span>
+        <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div class="h-full bg-cta-500" id="kpi-progress-bar" style="width:72%"></div>
+        </div>
+      </div>
+      <div class="text-xs flex items-center gap-1.5" id="kpi-attention">
+        <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+        <span class="text-rose-700 font-medium">2 ליקויים פתוחים</span>
+      </div>
+      <button class="bg-cta-500 hover:bg-cta-600 text-white text-xs font-medium px-3 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm" data-action="add-line">
+        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        הוסף שורת BoQ
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- 3-column body -->
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- ── RIGHT — CHAPTER NAVIGATOR ── -->
+  <aside class="w-64 shrink-0 bg-slate-100 border-l border-slate-200 overflow-y-auto" aria-label="מבנה פרקים">
+    <div class="px-4 py-3 sticky top-0 bg-slate-100/95 backdrop-blur z-10">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-semibold text-slate-600 uppercase tracking-wider">פרקים</h2>
+        <button class="p-1 rounded hover:bg-slate-200" aria-label="הוסף פרק" data-action="add-chapter">
+          <i data-lucide="plus" class="w-3.5 h-3.5 text-slate-600"></i>
+        </button>
+      </div>
+      <div class="relative mt-2">
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute top-2 start-2 text-slate-400"></i>
+        <input id="chap-search" class="bg-white border border-slate-200 rounded text-xs ps-7 pe-2 py-1.5 w-full focus:outline-none focus:ring-1 focus:ring-cta-500 focus:border-cta-500" placeholder="חיפוש פרק או שורה…" />
+      </div>
+    </div>
+
+    <div id="chap-tree" class="px-2 py-2 space-y-1"></div>
+  </aside>
+
+  <!-- ── CENTER — LINE-ITEM DETAIL ── -->
+  <main class="flex-1 min-w-0 bg-white overflow-y-auto">
+    <div id="line-meta" class="px-6 py-4 border-b border-slate-200"></div>
+    <div class="border-b border-slate-200 px-6 sticky top-0 bg-white z-10">
+      <div class="flex items-center gap-1" role="tablist" id="tab-bar"></div>
+    </div>
+    <div class="px-6 py-5" id="tab-content"></div>
+  </main>
+
+  <!-- ── LEFT — DOCUMENT RAIL ── -->
+  <aside class="docrail w-72 shrink-0 bg-slate-100 border-e border-slate-200 overflow-y-auto" aria-label="מסמכי פרק">
+    <div class="px-3 py-3 sticky top-0 bg-slate-100/95 backdrop-blur z-10 border-b border-slate-200">
+      <div class="flex items-center justify-between gap-2">
+        <button class="rail-toggle p-1.5 rounded hover:bg-slate-200 shrink-0" aria-label="צמצם" id="rail-toggle">
+          <i data-lucide="panels-left-bottom" class="w-4 h-4 text-slate-600 rail-toggle-icon"></i>
+        </button>
+        <div class="rail-content min-w-0 flex-1">
+          <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider">מסמכים</div>
+          <div class="text-xs text-slate-700 mt-0.5 truncate" id="rail-chapter-name"></div>
+        </div>
+      </div>
+    </div>
+    <div class="rail-content" id="rail-body"></div>
+  </aside>
+
+</div>
+
+<!-- Toast container -->
+<div id="toast-stack" class="fixed bottom-6 start-6 z-50 space-y-2"></div>
+
+<!-- Footer -->
+<div class="px-6 py-1.5 bg-slate-100 border-t border-slate-200 text-[10px] text-slate-500 text-center shrink-0">
+  Workspace mockup · interactive · /projects/:id/workspace · A v1
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────────────────────
+
+const TABS = [
+  { id: 'overview', label: 'סקירה', icon: 'layout-list' },
+  { id: 'qc',       label: 'בקרת איכות', icon: 'clipboard-check' },
+  { id: 'procurement', label: 'רכש', icon: 'truck' },
+  { id: 'tasks',    label: 'משימות', icon: 'list-checks' },
+];
+
+const QC_STATUSES = [
+  { id: 'done',    label: 'בוצע',  bg: 'bg-emerald-600', icon: 'check' },
+  { id: 'pending', label: 'ממתין', bg: 'bg-slate-700',   icon: 'circle' },
+  { id: 'failed',  label: 'נכשל',  bg: 'bg-rose-600',    icon: 'x' },
+];
+
+const QC_STATUS_RING = {
+  done:    { ring: 'ring-emerald-200', bg: 'bg-emerald-100', icon: 'check', iconColor: 'text-emerald-700' },
+  pending: { ring: 'ring-slate-200',   bg: 'bg-slate-100',   icon: 'circle', iconColor: 'text-slate-400' },
+  failed:  { ring: 'ring-rose-200',    bg: 'bg-rose-100',    icon: 'x', iconColor: 'text-rose-700' },
+};
+
+const QUOTE_STATUS = {
+  approved: { label: 'אושר',  cls: 'bg-emerald-100 text-emerald-800' },
+  sent:     { label: 'נשלח',  cls: 'bg-blue-100 text-blue-800' },
+  review:   { label: 'בבדיקה', cls: 'bg-amber-100 text-amber-800' },
+  draft:    { label: 'טיוטה', cls: 'bg-slate-100 text-slate-600' },
+};
+
+const TASK_STATUS = {
+  pending:    { label: 'ממתין',  cls: 'bg-amber-100 text-amber-800' },
+  inProgress: { label: 'בעבודה', cls: 'bg-blue-100 text-blue-800' },
+  done:       { label: 'הושלם',  cls: 'bg-emerald-100 text-emerald-800' },
+};
+
+const PRIORITY = {
+  urgent: { label: 'דחוף',  cls: 'bg-rose-100 text-rose-800' },
+  medium: { label: 'בינוני', cls: 'bg-amber-100 text-amber-800' },
+  low:    { label: 'נמוך',  cls: 'bg-slate-100 text-slate-600' },
+};
+
+// Helper: avatar tone deterministic by name
+function avatarTone(name) {
+  const tones = ['bg-violet-100 text-violet-700','bg-blue-100 text-blue-700','bg-emerald-100 text-emerald-700','bg-amber-100 text-amber-700','bg-rose-100 text-rose-700','bg-cta-100 text-cta-700'];
+  let h = 0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))|0;
+  return tones[Math.abs(h)%tones.length];
+}
+function initials(name) {
+  return name.split(/\s+/).slice(0,2).map(s=>s[0]).join('');
+}
+function fmtILS(n) {
+  return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(n);
+}
+
+// Pre-built line items (a couple of useful templates inlined per chapter)
+const data = {
+  chapters: [
+    {
+      id: '01', name: 'פרק 1: בינוי', icon: 'layers', attention: true,
+      folders: [
+        { id: 'arch', name: 'תוכניות אדריכל', plans: [
+          { id: 'p1', title: 'תוכנית אדריכלית — YHM', version: 'v2', date: '01/05/26', status: 'current' },
+          { id: 'p2', title: 'תוכנית אדריכלית — YHM', version: 'v1', date: '21/02/26', status: 'old' },
+          { id: 'p3', title: 'חתך אקסונומטרי — מחיצות', version: 'v1', date: '15/04/26', status: 'current' },
+        ]},
+        { id: 'consultants', name: 'תוכניות יועצים', plans: [
+          { id: 'p4', title: 'תוכנית קונסטרוקציה', version: 'v1', date: '08/03/26', status: 'current' },
+          { id: 'p5', title: 'יועץ איטום — דו״ח', version: 'v1', date: '12/04/26', status: 'current' },
+        ]},
+        { id: 'agreements', name: 'הסכמים', plans: [
+          { id: 'p6', title: 'הסכם קבלן ראשי', version: 'חתום', date: '15/01/26', status: 'current' },
+        ]},
+        { id: 'specs', name: 'מפרטים טכניים', plans: [
+          { id: 'p7', title: 'מפרט גבס כחול עמיד מים', version: 'v1', date: '10/02/26', status: 'current' },
+          { id: 'p8', title: 'מפרט גבס לבן רגיל', version: 'v1', date: '10/02/26', status: 'current' },
+          { id: 'p9', title: 'תקני ת״י 5113', version: 'v1', date: '10/02/26', status: 'current' },
+          { id: 'p10', title: 'תקני ת״י 1923', version: 'v1', date: '10/02/26', status: 'current' },
+        ]},
+        { id: 'budget', name: 'תקציב / כתב כמויות', plans: [
+          { id: 'p11', title: 'כתב כמויות ראשי', version: 'v3', date: '20/04/26', status: 'current' },
+        ]},
+      ],
+      items: [
+        {
+          id: '01.001', desc: 'הריסת מחיצות קיימות', status: 'done',
+          qty: 1, unit: 'קומפלט', unitPrice: 8000, total: 8000, progress: 100,
+          notes: 'הריסת מחיצות קיימות בקומה ב׳. פינוי פסולת בנייה לאתר מורשה.',
+          qc: [
+            { id: 'qc-perm', desc: 'אישור היתר הריסה', status: 'done', meta: 'אושר ע״י: מנהל הרשות' },
+            { id: 'qc-clean', desc: 'פינוי פסולת — קבלה ממטמנה', status: 'done', meta: 'תעודה #4827' },
+          ],
+          quotes: [
+            { supplier: 'הריסות יעקובי', amount: 7800, status: 'approved', meta: 'הזול ביותר', cheapest: true },
+            { supplier: 'דרוך הריסות', amount: 8500, status: 'sent' },
+          ],
+          tasks: [
+            { id: 't1', title: 'תיאום פינוי קונטיינר', priority: 'low', status: 'done', due: '15/03', assignee: 'רוני אבני' },
+          ],
+          activity: [
+            { actor: 'שי כהן', verb: 'סיים', target: 'את ההריסה', when: 'לפני שבועיים', icon: 'check', tone: 'emerald' },
+          ],
+        },
+        {
+          id: '01.002', desc: 'בניית מחיצות גבס לבן', status: 'done',
+          qty: 120, unit: 'm²', unitPrice: 380, total: 45600, progress: 100,
+          notes: 'מחיצות גבס לבן רגיל בחדרי השינה והסלון. קונסטרוקציה מתכת + שכבה כפולה.',
+          qc: [
+            { id: 'qc-mark', desc: 'סימון קווים — אישור אדריכל', status: 'done', meta: 'אושר ע״י: יעל בן־ארי' },
+            { id: 'qc-frame', desc: 'בדיקת קונסטרוקציית מתכת', status: 'done', meta: 'יוסי קוטלר · יועץ קונסטרוקציה' },
+            { id: 'qc-fin', desc: 'בדיקת התאמה לתוכניות', status: 'done', meta: 'הושלם 18/04' },
+          ],
+          quotes: [
+            { supplier: 'חברת כצמן בע״מ', amount: 42500, status: 'approved', cheapest: true },
+            { supplier: 'גבסון בע״מ', amount: 45800, status: 'sent' },
+          ],
+          tasks: [
+            { id: 't2', title: 'הזמנת חומרי גבס לבן', priority: 'medium', status: 'done', due: '02/04', assignee: 'רוני אבני' },
+          ],
+          activity: [
+            { actor: 'יעל בן־ארי', verb: 'אישרה', target: 'התאמה לתוכניות', when: 'לפני 6 ימים', icon: 'check', tone: 'emerald' },
+            { actor: 'שי כהן', verb: 'סימן הושלם', target: '120m²', when: 'לפני 4 ימים', icon: 'flag', tone: 'cta' },
+          ],
+        },
+        {
+          id: '01.003', desc: 'בניית מחיצות גבס כחול', status: 'attention',
+          qty: 80, unit: 'm²', unitPrice: 450, total: 36000, progress: 25,
+          notes: 'מחיצות גבס כחול עמיד מים — להתקין באזורי השירותים והמטבחון בקומה ב׳. מתאים לתקן ישראלי 5113. דרוש אישור אדריכל לאחר סימון לייזר ברצפה.',
+          qc: [
+            { id: 'qc-damp', desc: 'בדיקת רטיבות אזור מקלחות', status: 'failed', meta: 'תקן ישראלי 5113 · יועץ איטום נדרש',
+              comments: [
+                { author: 'דנה רביב', role: 'יועצת איטום', when: 'היום 09:14',
+                  body: 'נמצאה רטיבות בפינה הצפונית-מערבית. דרוש איטום נוסף לפני המשך עבודות גבס.' },
+                { author: 'שי כהן', role: 'מנכ״ל', when: 'היום 11:42',
+                  body: 'תיאמתי איטום נוסף עם קבלן המשנה. ביצוע בשבוע הבא.' },
+              ]
+            },
+            { id: 'qc-laser', desc: 'סימון לייזר ברצפה — אישור אדריכל', status: 'done', meta: 'אושר ע״י: יעל בן־ארי · אדריכלית · היום 14:32' },
+            { id: 'qc-anchor', desc: 'אישור יועץ קונסטרוקציה — עיגון מחיצות', status: 'pending', meta: 'צפוי: 28/04 · יוסי קוטלר' },
+            { id: 'qc-arch', desc: 'בדיקת התאמה לתוכניות אדריכל', status: 'pending', meta: 'לאחר סיום ביצוע' },
+          ],
+          quotes: [
+            { supplier: 'חברת כצמן בע״מ', amount: 34500, status: 'approved', cheapest: true, meta: 'PO #2026/0142' },
+            { supplier: 'גבסון בע״מ', amount: 36800, status: 'sent' },
+            { supplier: 'אריאל קבלנות גבס', amount: 41200, status: 'review' },
+          ],
+          tasks: [
+            { id: 't3', title: 'הזמנת חומרי גבס כחול עמיד מים', priority: 'urgent', status: 'pending', due: '26/04', assignee: 'רוני אבני' },
+            { id: 't4', title: 'תיאום ביקור יועץ איטום', priority: 'medium', status: 'inProgress', due: '28/04', assignee: 'שי כהן' },
+            { id: 't5', title: 'סימון מיקום מחיצות בלייזר', priority: 'medium', status: 'done', due: '22/04', assignee: 'דנה רביב' },
+          ],
+          activity: [
+            { actor: 'שי כהן', verb: 'אישר', target: 'סימון לייזר ברצפה', when: 'היום 14:32', icon: 'check', tone: 'emerald' },
+            { actor: 'רוני אבני', verb: 'אישר הצעת מחיר', target: 'חברת כצמן בע״מ · ₪34,500', when: 'אתמול 11:08', icon: 'thumbs-up', tone: 'cta' },
+            { actor: 'אורית מזרחי', verb: 'העלתה תוכנית', target: 'YHM v2', when: 'לפני 3 ימים', icon: 'upload', tone: 'blue' },
+          ],
+        },
+        {
+          id: '01.004', desc: 'בניית מחיצות גבס ירוק', status: 'pending',
+          qty: 40, unit: 'm²', unitPrice: 420, total: 16800, progress: 0,
+          notes: 'גבס ירוק (עמיד אש) למחיצות חדר חשמל. דרוש מפרט יועץ בטיחות.',
+          qc: [
+            { id: 'qc-fire', desc: 'אישור יועץ בטיחות אש', status: 'pending', meta: 'דרוש לפני התחלה' },
+            { id: 'qc-arch2', desc: 'בדיקת התאמה לתוכניות', status: 'pending', meta: 'לאחר ביצוע' },
+          ],
+          quotes: [],
+          tasks: [
+            { id: 't6', title: 'איסוף הצעות ספקים', priority: 'medium', status: 'pending', due: '05/05', assignee: 'רוני אבני' },
+          ],
+          activity: [
+            { actor: 'שי כהן', verb: 'יצר שורה', target: '01.004', when: 'לפני שבוע', icon: 'plus', tone: 'cta' },
+          ],
+        },
+        {
+          id: '01.005', desc: 'בניית מחיצות גבס אדום', status: 'pending',
+          qty: 20, unit: 'm²', unitPrice: 480, total: 9600, progress: 0,
+          notes: 'גבס אדום (אקוסטי) לחדר עבודה ביתית. ספיגת רעש מוגברת.',
+          qc: [
+            { id: 'qc-acoustic', desc: 'בדיקת ביצועי ספיגה אקוסטית', status: 'pending', meta: 'יועץ אקוסטי' },
+          ],
+          quotes: [],
+          tasks: [],
+          activity: [],
+        },
+      ],
+    },
+    {
+      id: '02', name: 'פרק 2: חשמל', icon: 'zap', attention: true,
+      folders: [
+        { id: 'arch', name: 'תוכניות חשמל', plans: [
+          { id: 'p20', title: 'תוכנית חשמל ראשית — אינג׳ דוד', version: 'v3', date: '05/04/26', status: 'current' },
+          { id: 'p21', title: 'תוכנית חשמל ראשית — אינג׳ דוד', version: 'v2', date: '12/02/26', status: 'old' },
+        ]},
+        { id: 'consultants', name: 'יועצים', plans: [
+          { id: 'p22', title: 'דו״ח יועץ חשמל', version: 'v1', date: '10/04/26', status: 'current' },
+        ]},
+        { id: 'agreements', name: 'הסכמים', plans: [
+          { id: 'p23', title: 'הסכם קבלן חשמל — אלקטרו פלוס', version: 'חתום', date: '20/01/26', status: 'current' },
+        ]},
+        { id: 'specs', name: 'מפרטים טכניים', plans: [
+          { id: 'p24', title: 'מפרט לוח חשמל ראשי', version: 'v1', date: '08/02/26', status: 'current' },
+          { id: 'p25', title: 'תקני ת״י 1004', version: 'v1', date: '01/01/26', status: 'current' },
+        ]},
+        { id: 'budget', name: 'תקציב', plans: [] },
+      ],
+      items: [
+        {
+          id: '02.002', desc: 'בניית לוח חשמל חדש', status: 'done',
+          qty: 1, unit: 'יח׳', unitPrice: 18500, total: 18500, progress: 100,
+          notes: 'לוח חשמל ראשי 3 פאזות 80A. כולל מפסקים פחת + מגן ברק.',
+          qc: [
+            { id: 'qc-bond', desc: 'בדיקת הארקה', status: 'done', meta: 'בודק חשמל מורשה · 22/03' },
+            { id: 'qc-meter', desc: 'אישור חברת חשמל', status: 'done', meta: 'תעודה #99841' },
+          ],
+          quotes: [
+            { supplier: 'אלקטרו פלוס', amount: 17800, status: 'approved', cheapest: true },
+          ],
+          tasks: [],
+          activity: [
+            { actor: 'אינג׳ דוד', verb: 'אישר', target: 'בדיקת הארקה', when: 'לפני חודש', icon: 'check', tone: 'emerald' },
+          ],
+        },
+        {
+          id: '02.003', desc: 'התקנת קופסאות בקירות', status: 'attention',
+          qty: 45, unit: 'נק׳', unitPrice: 85, total: 3825, progress: 60,
+          notes: 'קופסאות חשמל בקירות גבס. לוודא תיאום עם תוכנית גבס לפני התקנה.',
+          qc: [
+            { id: 'qc-pos', desc: 'בדיקת מיקום קופסאות מול תוכנית', status: 'failed', meta: '3 קופסאות לא במקום הנכון',
+              comments: [
+                { author: 'יוסי קוטלר', role: 'מבקר עבודות', when: 'אתמול 16:20',
+                  body: 'בקיר המזרחי 3 קופסאות מותקנות 5cm מהמיקום בתוכנית. דרוש תיקון.' },
+              ]
+            },
+            { id: 'qc-grounding', desc: 'הארקת קופסאות מתכת', status: 'pending', meta: 'לאחר תיקון' },
+          ],
+          quotes: [
+            { supplier: 'אלקטרו פלוס', amount: 3825, status: 'approved', cheapest: true },
+          ],
+          tasks: [
+            { id: 't10', title: 'תיקון מיקום 3 קופסאות בקיר מזרחי', priority: 'urgent', status: 'pending', due: '27/04', assignee: 'אינג׳ דוד' },
+          ],
+          activity: [
+            { actor: 'יוסי קוטלר', verb: 'דיווח על בעיה', target: '3 קופסאות שגויות', when: 'אתמול 16:20', icon: 'alert-triangle', tone: 'rose' },
+          ],
+        },
+        {
+          id: '02.004', desc: 'חיווט נקודות חשמל', status: 'pending',
+          qty: 45, unit: 'נק׳', unitPrice: 120, total: 5400, progress: 0,
+          notes: 'חיווט מהלוח לקופסאות. רק לאחר אישור QC על מיקום קופסאות.',
+          qc: [
+            { id: 'qc-wire', desc: 'בדיקת חתכים', status: 'pending', meta: 'במהלך עבודות' },
+          ],
+          quotes: [],
+          tasks: [],
+          activity: [],
+        },
+        {
+          id: '02.005', desc: 'בדיקת ארקה', status: 'pending',
+          qty: 1, unit: 'קומפלט', unitPrice: 1500, total: 1500, progress: 0,
+          notes: 'בדיקה סופית של מערכת ההארקה לפני חיבור חברת חשמל.',
+          qc: [
+            { id: 'qc-final', desc: 'בדיקה סופית — בודק חשמל מורשה', status: 'pending', meta: 'בסיום' },
+          ],
+          quotes: [],
+          tasks: [],
+          activity: [],
+        },
+      ],
+    },
+    {
+      id: '03', name: 'פרק 3: אינסטלציה', icon: 'droplet', attention: false,
+      folders: [
+        { id: 'arch', name: 'תוכניות אינסטלציה', plans: [
+          { id: 'p30', title: 'תוכנית אינסטלציה', version: 'v1', date: '01/03/26', status: 'current' },
+        ]},
+        { id: 'specs', name: 'מפרטים טכניים', plans: [
+          { id: 'p31', title: 'מפרט צנרת PEX', version: 'v1', date: '15/02/26', status: 'current' },
+        ]},
+      ],
+      items: [
+        {
+          id: '03.001', desc: 'התקנת צנרת מים חמים/קרים', status: 'pending',
+          qty: 80, unit: 'מ׳', unitPrice: 65, total: 5200, progress: 0,
+          notes: 'צנרת PEX מבודדת מהדוד הראשי לכל הנקודות.',
+          qc: [{ id: 'qc-press', desc: 'בדיקת לחץ', status: 'pending', meta: '6 בר למשך 30 דק׳' }],
+          quotes: [], tasks: [], activity: [],
+        },
+        {
+          id: '03.002', desc: 'התקנת צנרת ביוב', status: 'pending',
+          qty: 30, unit: 'מ׳', unitPrice: 95, total: 2850, progress: 0,
+          notes: 'PVC 110mm + נקודות שטיפה.',
+          qc: [], quotes: [], tasks: [], activity: [],
+        },
+      ],
+    },
+    {
+      id: '04', name: 'פרק 4: ריצוף', icon: 'grid-3x3', attention: false,
+      folders: [
+        { id: 'arch', name: 'תוכניות ריצוף', plans: [
+          { id: 'p40', title: 'תוכנית ריצוף', version: 'v1', date: '20/03/26', status: 'current' },
+        ]},
+        { id: 'specs', name: 'מפרטים', plans: [] },
+      ],
+      items: [
+        {
+          id: '04.001', desc: 'ריצוף קרמיקה — סלון', status: 'pending',
+          qty: 60, unit: 'm²', unitPrice: 280, total: 16800, progress: 0,
+          notes: 'קרמיקה איטלקית 60×60. מספר דגם DR-AVO-CR.',
+          qc: [], quotes: [], tasks: [], activity: [],
+        },
+      ],
+    },
+    {
+      id: '05', name: 'פרק 5: גמר', icon: 'paintbrush', attention: false,
+      folders: [
+        { id: 'specs', name: 'מפרטי גמר', plans: [] },
+      ],
+      items: [
+        {
+          id: '05.001', desc: 'צביעת קירות פנים', status: 'pending',
+          qty: 320, unit: 'm²', unitPrice: 35, total: 11200, progress: 0,
+          notes: 'שתי שכבות צבע אקרילי לבן. גמר עמום.',
+          qc: [], quotes: [], tasks: [], activity: [],
+        },
+      ],
+    },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────
+
+const state = {
+  chapterId: '01',
+  lineId: '01.003',
+  folderId: 'arch',
+  tab: 'overview',
+  expandedChapters: new Set(['01', '02']),
+  // user-driven mutations:
+  qcOverrides: {},      // key `${lineId}|${qcId}` → status
+  qcCommentsAdded: {},  // key `${lineId}|${qcId}` → [{author,role,when,body}]
+  expandedQcId: null,   // which QC card has its thread open
+};
+
+// Lookups
+function getChapter(id) { return data.chapters.find(c => c.id === id); }
+function getLine(chapterId, lineId) {
+  const c = getChapter(chapterId); if (!c) return null;
+  return c.items.find(i => i.id === lineId);
+}
+function effectiveQcStatus(lineId, qc) {
+  return state.qcOverrides[`${lineId}|${qc.id}`] ?? qc.status;
+}
+function qcThreadFor(lineId, qc) {
+  const base = qc.comments || [];
+  const added = state.qcCommentsAdded[`${lineId}|${qc.id}`] || [];
+  return [...base, ...added];
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────────────────────
+
+function renderChapterTree() {
+  const search = (document.getElementById('chap-search')?.value || '').toLowerCase();
+  const root = document.getElementById('chap-tree');
+  root.innerHTML = data.chapters.map(c => {
+    const expanded = state.expandedChapters.has(c.id);
+    const filtered = search
+      ? c.items.filter(i => i.id.toLowerCase().includes(search) || i.desc.toLowerCase().includes(search))
+      : c.items;
+    const showItems = expanded || (search && filtered.length > 0);
+    const matchesChapterSearch = search && c.name.toLowerCase().includes(search);
+    if (search && filtered.length === 0 && !matchesChapterSearch) return '';
+    return `
+      <div>
+        <button class="chap-row w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-200 text-start" aria-expanded="${expanded}" data-chapter="${c.id}">
+          <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-slate-500 chap-chev"></i>
+          <i data-lucide="${c.icon}" class="w-4 h-4 text-slate-600 shrink-0"></i>
+          <span class="flex-1 min-w-0 text-sm font-medium text-slate-900 truncate">${c.name}</span>
+          ${c.attention ? '<span class="h-1.5 w-1.5 rounded-full bg-rose-500 shrink-0" title="ליקויים פתוחים"></span>' : ''}
+          <span class="text-xs text-slate-500 nums">${c.items.length}</span>
+        </button>
+        <div class="chap-items ms-2 mt-0.5 space-y-0.5" ${!showItems ? 'style="display:none"' : ''}>
+          ${filtered.map(i => renderLineButton(c.id, i)).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+  lucide.createIcons();
+}
+
+function renderLineButton(chapterId, line) {
+  const isCurrent = state.chapterId === chapterId && state.lineId === line.id;
+  const dotIcon = line.status === 'done'
+    ? '<i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 shrink-0 ms-auto"></i>'
+    : line.status === 'attention'
+      ? `<span class="text-[10px] nums px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-medium shrink-0 ms-auto">${line.progress > 0 ? line.progress + '%' : 'בעיה'}</span>`
+      : '<span class="h-1.5 w-1.5 rounded-full bg-slate-300 shrink-0 ms-auto" title="טרם החל"></span>';
+  const rowCls = line.status === 'attention'
+    ? 'line-row w-full flex items-center gap-2 px-3 py-2 ps-8 rounded-md text-start row-attention transition-colors'
+    : 'line-row w-full flex items-center gap-2 px-3 py-2 ps-8 rounded-md text-start hover:bg-slate-200 transition-colors';
+  return `
+    <button class="${rowCls}" ${isCurrent ? 'aria-current="true"' : ''} data-chapter="${chapterId}" data-line="${line.id}">
+      <span class="text-xs nums text-slate-500 shrink-0">${line.id}</span>
+      <span class="text-sm truncate ${line.status === 'attention' ? 'text-slate-900' : 'text-slate-700'}">${line.desc}</span>
+      ${dotIcon}
+    </button>
+  `;
+}
+
+function renderTopBarKpis() {
+  // Recompute attention count from data + overrides
+  let attentionCount = 0;
+  for (const c of data.chapters) {
+    for (const item of c.items) {
+      for (const qc of item.qc) {
+        if (effectiveQcStatus(item.id, qc) === 'failed') attentionCount++;
+      }
+    }
+  }
+  const kpi = document.getElementById('kpi-attention');
+  if (attentionCount === 0) {
+    kpi.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span><span class="text-emerald-700 font-medium">אין ליקויים פתוחים</span>`;
+  } else {
+    kpi.innerHTML = `<span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span><span class="text-rose-700 font-medium">${attentionCount} ליקויים פתוחים</span>`;
+  }
+}
+
+function renderLineMeta() {
+  const c = getChapter(state.chapterId);
+  const line = getLine(state.chapterId, state.lineId);
+  if (!line) {
+    document.getElementById('line-meta').innerHTML = '<p class="text-sm text-slate-500">בחר שורה מהפאנל הימני</p>';
+    return;
+  }
+  document.getElementById('line-meta').innerHTML = `
+    <div class="flex items-start justify-between gap-4 flex-wrap">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+          <span class="nums">${line.id}</span>
+          <span>·</span>
+          <span>${c.name}</span>
+        </div>
+        <h2 class="text-lg font-semibold text-slate-900">${line.desc}</h2>
+      </div>
+      <div class="flex items-center gap-1">
+        <button class="text-xs font-medium px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 flex items-center gap-1" data-action="edit-line">
+          <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          ערוך
+        </button>
+        <button class="text-xs font-medium px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 flex items-center gap-1" data-action="more">
+          <i data-lucide="more-horizontal" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-4 gap-3 mt-3">
+      <div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500">כמות</div>
+        <div class="text-sm nums font-medium mt-0.5">${line.qty} ${line.unit}</div>
+      </div>
+      <div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500">מחיר יחידה</div>
+        <div class="text-sm nums font-medium mt-0.5">${fmtILS(line.unitPrice)}</div>
+      </div>
+      <div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500">סך מוערך</div>
+        <div class="text-sm nums font-medium mt-0.5 text-slate-900">${fmtILS(line.total)}</div>
+      </div>
+      <div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500">סטטוס ביצוע</div>
+        <div class="flex items-center gap-2 mt-0.5">
+          <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div class="h-full bg-cta-500" style="width:${line.progress}%"></div>
+          </div>
+          <span class="text-xs nums font-medium">${line.progress}%</span>
+        </div>
+      </div>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+function renderTabBar() {
+  const line = getLine(state.chapterId, state.lineId);
+  const failedCount = line ? line.qc.filter(q => effectiveQcStatus(line.id, q) === 'failed').length : 0;
+  const openTaskCount = line ? line.tasks.filter(t => t.status !== 'done').length : 0;
+  const counts = {
+    overview: null,
+    qc: failedCount > 0 ? { value: failedCount, tone: 'rose' } : null,
+    procurement: line && line.quotes.length > 0 ? { value: line.quotes.length, tone: 'slate' } : null,
+    tasks: openTaskCount > 0 ? { value: openTaskCount, tone: 'amber' } : null,
+  };
+  document.getElementById('tab-bar').innerHTML = TABS.map(t => `
+    <button class="tab-trigger inline-flex items-center gap-1.5 text-sm font-medium px-3 py-3 text-slate-600 hover:text-slate-900" role="tab" aria-selected="${state.tab === t.id}" data-tab="${t.id}">
+      <i data-lucide="${t.icon}" class="w-4 h-4"></i>
+      ${t.label}
+      ${counts[t.id] ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-medium nums ${counts[t.id].tone === 'rose' ? 'bg-rose-100 text-rose-700' : counts[t.id].tone === 'amber' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}">${counts[t.id].value}</span>` : ''}
+    </button>
+  `).join('');
+  lucide.createIcons();
+}
+
+function renderTabContent() {
+  const line = getLine(state.chapterId, state.lineId);
+  if (!line) return;
+  const root = document.getElementById('tab-content');
+  if (state.tab === 'overview') root.innerHTML = renderOverview(line);
+  else if (state.tab === 'qc') root.innerHTML = renderQc(line);
+  else if (state.tab === 'procurement') root.innerHTML = renderProcurement(line);
+  else if (state.tab === 'tasks') root.innerHTML = renderTasks(line);
+  lucide.createIcons();
+}
+
+function renderOverview(line) {
+  return `
+    <div class="space-y-5">
+      <div>
+        <div class="text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-500"></i>
+          הערות
+        </div>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 leading-relaxed">
+          ${line.notes || '—'}
+        </div>
+      </div>
+      <div>
+        <div class="text-xs font-semibold text-slate-700 mb-2.5 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <i data-lucide="history" class="w-3.5 h-3.5 text-slate-500"></i>
+            פעילות אחרונה
+          </span>
+          <a class="text-[11px] text-cta-600 hover:text-cta-700 font-medium cursor-pointer" data-action="full-activity">הצג הכל ←</a>
+        </div>
+        ${line.activity.length === 0
+          ? `<div class="text-sm text-slate-400 italic py-6 text-center">אין פעילות אחרונה לשורה זו</div>`
+          : `<ol class="relative space-y-3">${line.activity.map((a,i) => `
+              <li class="relative ps-9">
+                ${i < line.activity.length - 1 ? '<span class="absolute start-3 top-7 bottom-0 w-px bg-slate-200"></span>' : ''}
+                <span class="absolute start-0 top-0 h-6 w-6 rounded-full bg-${a.tone}-100 grid place-items-center ring-4 ring-white">
+                  <i data-lucide="${a.icon}" class="w-3 h-3 text-${a.tone}-700"></i>
+                </span>
+                <div class="text-sm">
+                  <span class="font-medium">${a.actor}</span>
+                  <span class="text-slate-600"> ${a.verb} </span>
+                  <span class="font-medium">${a.target}</span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">${a.when}</div>
+              </li>
+            `).join('')}</ol>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function renderQc(line) {
+  if (line.qc.length === 0) {
+    return `
+      <div class="text-center py-12">
+        <i data-lucide="clipboard-check" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+        <h3 class="text-sm font-medium text-slate-700">אין בדיקות איכות מוגדרות לשורה זו</h3>
+        <button class="mt-4 text-sm font-medium px-3 py-1.5 rounded bg-cta-500 hover:bg-cta-600 text-white inline-flex items-center gap-1.5" data-action="add-qc">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          הוסף בדיקת איכות
+        </button>
+      </div>
+    `;
+  }
+  return `
+    <div class="space-y-3">
+      ${line.qc.map(qc => renderQcCard(line.id, qc)).join('')}
+      <button class="w-full text-sm font-medium text-cta-600 hover:text-cta-700 hover:bg-cta-50 border border-dashed border-cta-300 rounded-lg py-2.5 flex items-center justify-center gap-1.5 transition-colors" data-action="add-qc">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        הוסף בדיקת איכות
+      </button>
+    </div>
+  `;
+}
+
+function renderQcCard(lineId, qc) {
+  const status = effectiveQcStatus(lineId, qc);
+  const ring = QC_STATUS_RING[status];
+  const cardCls = status === 'failed'
+    ? 'rounded-lg border border-rose-200 bg-rose-50/40 p-4'
+    : 'rounded-lg border border-slate-200 bg-white p-4';
+  const thread = qcThreadFor(lineId, qc);
+  const expandedKey = `${lineId}|${qc.id}`;
+  const expanded = state.expandedQcId === expandedKey;
+  return `
+    <article class="${cardCls}" data-qc="${qc.id}" data-line="${lineId}">
+      <div class="flex items-start justify-between gap-3 flex-wrap">
+        <div class="flex items-start gap-3 min-w-0 flex-1">
+          <span class="h-7 w-7 rounded-full ${ring.bg} grid place-items-center shrink-0 ring-2 ${ring.ring}">
+            <i data-lucide="${ring.icon}" class="w-4 h-4 ${ring.iconColor}"></i>
+          </span>
+          <div class="min-w-0">
+            <div class="text-sm font-medium text-slate-900">${qc.desc}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${qc.meta || ''}</div>
+          </div>
+        </div>
+        <div class="inline-flex items-center gap-1 p-1 rounded-md bg-${status === 'failed' ? 'white' : 'slate-50'} border border-slate-200">
+          ${QC_STATUSES.map(s => `
+            <button class="text-xs font-medium px-2 py-0.5 rounded ${status === s.id ? s.bg + ' text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'}" data-action="qc-status" data-line="${lineId}" data-qc="${qc.id}" data-status="${s.id}">${s.label}</button>
+          `).join('')}
+        </div>
+      </div>
+      <button class="mt-3 text-[11px] text-cta-600 hover:text-cta-700 font-medium flex items-center gap-1 qc-comment-toggle" data-action="qc-toggle" data-line="${lineId}" data-qc="${qc.id}">
+        <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+        ${thread.length} ${thread.length === 1 ? 'הערה' : 'הערות'}
+        <i data-lucide="${expanded ? 'chevron-up' : 'chevron-down'}" class="w-3 h-3"></i>
+      </button>
+      ${expanded ? renderQcThread(lineId, qc, thread) : ''}
+    </article>
+  `;
+}
+
+function renderQcThread(lineId, qc, thread) {
+  return `
+    <div class="qc-comment-thread mt-3 space-y-2.5">
+      ${thread.length === 0
+        ? `<div class="text-xs text-slate-400 italic px-2">אין הערות עדיין. כתוב את הראשונה.</div>`
+        : thread.map(c => `
+          <div class="flex gap-2.5 items-start">
+            <span class="h-7 w-7 rounded-full ${avatarTone(c.author)} grid place-items-center text-[11px] font-semibold shrink-0">${initials(c.author)}</span>
+            <div class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="text-xs font-medium">${c.author}</span>
+                <span class="text-[10px] text-slate-500">${c.when}${c.role ? ' · ' + c.role : ''}</span>
+              </div>
+              <div class="text-sm mt-0.5 whitespace-pre-line">${c.body}</div>
+            </div>
+          </div>
+        `).join('')
+      }
+      <form class="flex gap-2 mt-2" data-action="qc-comment-form" data-line="${lineId}" data-qc="${qc.id}">
+        <input class="flex-1 bg-white border border-slate-200 rounded-md text-sm px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-cta-500 focus:border-cta-500" placeholder="הוסף הערה…" autocomplete="off" />
+        <button class="text-xs font-medium px-3 py-1.5 rounded bg-cta-500 text-white hover:bg-cta-600">שלח</button>
+      </form>
+    </div>
+  `;
+}
+
+function renderProcurement(line) {
+  if (line.quotes.length === 0) {
+    return `
+      <div class="text-center py-12">
+        <i data-lucide="truck" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+        <h3 class="text-sm font-medium text-slate-700">אין הצעות מחיר עדיין</h3>
+        <p class="text-xs text-slate-500 mt-1">פתח RFQ לקבלת הצעות מספקים</p>
+        <button class="mt-4 text-sm font-medium px-3 py-1.5 rounded bg-cta-500 hover:bg-cta-600 text-white inline-flex items-center gap-1.5" data-action="add-quote">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          פתח RFQ
+        </button>
+      </div>
+    `;
+  }
+  const cheapest = line.quotes.find(q => q.cheapest);
+  const approved = line.quotes.find(q => q.status === 'approved');
+  return `
+    <div class="space-y-4">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-900">הצעות מחיר ספקים</h3>
+          <p class="text-xs text-slate-500 mt-0.5">${line.quotes.length} הצעות${approved ? ' · אושרה' : ''}</p>
+        </div>
+        <button class="text-xs font-medium px-3 py-1.5 rounded border border-slate-200 bg-white text-slate-700 hover:border-slate-300 flex items-center gap-1.5" data-action="add-quote">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          הוסף הצעה
+        </button>
+      </div>
+      <div class="rounded-lg border border-slate-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="text-xs text-slate-500 bg-slate-50">
+            <tr>
+              <th class="text-start font-medium px-4 py-2.5">ספק</th>
+              <th class="text-end font-medium px-4 py-2.5">סכום</th>
+              <th class="text-start font-medium px-4 py-2.5">סטטוס</th>
+              <th class="text-start font-medium px-4 py-2.5">דירוג</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${line.quotes.map(q => `
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3">
+                  <div class="font-medium text-slate-900">${q.supplier}</div>
+                  ${q.meta ? `<div class="text-xs text-slate-500">${q.meta}</div>` : ''}
+                </td>
+                <td class="px-4 py-3 text-end nums ${q.cheapest ? 'font-semibold' : ''}">${fmtILS(q.amount)}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex text-xs px-2 py-0.5 rounded font-medium ${QUOTE_STATUS[q.status].cls}">${QUOTE_STATUS[q.status].label}</span>
+                </td>
+                <td class="px-4 py-3">
+                  ${q.cheapest
+                    ? `<span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium"><i data-lucide="award" class="w-3 h-3"></i>הזול ביותר</span>`
+                    : cheapest ? `<span class="text-xs text-slate-500">+${fmtILS(q.amount - cheapest.amount)}</span>` : ''}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${approved && approved.meta && approved.meta.startsWith('PO') ? `
+        <div class="rounded-lg bg-emerald-50 border border-emerald-200 p-3 flex items-center gap-3">
+          <i data-lucide="receipt" class="w-5 h-5 text-emerald-700 shrink-0"></i>
+          <div class="flex-1 text-sm">
+            <div class="font-medium text-emerald-900">${approved.meta} הופק</div>
+            <div class="text-xs text-emerald-800 mt-0.5">${approved.supplier} · ${fmtILS(approved.amount)}</div>
+          </div>
+          <button class="text-xs font-medium text-emerald-800 hover:text-emerald-900 flex items-center gap-1" data-action="view-po">
+            צפה בהזמנה
+            <i data-lucide="external-link" class="w-3 h-3"></i>
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderTasks(line) {
+  if (line.tasks.length === 0) {
+    return `
+      <div class="text-center py-12">
+        <i data-lucide="list-checks" class="w-10 h-10 text-slate-300 mx-auto mb-3"></i>
+        <h3 class="text-sm font-medium text-slate-700">אין משימות מקושרות לשורה זו</h3>
+        <button class="mt-4 text-sm font-medium px-3 py-1.5 rounded bg-cta-500 hover:bg-cta-600 text-white inline-flex items-center gap-1.5" data-action="add-task">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          משימה חדשה
+        </button>
+      </div>
+    `;
+  }
+  const open = line.tasks.filter(t => t.status !== 'done').length;
+  const done = line.tasks.length - open;
+  return `
+    <div class="space-y-3">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-900">משימות מקושרות</h3>
+          <p class="text-xs text-slate-500 mt-0.5">${open} פתוחות · ${done} ${done === 1 ? 'הושלמה' : 'הושלמו'}</p>
+        </div>
+        <button class="text-xs font-medium px-3 py-1.5 rounded bg-cta-500 hover:bg-cta-600 text-white flex items-center gap-1.5 shadow-sm" data-action="add-task">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          משימה חדשה
+        </button>
+      </div>
+      <div class="space-y-2">
+        ${line.tasks.map(task => {
+          const isDone = task.status === 'done';
+          return `
+            <article class="rounded-lg border border-slate-200 bg-white p-3 hover:border-slate-300 transition-colors ${isDone ? 'opacity-70' : ''}">
+              <div class="flex items-start justify-between gap-3 flex-wrap">
+                <div class="min-w-0 flex-1">
+                  <div class="text-sm font-medium ${isDone ? 'text-slate-700 line-through' : 'text-slate-900'}">${task.title}</div>
+                  <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+                    <span class="inline-flex text-[10px] px-1.5 py-0.5 rounded font-medium ${PRIORITY[task.priority].cls}">${PRIORITY[task.priority].label}</span>
+                    <span class="inline-flex text-[10px] px-1.5 py-0.5 rounded font-medium ${TASK_STATUS[task.status].cls}">${TASK_STATUS[task.status].label}</span>
+                    <span class="text-xs text-slate-500 flex items-center gap-1">
+                      <i data-lucide="${isDone ? 'check' : 'calendar-days'}" class="w-3 h-3 ${isDone ? 'text-emerald-600' : ''}"></i>
+                      ${isDone ? 'הושלם ' : ''}${task.due}
+                    </span>
+                  </div>
+                </div>
+                <span class="h-7 w-7 rounded-full ${avatarTone(task.assignee)} grid place-items-center text-[11px] font-semibold shrink-0" title="${task.assignee}">${initials(task.assignee)}</span>
+              </div>
+            </article>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderRail() {
+  const c = getChapter(state.chapterId);
+  document.getElementById('rail-chapter-name').textContent = c.name;
+  if (c.folders.length === 0) {
+    document.getElementById('rail-body').innerHTML = `
+      <div class="px-4 py-8 text-center text-xs text-slate-400">
+        אין מסמכים לפרק זה
+      </div>
+    `;
+    return;
+  }
+  const selectedFolder = c.folders.find(f => f.id === state.folderId) || c.folders[0];
+  if (!c.folders.find(f => f.id === state.folderId)) state.folderId = c.folders[0].id;
+  document.getElementById('rail-body').innerHTML = `
+    <div class="px-2 py-2 space-y-3">
+      <div class="space-y-0.5">
+        ${c.folders.map(f => {
+          const sel = f.id === selectedFolder.id;
+          return `
+            <button class="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm ${sel ? 'bg-cta-100 text-cta-800 font-medium' : 'text-slate-700 hover:bg-slate-200'}" data-action="folder" data-folder="${f.id}">
+              <i data-lucide="${sel ? 'folder-open' : 'folder'}" class="w-4 h-4 ${sel ? 'text-cta-600' : 'text-slate-500'} shrink-0"></i>
+              <span class="flex-1 text-start truncate">${f.name}</span>
+              <span class="text-[10px] nums ${sel ? 'text-cta-700' : 'text-slate-500'}">${f.plans.length}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <hr class="border-slate-200" />
+      <div class="space-y-2">
+        <div class="px-2 text-[10px] font-medium text-slate-500 uppercase tracking-wider flex items-center justify-between">
+          <span>${selectedFolder.name}</span>
+          ${selectedFolder.plans.length > 0 ? `<span class="nums text-slate-400">${selectedFolder.plans.length}</span>` : ''}
+        </div>
+        ${selectedFolder.plans.length === 0
+          ? `<div class="px-2 py-4 text-center text-[11px] text-slate-400 italic">תיקייה ריקה</div>`
+          : selectedFolder.plans.map(p => renderPlan(p)).join('')
+        }
+      </div>
+      <hr class="border-slate-200" />
+      <button class="w-full text-sm font-medium text-cta-600 hover:text-cta-700 hover:bg-cta-50 border border-dashed border-cta-300 rounded-md py-2 flex items-center justify-center gap-1.5 transition-colors" data-action="upload-plan">
+        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+        העלה תוכנית
+      </button>
+      <p class="text-center text-[10px] text-slate-400 px-2 leading-relaxed">
+        מסמכים מתויגים לפי פרק. גישה לפי הרשאת תפקיד.
+      </p>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+function renderPlan(p) {
+  const isCurrent = p.status === 'current';
+  return `
+    <article class="${isCurrent ? 'bg-white' : 'bg-white/60 opacity-80'} rounded-md border border-slate-200 p-2.5 hover:border-slate-300">
+      <div class="flex items-start gap-2">
+        <i data-lucide="file-text" class="w-4 h-4 ${isCurrent ? 'text-slate-500' : 'text-slate-400'} shrink-0 mt-0.5"></i>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-medium ${isCurrent ? 'text-slate-900' : 'text-slate-600'} truncate">${p.title}</div>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${isCurrent ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${p.version}${isCurrent ? ' · עדכני' : ' · ישן'}</span>
+            <span class="text-[10px] text-slate-500">${p.date}</span>
+          </div>
+        </div>
+      </div>
+      ${isCurrent ? `
+        <div class="flex items-center gap-1 mt-2">
+          <button class="text-[11px] font-medium px-2 py-0.5 rounded bg-cta-500 text-white hover:bg-cta-600" data-action="view-plan">צפה</button>
+          <button class="text-[11px] font-medium px-2 py-0.5 rounded text-slate-600 hover:bg-slate-100" data-action="versions">גרסאות</button>
+          <button class="text-[11px] font-medium p-1 rounded text-slate-500 hover:bg-slate-100" aria-label="עוד" data-action="plan-more"><i data-lucide="more-horizontal" class="w-3 h-3"></i></button>
+        </div>
+      ` : ''}
+    </article>
+  `;
+}
+
+function renderAll() {
+  renderTopBarKpis();
+  renderChapterTree();
+  renderLineMeta();
+  renderTabBar();
+  renderTabContent();
+  renderRail();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  ACTIONS
+// ─────────────────────────────────────────────────────────────
+
+function selectLine(chapterId, lineId) {
+  state.chapterId = chapterId;
+  state.lineId = lineId;
+  state.expandedChapters.add(chapterId);
+  state.expandedQcId = null;
+  // If folder no longer exists in the chapter, fall back
+  const c = getChapter(chapterId);
+  if (!c.folders.find(f => f.id === state.folderId) && c.folders[0]) {
+    state.folderId = c.folders[0].id;
+  }
+  renderAll();
+}
+
+function selectFolder(folderId) {
+  state.folderId = folderId;
+  renderRail();
+}
+
+function selectTab(tabId) {
+  state.tab = tabId;
+  state.expandedQcId = null;
+  renderTabBar();
+  renderTabContent();
+}
+
+function toggleChapter(chapterId) {
+  if (state.expandedChapters.has(chapterId)) state.expandedChapters.delete(chapterId);
+  else state.expandedChapters.add(chapterId);
+  // also flip the active chapter to this one (so doc rail updates)
+  state.chapterId = chapterId;
+  // pick first line of chapter if current line isn't in it
+  const c = getChapter(chapterId);
+  if (!c.items.find(i => i.id === state.lineId)) {
+    state.lineId = c.items[0]?.id;
+    if (!c.folders.find(f => f.id === state.folderId) && c.folders[0]) state.folderId = c.folders[0].id;
+  }
+  renderAll();
+}
+
+function toggleQcThread(lineId, qcId) {
+  const key = `${lineId}|${qcId}`;
+  state.expandedQcId = state.expandedQcId === key ? null : key;
+  renderTabContent();
+}
+
+function setQcStatus(lineId, qcId, status) {
+  state.qcOverrides[`${lineId}|${qcId}`] = status;
+  renderAll();
+  toast(`סטטוס עודכן: ${QC_STATUSES.find(s => s.id === status).label}`);
+}
+
+function addQcComment(lineId, qcId, body) {
+  if (!body.trim()) return;
+  const key = `${lineId}|${qcId}`;
+  state.qcCommentsAdded[key] = state.qcCommentsAdded[key] || [];
+  state.qcCommentsAdded[key].push({
+    author: 'שי כהן',
+    role: 'מנכ״ל',
+    when: 'עכשיו',
+    body: body.trim(),
+  });
+  renderTabContent();
+  // refocus the input on the same expanded thread
+  const form = document.querySelector(`form[data-action="qc-comment-form"][data-line="${lineId}"][data-qc="${qcId}"]`);
+  if (form) form.querySelector('input').focus();
+}
+
+function toast(message) {
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = 'toast bg-slate-900 text-white text-sm px-3 py-2 rounded-md shadow-lg flex items-center gap-2';
+  t.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i><span>${message}</span>`;
+  stack.appendChild(t);
+  lucide.createIcons();
+  setTimeout(() => {
+    t.style.transition = 'opacity 200ms';
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 250);
+  }, 1800);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  EVENT WIRING (delegated)
+// ─────────────────────────────────────────────────────────────
+
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-action], [data-line], [data-tab], [data-folder], [data-chapter]');
+  if (!target) return;
+
+  // Chapter row toggle (and select)
+  if (target.matches('.chap-row[data-chapter]')) {
+    e.preventDefault();
+    toggleChapter(target.getAttribute('data-chapter'));
+    return;
+  }
+
+  // Line row select
+  if (target.matches('.line-row[data-line]')) {
+    e.preventDefault();
+    selectLine(target.getAttribute('data-chapter'), target.getAttribute('data-line'));
+    return;
+  }
+
+  // Tab
+  if (target.matches('[role="tab"][data-tab]')) {
+    e.preventDefault();
+    selectTab(target.getAttribute('data-tab'));
+    return;
+  }
+
+  // Folder pick
+  if (target.matches('[data-action="folder"][data-folder]')) {
+    e.preventDefault();
+    selectFolder(target.getAttribute('data-folder'));
+    return;
+  }
+
+  // QC status update
+  if (target.matches('[data-action="qc-status"]')) {
+    e.preventDefault();
+    setQcStatus(target.getAttribute('data-line'), target.getAttribute('data-qc'), target.getAttribute('data-status'));
+    return;
+  }
+
+  // QC thread toggle
+  if (target.matches('[data-action="qc-toggle"]')) {
+    e.preventDefault();
+    toggleQcThread(target.getAttribute('data-line'), target.getAttribute('data-qc'));
+    return;
+  }
+
+  // Doc rail toggle
+  if (target.id === 'rail-toggle' || target.closest('#rail-toggle')) {
+    document.querySelector('.docrail').classList.toggle('is-collapsed');
+    return;
+  }
+
+  // Stub actions (toasts only)
+  const action = target.getAttribute('data-action');
+  if (action) {
+    const stubMessages = {
+      'add-line': 'שורת BoQ חדשה — בקרוב',
+      'add-chapter': 'הוסף פרק — בקרוב',
+      'edit-line': 'עריכת שורה — בקרוב',
+      'more': 'תפריט עוד — בקרוב',
+      'add-qc': 'הוסף בדיקת איכות — בקרוב',
+      'add-quote': 'הוסף הצעת מחיר — בקרוב',
+      'view-po': 'פתיחת PO — בקרוב',
+      'add-task': 'משימה חדשה — בקרוב',
+      'upload-plan': 'העלאת תוכנית — בקרוב',
+      'view-plan': 'פתיחת תוכנית — בקרוב',
+      'versions': 'גרסאות — בקרוב',
+      'plan-more': 'תפריט תוכנית — בקרוב',
+      'full-activity': 'יומן פעילות מלא — בקרוב',
+    };
+    if (stubMessages[action]) {
+      toast(stubMessages[action]);
+    }
+  }
+});
+
+// QC comment form submit
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('form[data-action="qc-comment-form"]');
+  if (!form) return;
+  e.preventDefault();
+  const input = form.querySelector('input');
+  addQcComment(form.getAttribute('data-line'), form.getAttribute('data-qc'), input.value);
+  input.value = '';
+});
+
+// Search filter
+document.getElementById('chap-search').addEventListener('input', () => {
+  renderChapterTree();
+});
+
+// Keyboard shortcut: arrow keys navigate line items
+document.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, textarea')) return;
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  // Build a flat list of (chapterId, lineId) for chapters that are expanded
+  const flat = [];
+  for (const c of data.chapters) {
+    if (state.expandedChapters.has(c.id)) {
+      for (const item of c.items) flat.push([c.id, item.id]);
+    }
+  }
+  const idx = flat.findIndex(([c, l]) => c === state.chapterId && l === state.lineId);
+  if (idx === -1) return;
+  const next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+  if (next < 0 || next >= flat.length) return;
+  e.preventDefault();
+  selectLine(flat[next][0], flat[next][1]);
+});
+
+// Theme switcher — flip visual variant in real time.
+// Some themes are layered: e.g. "blue" applies Bento layout + a blue color override.
+const THEME_CLASSES = {
+  industrial: ['theme-industrial'],
+  bento:      ['theme-bento'],
+  dense:      ['theme-dense'],
+  glow:       ['theme-glow'],
+  blue:       ['theme-bento', 'theme-blue'],     // Bento layout + blue accent
+  vertical:   ['theme-bento', 'theme-vertical'], // Bento layout + vertical sub-tabs
+};
+function applyTheme(theme) {
+  const classes = THEME_CLASSES[theme] || ['theme-industrial'];
+  document.body.classList.remove(
+    'theme-industrial', 'theme-bento', 'theme-dense', 'theme-glow', 'theme-blue', 'theme-vertical',
+  );
+  classes.forEach((c) => document.body.classList.add(c));
+  try { localStorage.setItem('ws-theme', theme); } catch (e) {}
+  document.querySelectorAll('#theme-switcher button').forEach((b) => {
+    b.setAttribute('aria-pressed', b.getAttribute('data-theme') === theme ? 'true' : 'false');
+  });
+}
+document.querySelectorAll('#theme-switcher button').forEach((b) => {
+  b.addEventListener('click', () => applyTheme(b.getAttribute('data-theme')));
+});
+const urlTheme = new URL(location.href).searchParams.get('theme');
+let savedTheme = null;
+try { savedTheme = localStorage.getItem('ws-theme'); } catch (e) {}
+applyTheme(urlTheme || savedTheme || 'industrial');
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>

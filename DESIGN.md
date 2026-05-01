@@ -16,13 +16,13 @@ Design DNA, condensed: **sidebar-nav dashboards** with **data-dense lists**, **p
 
 ## 2. Color
 
-### 2.1 Brand palette (Direction A v1 — Site Foreman)
+### 2.1 Brand palette (Direction A v2 — Bento Blue, locked 2026-05-01)
 
 | Token | Purpose | HSL | ≈ Hex |
 |---|---|---|---|
-| `--primary` | Action color (buttons, links, focus ring) — safety orange | `25 95% 53%` | `#f97316` |
+| `--primary` | Action color (buttons, links, focus ring) — sky blue | `199 89% 40%` | `#0284c7` |
 | `--primary-foreground` | Text on primary | `0 0% 100%` | white |
-| `--ring` | Focus ring (matches primary) | `25 95% 53%` | `#f97316` |
+| `--ring` | Focus ring (matches primary) | `199 89% 40%` | `#0284c7` |
 | `--sidebar` | Sidebar background — slate-800 | `217 33% 17%` | `#1e293b` |
 | `--sidebar-foreground` | Sidebar body text | `210 40% 96%` | slate-50 |
 | `--sidebar-muted-foreground` | Sidebar meta / inactive link | `215 16% 65%` | slate-400 |
@@ -36,7 +36,7 @@ Design DNA, condensed: **sidebar-nav dashboards** with **data-dense lists**, **p
 | `--border` | Card / row dividers | `214.3 31.8% 91.4%` | slate-200 |
 | `--destructive` | Error state | `0 84.2% 60.2%` | rose-500 |
 
-> The teal palette (`--primary 173 77% 32%`) shipped in Phases 0–65 was retired on 2026-04-25 when Direction A v1 was locked. See [UX_MOODBOARD.md](UX_MOODBOARD.md) for the full token rationale and "what's in / what's out" table.
+> The teal palette (`--primary 173 77% 32%`) shipped in Phases 0–65 was retired on 2026-04-25 when Direction A v1 (orange `25 95% 53%`) was locked. The orange palette was retired on 2026-05-01 when Direction A v2 (Bento Blue `199 89% 40%`) replaced it via Phase 66.5 token swap. See [UX_MOODBOARD.md](UX_MOODBOARD.md) for the full audit trail.
 
 ### 2.2 Status tones (pastel pill palette)
 
