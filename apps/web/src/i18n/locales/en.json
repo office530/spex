@@ -958,8 +958,19 @@
       }
     },
     "tasks": {
-      "placeholderTitle": "Linked tasks ship in Phase 80",
-      "placeholderDescription": "Linking tasks to BoQ lines requires a schema migration. For now, manage tasks from the Operations tab in /projects/:id."
+      "empty": "No tasks for this line",
+      "emptyHint": "Add a task to start tracking work on this line",
+      "add": "Add task",
+      "confirmDelete": "Delete this task?",
+      "field": {
+        "title": "Title",
+        "description": "Description",
+        "status": "Status",
+        "priority": "Priority",
+        "assignee": "Assignee",
+        "dueDate": "Due date",
+        "unassigned": "Unassigned"
+      }
     },
     "docrail": {
       "title": "Documents",

@@ -58,6 +58,12 @@ interface QuoteAggregate {
   line_item_id: string;
 }
 
+interface TaskLite {
+  boq_line_item_id: string;
+  status: string;
+  assignee_id: string | null;
+}
+
 export function ProjectWorkspacePage() {
   const { t } = useTranslation();
   const { id: projectId } = useParams<{ id: string }>();
@@ -70,6 +76,7 @@ export function ProjectWorkspacePage() {
   const [lineItems, setLineItems] = useState<LineItem[]>([]);
   const [qcChecks, setQcChecks] = useState<QcCheckLite[]>([]);
   const [quotes, setQuotes] = useState<QuoteAggregate[]>([]);
+  const [tasks, setTasks] = useState<TaskLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
 
@@ -105,7 +112,7 @@ export function ProjectWorkspacePage() {
 
     const lineIds = (lineRes.data as LineItem[] | null)?.map((l) => l.id) ?? [];
     if (lineIds.length > 0) {
-      const [qcRes, quoteRes] = await Promise.all([
+      const [qcRes, quoteRes, taskRes] = await Promise.all([
         supabase
           .from('boq_line_item_checks')
           .select('line_item_id, status, due_date')
@@ -114,6 +121,10 @@ export function ProjectWorkspacePage() {
           .from('supplier_quotes')
           .select('boq_line_item_id')
           .in('boq_line_item_id', lineIds),
+        supabase
+          .from('tasks')
+          .select('boq_line_item_id, status, assignee_id')
+          .in('boq_line_item_id', lineIds),
       ]);
       setQcChecks((qcRes.data as unknown as QcCheckLite[]) ?? []);
       setQuotes(
@@ -121,9 +132,11 @@ export function ProjectWorkspacePage() {
           line_item_id: q.boq_line_item_id,
         })),
       );
+      setTasks((taskRes.data as TaskLite[]) ?? []);
     } else {
       setQcChecks([]);
       setQuotes([]);
+      setTasks([]);
     }
   }, [projectId]);
 
@@ -160,6 +173,15 @@ export function ProjectWorkspacePage() {
     return map;
   }, [quotes]);
 
+  const tasksOpenByLine = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const t of tasks) {
+      if (t.status === 'done' || t.status === 'cancelled') continue;
+      map[t.boq_line_item_id] = (map[t.boq_line_item_id] ?? 0) + 1;
+    }
+    return map;
+  }, [tasks]);
+
   // Default selection: first chapter, its first line
   useEffect(() => {
     if (loading) return;
@@ -191,6 +213,7 @@ export function ProjectWorkspacePage() {
   const isAssignedPm = project?.pm_id != null && project.pm_id === user?.id;
   const canCrud = isAdmin || isAssignedPm;
   const canComment = true; // any project member who can read can comment (RLS enforces)
+  const canEditOwnTasks = !canCrud; // foreman / non-PM can update status of own tasks via RLS
 
   // Phase 78 mutation handlers — only wired when canCrud
   const createChapter = useCallback(
@@ -393,10 +416,12 @@ export function ProjectWorkspacePage() {
             qcTotal={qcByLine[selectedLine.id]?.total ?? 0}
             qcDone={qcByLine[selectedLine.id]?.done ?? 0}
             procurementCount={quoteByLine[selectedLine.id] ?? 0}
+            tasksOpenCount={tasksOpenByLine[selectedLine.id] ?? 0}
             activeTab={activeTab}
             onTabChange={handleTabChange}
             canCrud={canCrud}
             canComment={canComment}
+            canEditOwnTasks={canEditOwnTasks}
           />
         ) : (
           <main className="flex-1 min-w-0 bg-white grid place-items-center">

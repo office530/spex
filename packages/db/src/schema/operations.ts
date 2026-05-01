@@ -12,6 +12,7 @@ import {
 import { id, timestamps } from './_helpers';
 import { projects } from './projects';
 import { userProfiles } from './platform';
+import { boqLineItems } from './boq';
 
 export const taskStatusEnum = pgEnum('task_status', [
   'awaiting_execution',
@@ -43,6 +44,9 @@ export const tasks = pgTable('tasks', {
   }),
   due_date: timestamp('due_date', { withTimezone: true }),
   sort_order: integer('sort_order').default(0).notNull(),
+  boq_line_item_id: uuid('boq_line_item_id').references(() => boqLineItems.id, {
+    onDelete: 'set null',
+  }),
   ...timestamps,
 });
 

@@ -963,8 +963,19 @@
       }
     },
     "tasks": {
-      "placeholderTitle": "משימות מקושרות יושקו ב־Phase 80",
-      "placeholderDescription": "הקישור בין משימות לשורות BoQ דורש מיגרציה נפרדת. בינתיים — צור משימות מהטאב 'תפעול' ב/projects/:id."
+      "empty": "אין משימות לסעיף הזה",
+      "emptyHint": "הוסף משימה כדי להתחיל לעקוב אחרי ביצוע הסעיף",
+      "add": "הוסף משימה",
+      "confirmDelete": "למחוק את המשימה?",
+      "field": {
+        "title": "כותרת",
+        "description": "תיאור",
+        "status": "סטטוס",
+        "priority": "עדיפות",
+        "assignee": "אחראי",
+        "dueDate": "יעד",
+        "unassigned": "ללא"
+      }
     },
     "docrail": {
       "title": "מסמכים",
