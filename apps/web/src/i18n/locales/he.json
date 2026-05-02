@@ -954,20 +954,18 @@
     },
     "procurement": {
       "title": "הצעות מחיר ספקים",
-      "summary_one": "הצעה אחת",
-      "summary_two": "{{count}} הצעות",
-      "summary_other": "{{count}} הצעות",
-      "summary_one_approved": "הצעה אחת · אושרה",
-      "summary_other_approved": "{{count}} הצעות · אושרה",
       "empty": "אין הצעות מחיר עדיין",
-      "emptyHint": "לפתיחת RFQ ואישור הצעה ראשית — עבור לכתב הכמויות.",
+      "emptyHint": "הוסף הצעת מחיר ראשונה לסעיף הזה.",
       "openInBoq": "פתח בכתב הכמויות",
-      "col": {
-        "supplier": "ספק",
-        "amount": "סכום",
-        "status": "סטטוס",
-        "rank": "דירוג"
-      }
+      "add": "הוסף הצעה",
+      "supplier": "ספק",
+      "selectSupplier": "בחר ספק…",
+      "amount": "סכום",
+      "statusLabel": "סטטוס",
+      "statusAria": "עדכון סטטוס הצעה",
+      "notes": "הערות",
+      "notesPlaceholder": "תנאים, זמן אספקה, הערות…",
+      "confirmDelete": "למחוק את ההצעה?"
     },
     "tasks": {
       "empty": "אין משימות לסעיף הזה",
