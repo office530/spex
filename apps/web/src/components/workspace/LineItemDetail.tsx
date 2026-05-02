@@ -70,35 +70,7 @@ export function LineItemDetail({
         variant="underline"
       >
         <div className="p-3 md:p-4 space-y-3">
-          {/* Tabs row — at the top, above the line title */}
-          <div className={`${BENTO_CARD} px-5 md:px-6`}>
-            <TabsList className="border-none">
-              <TabsTrigger value="overview">
-                <LayoutList />
-                {t('workspace.tabs.overview')}
-              </TabsTrigger>
-              <TabsTrigger value="qc" count={qcAttention > 0 ? qcAttention : undefined}>
-                <ClipboardCheck />
-                {t('workspace.tabs.qc')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="procurement"
-                count={procurementCount > 0 ? procurementCount : undefined}
-              >
-                <Truck />
-                {t('workspace.tabs.procurement')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="tasks"
-                count={tasksOpenCount > 0 ? tasksOpenCount : undefined}
-              >
-                <ListChecks />
-                {t('workspace.tabs.tasks')}
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          {/* Line meta — title + 4 metric tiles */}
+          {/* Line meta — title + 4 metric tiles (top card) */}
           <div className={`${BENTO_CARD} p-6`}>
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="min-w-0">
@@ -167,25 +139,53 @@ export function LineItemDetail({
             </div>
           </div>
 
-          {/* Tab body */}
-          <div className={`${BENTO_CARD} p-6 min-h-[420px]`}>
-            <TabsContent value="overview">
-              <OverviewTab lineId={line.id} notes={line.notes} />
-            </TabsContent>
-            <TabsContent value="qc">
-              <QcTab lineId={line.id} canCrud={canCrud} canComment={canComment} />
-            </TabsContent>
-            <TabsContent value="procurement">
-              <ProcurementTab lineId={line.id} projectId={projectId} />
-            </TabsContent>
-            <TabsContent value="tasks">
-              <TasksTab
-                lineId={line.id}
-                projectId={projectId}
-                canCrud={canCrud}
-                canEditOwn={canEditOwnTasks}
-              />
-            </TabsContent>
+          {/* Combined Tabs+Body card — tabs are the top edge, content fills below */}
+          <div className={`${BENTO_CARD} overflow-hidden`}>
+            <div className="border-b border-slate-200/70 px-5 md:px-6 bg-white">
+              <TabsList className="border-none">
+                <TabsTrigger value="overview">
+                  <LayoutList />
+                  {t('workspace.tabs.overview')}
+                </TabsTrigger>
+                <TabsTrigger value="qc" count={qcAttention > 0 ? qcAttention : undefined}>
+                  <ClipboardCheck />
+                  {t('workspace.tabs.qc')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="procurement"
+                  count={procurementCount > 0 ? procurementCount : undefined}
+                >
+                  <Truck />
+                  {t('workspace.tabs.procurement')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="tasks"
+                  count={tasksOpenCount > 0 ? tasksOpenCount : undefined}
+                >
+                  <ListChecks />
+                  {t('workspace.tabs.tasks')}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <div className="p-6 min-h-[420px]">
+              <TabsContent value="overview">
+                <OverviewTab lineId={line.id} notes={line.notes} />
+              </TabsContent>
+              <TabsContent value="qc">
+                <QcTab lineId={line.id} canCrud={canCrud} canComment={canComment} />
+              </TabsContent>
+              <TabsContent value="procurement">
+                <ProcurementTab lineId={line.id} projectId={projectId} />
+              </TabsContent>
+              <TabsContent value="tasks">
+                <TasksTab
+                  lineId={line.id}
+                  projectId={projectId}
+                  canCrud={canCrud}
+                  canEditOwn={canEditOwnTasks}
+                />
+              </TabsContent>
+            </div>
           </div>
         </div>
       </Tabs>
