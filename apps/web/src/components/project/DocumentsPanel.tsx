@@ -9,18 +9,12 @@ import {
 import { FileText, Folder, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { useAuth } from '../../auth/AuthContext';
 import { supabase } from '../../lib/supabase';
+import { uploadDocument, type DocFolder as UploadDocFolder } from '../../lib/uploadDocument';
 
-type DocFolder =
-  | 'plans'
-  | 'consultants'
-  | 'contract'
-  | 'invoices'
-  | 'photos'
-  | 'meetings'
-  | 'handover'
-  | 'other';
+type DocFolder = UploadDocFolder;
 
 const FOLDERS: DocFolder[] = [
   'plans',
@@ -49,10 +43,6 @@ function formatSize(bytes: number | null): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function sanitize(name: string): string {
-  return name.replace(/[^\w.\-א-ת ]/g, '_').replace(/\s+/g, '_');
 }
 
 export function DocumentsPanel({
@@ -94,34 +84,23 @@ export function DocumentsPanel({
     if (!file) return;
     setUploading(true);
     setError(null);
-    const key = `${projectId}/${Date.now()}-${sanitize(file.name)}`;
-    const { error: upErr } = await supabase.storage
-      .from('project-docs')
-      .upload(key, file, { contentType: file.type || undefined });
-    if (upErr) {
-      setError(upErr.message);
+    try {
+      await uploadDocument({
+        file,
+        projectId,
+        folder: uploadFolder,
+        userId: user?.id ?? null,
+      });
+      toast.success(t('documents.uploadSuccess', { filename: file.name }));
+      await refresh();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg);
+      toast.error(t('documents.uploadFailed'));
+    } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
     }
-    const { error: insErr } = await supabase.from('documents').insert({
-      project_id: projectId,
-      drive_file_id: key,
-      filename: file.name,
-      folder_path: uploadFolder,
-      mime_type: file.type || null,
-      size_bytes: file.size,
-      uploaded_by_id: user?.id ?? null,
-    });
-    if (insErr) {
-      // best-effort: try to remove the orphan object
-      void supabase.storage.from('project-docs').remove([key]);
-      setError(insErr.message);
-    } else {
-      await refresh();
-    }
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   async function download(doc: DocRow) {

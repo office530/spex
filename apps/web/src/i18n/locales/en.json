@@ -337,6 +337,8 @@
     "empty": "No documents yet",
     "upload": "Upload file",
     "uploading": "Uploading…",
+    "uploadSuccess": "{{filename}} uploaded",
+    "uploadFailed": "Upload failed",
     "download": "Download",
     "confirmDelete": "Delete this file?",
     "folder": "Folder",
@@ -986,9 +988,9 @@
       "recent": "Recent",
       "folderEmpty": "Folder empty",
       "empty": "No documents",
-      "emptyHint": "Tag a document as belonging to this chapter via the project Documents tab.",
+      "emptyHint": "Upload a first file for this chapter.",
       "upload": "Upload document",
-      "uploadComingSoon": "Document upload available via the project Documents tab"
+      "uploadInProgress": "Uploading…"
     }
   },
   "qc": {

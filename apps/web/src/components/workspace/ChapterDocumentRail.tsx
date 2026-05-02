@@ -4,13 +4,17 @@ import {
   FileText,
   Folder,
   FolderOpen,
+  Loader2,
   PanelLeftClose,
   PanelLeftOpen,
   Upload,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { useAuth } from '../../auth/AuthContext';
 import { supabase } from '../../lib/supabase';
+import { uploadDocument } from '../../lib/uploadDocument';
 
 interface DocRow {
   id: string;
@@ -31,9 +35,27 @@ interface ChapterDocumentRailProps {
 // In the absence of any chapter tag we fall back to "all project docs".
 export function ChapterDocumentRail({ projectId, chapterId, chapterName }: ChapterDocumentRailProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [docs, setDocs] = useState<DocRow[] | null>(null);
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function refresh() {
+    setDocs(null);
+    let query = supabase
+      .from('documents')
+      .select('id, filename, folder_path, tags, created_at')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+    if (chapterId) {
+      query = query.contains('tags', [`chapter:${chapterId}`]);
+    }
+    const { data } = await query;
+    setDocs((data as unknown as DocRow[]) ?? []);
+    setActiveFolder(null);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -56,6 +78,29 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
       cancelled = true;
     };
   }, [projectId, chapterId]);
+
+  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      await uploadDocument({
+        file,
+        projectId,
+        folder: 'other',
+        userId: user?.id ?? null,
+        chapterId: chapterId ?? null,
+      });
+      toast.success(t('documents.uploadSuccess', { filename: file.name }));
+      await refresh();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(t('documents.uploadFailed'), { description: msg });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
 
   const folders = useMemo(() => {
     if (!docs) return [];
@@ -119,16 +164,41 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
         </div>
       </div>
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => void onFileChange(e)}
+        disabled={uploading}
+      />
       <div className="bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)] p-2">
       {docs === null ? (
         <SkeletonRows count={4} />
       ) : docs.length === 0 ? (
-        <div className="px-2 py-6">
+        <div className="px-2 py-6 space-y-4">
           <EmptyState
             icon={FileText}
             title={t('workspace.docrail.empty')}
             description={t('workspace.docrail.emptyHint')}
           />
+          <button
+            type="button"
+            disabled={uploading}
+            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 disabled:opacity-60 disabled:cursor-not-allowed border border-dashed border-primary/40 rounded-md py-2 flex items-center justify-center gap-1.5 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                {t('workspace.docrail.uploadInProgress')}
+              </>
+            ) : (
+              <>
+                <Upload className="w-3.5 h-3.5" />
+                {t('workspace.docrail.upload')}
+              </>
+            )}
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -199,11 +269,21 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
 
           <button
             type="button"
-            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 border border-dashed border-primary/40 rounded-md py-2 flex items-center justify-center gap-1.5 transition-colors"
-            onClick={() => alert(t('workspace.docrail.uploadComingSoon'))}
+            disabled={uploading}
+            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 disabled:opacity-60 disabled:cursor-not-allowed border border-dashed border-primary/40 rounded-md py-2 flex items-center justify-center gap-1.5 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="w-3.5 h-3.5" />
-            {t('workspace.docrail.upload')}
+            {uploading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                {t('workspace.docrail.uploadInProgress')}
+              </>
+            ) : (
+              <>
+                <Upload className="w-3.5 h-3.5" />
+                {t('workspace.docrail.upload')}
+              </>
+            )}
           </button>
         </div>
       )}
