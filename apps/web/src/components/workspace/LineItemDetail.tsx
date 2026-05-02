@@ -1,6 +1,9 @@
 import { Button, formatCurrencyILS, Tabs, TabsContent, TabsList, TabsTrigger } from '@spex/ui';
 import { ClipboardCheck, LayoutList, ListChecks, Pencil, Truck } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LineEditDialog } from './LineEditDialog';
+import type { LineDraft } from './LineForm';
 import { OverviewTab } from './tabs/OverviewTab';
 import { ProcurementTab } from './tabs/ProcurementTab';
 import { QcTab } from './tabs/QcTab';
@@ -32,6 +35,7 @@ interface LineItemDetailProps {
   canCrud: boolean;
   canComment: boolean;
   canEditOwnTasks: boolean;
+  onUpdateLine?: (id: string, draft: LineDraft) => Promise<void>;
 }
 
 const BENTO_CARD =
@@ -52,8 +56,10 @@ export function LineItemDetail({
   canCrud,
   canComment,
   canEditOwnTasks,
+  onUpdateLine,
 }: LineItemDetailProps) {
   const { t } = useTranslation();
+  const [editOpen, setEditOpen] = useState(false);
   const progress = qcTotal > 0 ? Math.round((qcDone / qcTotal) * 100) : 0;
 
   return (
@@ -103,12 +109,12 @@ export function LineItemDetail({
                   {line.description}
                 </h2>
               </div>
-              {canCrud && (
+              {canCrud && onUpdateLine && (
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => alert(t('workspace.editLineComingSoon'))}
+                  onClick={() => setEditOpen(true)}
                   className="gap-1 rounded-full"
                 >
                   <Pencil className="w-3.5 h-3.5" />
@@ -183,6 +189,23 @@ export function LineItemDetail({
           </div>
         </div>
       </Tabs>
+
+      {onUpdateLine && (
+        <LineEditDialog
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          initial={{
+            description: line.description,
+            unit: line.unit ?? '',
+            quantity: line.quantity?.toString() ?? '',
+            unit_price: line.unit_price?.toString() ?? '',
+            notes: line.notes ?? '',
+          }}
+          onSubmit={async (draft) => {
+            await onUpdateLine(line.id, draft);
+          }}
+        />
+      )}
     </main>
   );
 }

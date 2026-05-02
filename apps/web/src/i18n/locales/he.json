@@ -915,7 +915,6 @@
     "attentionFlag": "ליקויים פתוחים",
     "notStarted": "טרם החל",
     "invalid": "פרויקט לא תקין",
-    "editLineComingSoon": "עריכת שורה זמינה ב־Phase 78",
     "addLine": "הוסף שורה",
     "chapterNamePlaceholder": "שם פרק (לדוגמה: בינוי)",
     "confirmDeleteChapter": "למחוק את הפרק '{{name}}' וכל השורות שבו?",
@@ -925,7 +924,13 @@
       "quantity": "כמות",
       "unit": "יחידה",
       "unitPlaceholder": "m²/יח׳/קומפ׳",
-      "unitPrice": "מחיר יחידה"
+      "unitPrice": "מחיר יחידה",
+      "notesLabel": "הערות",
+      "notesPlaceholder": "פרטים, מפרט, שינויים..."
+    },
+    "lineEditDialog": {
+      "title": "עריכת שורה",
+      "description": "עדכון פרטי הסעיף, כולל הערות חופשיות"
     },
     "tabs": {
       "overview": "סקירה",

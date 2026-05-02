@@ -270,6 +270,7 @@ export function ProjectWorkspacePage() {
       unit: draft.unit || null,
       quantity: qty != null && Number.isFinite(qty) ? qty : null,
       unit_price: price != null && Number.isFinite(price) ? price : null,
+      notes: draft.notes ? draft.notes : null,
       estimated_total:
         qty != null && price != null && Number.isFinite(qty) && Number.isFinite(price)
           ? Math.round(qty * price)
@@ -422,6 +423,7 @@ export function ProjectWorkspacePage() {
             canCrud={canCrud}
             canComment={canComment}
             canEditOwnTasks={canEditOwnTasks}
+            onUpdateLine={canCrud ? updateLine : undefined}
           />
         ) : (
           <main className="flex-1 min-w-0 bg-white grid place-items-center">

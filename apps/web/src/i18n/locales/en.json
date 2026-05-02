@@ -911,7 +911,6 @@
     "attentionFlag": "Open issues",
     "notStarted": "Not started",
     "invalid": "Invalid project",
-    "editLineComingSoon": "Inline line edit ships in Phase 78",
     "addLine": "Add line",
     "chapterNamePlaceholder": "Chapter name (e.g. Construction)",
     "confirmDeleteChapter": "Delete chapter '{{name}}' and all its lines?",
@@ -921,7 +920,13 @@
       "quantity": "Quantity",
       "unit": "Unit",
       "unitPlaceholder": "m²/each/lot",
-      "unitPrice": "Unit price"
+      "unitPrice": "Unit price",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Details, spec, changes…"
+    },
+    "lineEditDialog": {
+      "title": "Edit line",
+      "description": "Update line details, including free-form notes"
     },
     "tabs": {
       "overview": "Overview",
