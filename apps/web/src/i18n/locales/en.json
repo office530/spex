@@ -950,19 +950,18 @@
     },
     "procurement": {
       "title": "Supplier quotes",
-      "summary_one": "1 quote",
-      "summary_other": "{{count}} quotes",
-      "summary_one_approved": "1 quote · approved",
-      "summary_other_approved": "{{count}} quotes · approved",
       "empty": "No quotes yet",
-      "emptyHint": "Open an RFQ and approve a quote — go to the BoQ.",
+      "emptyHint": "Add a first quote for this line.",
       "openInBoq": "Open in BoQ",
-      "col": {
-        "supplier": "Supplier",
-        "amount": "Amount",
-        "status": "Status",
-        "rank": "Rank"
-      }
+      "add": "Add quote",
+      "supplier": "Supplier",
+      "selectSupplier": "Select supplier…",
+      "amount": "Amount",
+      "statusLabel": "Status",
+      "statusAria": "Update quote status",
+      "notes": "Notes",
+      "notesPlaceholder": "Terms, delivery, notes…",
+      "confirmDelete": "Delete this quote?"
     },
     "tasks": {
       "empty": "No tasks for this line",

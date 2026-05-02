@@ -175,7 +175,7 @@ export function LineItemDetail({
                 <QcTab lineId={line.id} canCrud={canCrud} canComment={canComment} />
               </TabsContent>
               <TabsContent value="procurement">
-                <ProcurementTab lineId={line.id} projectId={projectId} />
+                <ProcurementTab lineId={line.id} projectId={projectId} canCrud={canCrud} />
               </TabsContent>
               <TabsContent value="tasks">
                 <TasksTab
