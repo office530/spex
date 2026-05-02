@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LineForm, type LineDraft } from './LineForm';
+
+export type { LineDraft };
 
 interface Chapter {
   id: string;
@@ -38,13 +41,6 @@ interface QcAggregate {
 
 export interface ChapterDraft {
   name: string;
-}
-
-export interface LineDraft {
-  description: string;
-  unit: string;
-  quantity: string;  // string for form input, parsed on submit
-  unit_price: string;
 }
 
 interface ChapterNavigatorProps {
@@ -275,11 +271,13 @@ export function ChapterNavigator({
                           return (
                             <div key={item.id} className="ms-2 px-3 py-2 bg-primary/5 rounded-md">
                               <LineForm
+                                compact
                                 initial={{
                                   description: item.description,
                                   unit: item.unit ?? '',
                                   quantity: item.quantity?.toString() ?? '',
                                   unit_price: item.unit_price?.toString() ?? '',
+                                  notes: item.notes ?? '',
                                 }}
                                 saving={busy}
                                 onSubmit={async (d) => {
@@ -361,7 +359,8 @@ export function ChapterNavigator({
                     {isAddingLineHere && onCreateLine ? (
                       <div className="ms-2 px-3 py-2 bg-primary/5 rounded-md">
                         <LineForm
-                          initial={{ description: '', unit: '', quantity: '', unit_price: '' }}
+                          compact
+                          initial={{ description: '', unit: '', quantity: '', unit_price: '', notes: '' }}
                           saving={busy}
                           onSubmit={async (d) => {
                             setBusy(true);
@@ -452,92 +451,3 @@ function ChapterForm({ initial, saving, onSubmit, onCancel }: ChapterFormProps) 
   );
 }
 
-interface LineFormProps {
-  initial: LineDraft;
-  saving: boolean;
-  onSubmit: (draft: LineDraft) => void | Promise<void>;
-  onCancel: () => void;
-}
-
-function LineForm({ initial, saving, onSubmit, onCancel }: LineFormProps) {
-  const { t } = useTranslation();
-  const [draft, setDraft] = useState<LineDraft>(initial);
-
-  function handle(e: FormEvent) {
-    e.preventDefault();
-    if (!draft.description.trim()) return;
-    void onSubmit({
-      description: draft.description.trim(),
-      unit: draft.unit.trim(),
-      quantity: draft.quantity.trim(),
-      unit_price: draft.unit_price.trim(),
-    });
-  }
-
-  return (
-    <form onSubmit={handle} className="space-y-2">
-      <div className="space-y-1">
-        <Label htmlFor="line-desc" className="text-[10px] uppercase tracking-wider text-slate-500">
-          {t('workspace.lineForm.description')} *
-        </Label>
-        <Input
-          id="line-desc"
-          value={draft.description}
-          onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-          className="text-sm"
-          autoFocus
-          required
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-1">
-        <div>
-          <Label htmlFor="line-qty" className="text-[10px] uppercase tracking-wider text-slate-500">
-            {t('workspace.lineForm.quantity')}
-          </Label>
-          <Input
-            id="line-qty"
-            type="number"
-            min="0"
-            step="any"
-            value={draft.quantity}
-            onChange={(e) => setDraft({ ...draft, quantity: e.target.value })}
-            className="text-sm"
-          />
-        </div>
-        <div>
-          <Label htmlFor="line-unit" className="text-[10px] uppercase tracking-wider text-slate-500">
-            {t('workspace.lineForm.unit')}
-          </Label>
-          <Input
-            id="line-unit"
-            value={draft.unit}
-            onChange={(e) => setDraft({ ...draft, unit: e.target.value })}
-            className="text-sm"
-            placeholder={t('workspace.lineForm.unitPlaceholder')}
-          />
-        </div>
-        <div>
-          <Label htmlFor="line-price" className="text-[10px] uppercase tracking-wider text-slate-500">
-            {t('workspace.lineForm.unitPrice')}
-          </Label>
-          <Input
-            id="line-price"
-            type="number"
-            min="0"
-            value={draft.unit_price}
-            onChange={(e) => setDraft({ ...draft, unit_price: e.target.value })}
-            className="text-sm"
-          />
-        </div>
-      </div>
-      <div className="flex justify-end gap-1">
-        <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={saving}>
-          {t('common.cancel')}
-        </Button>
-        <Button type="submit" size="sm" loading={saving}>
-          {t('common.save')}
-        </Button>
-      </div>
-    </form>
-  );
-}
