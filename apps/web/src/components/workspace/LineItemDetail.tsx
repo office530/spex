@@ -29,10 +29,13 @@ interface LineItemDetailProps {
   tasksOpenCount: number;
   activeTab: 'overview' | 'qc' | 'procurement' | 'tasks';
   onTabChange: (tab: 'overview' | 'qc' | 'procurement' | 'tasks') => void;
-  canCrud: boolean;     // can CRUD QC + edit BoQ line + CRUD tasks
-  canComment: boolean;  // can post QC comments
-  canEditOwnTasks: boolean; // foreman — status update on own tasks
+  canCrud: boolean;
+  canComment: boolean;
+  canEditOwnTasks: boolean;
 }
+
+const BENTO_CARD =
+  'bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)]';
 
 export function LineItemDetail({
   line,
@@ -54,112 +57,130 @@ export function LineItemDetail({
   const progress = qcTotal > 0 ? Math.round((qcDone / qcTotal) * 100) : 0;
 
   return (
-    <main className="flex-1 min-w-0 bg-white overflow-y-auto">
-      {/* Meta strip */}
-      <div className="px-6 py-4 border-b border-slate-200">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-              <span>{chapterName}</span>
-            </div>
-            <h2 className="text-lg font-semibold text-slate-900">{line.description}</h2>
-          </div>
-          {canCrud && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => alert(t('workspace.editLineComingSoon'))}
-              className="gap-1"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              {t('common.edit')}
-            </Button>
-          )}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {t('workspace.meta.quantity')}
-            </div>
-            <div className="text-sm nums font-medium mt-0.5">
-              {line.quantity ?? '—'} {line.unit ?? ''}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {t('workspace.meta.unitPrice')}
-            </div>
-            <div className="text-sm nums font-medium mt-0.5">
-              {line.unit_price != null ? formatCurrencyILS(line.unit_price) : '—'}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {t('workspace.meta.total')}
-            </div>
-            <div className="text-sm nums font-medium mt-0.5 text-slate-900">
-              {line.estimated_total != null ? formatCurrencyILS(line.estimated_total) : '—'}
-            </div>
-          </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              {t('workspace.meta.qcProgress')}
-            </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="text-xs nums font-medium">{progress}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sub-tabs */}
+    <main className="flex-1 min-w-0 bg-slate-50 overflow-y-auto">
       <Tabs
         value={activeTab}
         onValueChange={(v) => onTabChange(v as typeof activeTab)}
         variant="underline"
       >
-        <div className="border-b border-slate-200 px-6 sticky top-0 bg-white z-10">
-          <TabsList className="border-none">
-            <TabsTrigger value="overview">
-              <LayoutList />
-              {t('workspace.tabs.overview')}
-            </TabsTrigger>
-            <TabsTrigger value="qc" count={qcAttention > 0 ? qcAttention : undefined}>
-              <ClipboardCheck />
-              {t('workspace.tabs.qc')}
-            </TabsTrigger>
-            <TabsTrigger value="procurement" count={procurementCount > 0 ? procurementCount : undefined}>
-              <Truck />
-              {t('workspace.tabs.procurement')}
-            </TabsTrigger>
-            <TabsTrigger value="tasks" count={tasksOpenCount > 0 ? tasksOpenCount : undefined}>
-              <ListChecks />
-              {t('workspace.tabs.tasks')}
-            </TabsTrigger>
-          </TabsList>
-        </div>
-        <div className="px-6 py-5">
-          <TabsContent value="overview">
-            <OverviewTab lineId={line.id} notes={line.notes} />
-          </TabsContent>
-          <TabsContent value="qc">
-            <QcTab lineId={line.id} canCrud={canCrud} canComment={canComment} />
-          </TabsContent>
-          <TabsContent value="procurement">
-            <ProcurementTab lineId={line.id} projectId={projectId} />
-          </TabsContent>
-          <TabsContent value="tasks">
-            <TasksTab
-              lineId={line.id}
-              projectId={projectId}
-              canCrud={canCrud}
-              canEditOwn={canEditOwnTasks}
-            />
-          </TabsContent>
+        <div className="p-3 md:p-4 space-y-3">
+          {/* Tabs row — at the top, above the line title */}
+          <div className={`${BENTO_CARD} px-5 md:px-6`}>
+            <TabsList className="border-none">
+              <TabsTrigger value="overview">
+                <LayoutList />
+                {t('workspace.tabs.overview')}
+              </TabsTrigger>
+              <TabsTrigger value="qc" count={qcAttention > 0 ? qcAttention : undefined}>
+                <ClipboardCheck />
+                {t('workspace.tabs.qc')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="procurement"
+                count={procurementCount > 0 ? procurementCount : undefined}
+              >
+                <Truck />
+                {t('workspace.tabs.procurement')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="tasks"
+                count={tasksOpenCount > 0 ? tasksOpenCount : undefined}
+              >
+                <ListChecks />
+                {t('workspace.tabs.tasks')}
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* Line meta — title + 4 metric tiles */}
+          <div className={`${BENTO_CARD} p-6`}>
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1.5 uppercase tracking-wider">
+                  <span>{chapterName}</span>
+                </div>
+                <h2 className="text-xl font-semibold text-slate-900 leading-tight tracking-tight">
+                  {line.description}
+                </h2>
+              </div>
+              {canCrud && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => alert(t('workspace.editLineComingSoon'))}
+                  className="gap-1 rounded-full"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  {t('common.edit')}
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
+              <div className="rounded-xl bg-slate-50/70 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                  {t('workspace.meta.quantity')}
+                </div>
+                <div className="text-base nums font-semibold mt-1 text-slate-900">
+                  {line.quantity ?? '—'}{' '}
+                  <span className="text-xs font-normal text-slate-500">{line.unit ?? ''}</span>
+                </div>
+              </div>
+              <div className="rounded-xl bg-slate-50/70 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                  {t('workspace.meta.unitPrice')}
+                </div>
+                <div className="text-base nums font-semibold mt-1 text-slate-900">
+                  {line.unit_price != null ? formatCurrencyILS(line.unit_price) : '—'}
+                </div>
+              </div>
+              <div className="rounded-xl bg-gradient-to-br from-sky-50 to-blue-50/60 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-sky-700/80 font-medium">
+                  {t('workspace.meta.total')}
+                </div>
+                <div className="text-base nums font-semibold mt-1 text-sky-900">
+                  {line.estimated_total != null ? formatCurrencyILS(line.estimated_total) : '—'}
+                </div>
+              </div>
+              <div className="rounded-xl bg-slate-50/70 px-4 py-3">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                  {t('workspace.meta.qcProgress')}
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex-1 h-1.5 bg-slate-200/80 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-sky-500 to-sky-600 rounded-full transition-all"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <span className="text-xs nums font-semibold text-slate-900 shrink-0">
+                    {progress}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tab body */}
+          <div className={`${BENTO_CARD} p-6 min-h-[420px]`}>
+            <TabsContent value="overview">
+              <OverviewTab lineId={line.id} notes={line.notes} />
+            </TabsContent>
+            <TabsContent value="qc">
+              <QcTab lineId={line.id} canCrud={canCrud} canComment={canComment} />
+            </TabsContent>
+            <TabsContent value="procurement">
+              <ProcurementTab lineId={line.id} projectId={projectId} />
+            </TabsContent>
+            <TabsContent value="tasks">
+              <TasksTab
+                lineId={line.id}
+                projectId={projectId}
+                canCrud={canCrud}
+                canEditOwn={canEditOwnTasks}
+              />
+            </TabsContent>
+          </div>
         </div>
       </Tabs>
     </main>

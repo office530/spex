@@ -386,7 +386,7 @@ export function ProjectWorkspacePage() {
       </header>
 
       {/* 3-column body */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden bg-slate-50">
         <ChapterNavigator
           loading={loading}
           chapters={chapters}

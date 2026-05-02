@@ -387,7 +387,7 @@ export function TasksTab({ lineId, projectId, canCrud, canEditOwn }: TasksTabPro
         return (
           <article
             key={row.id}
-            className="rounded-lg border border-slate-200 bg-white p-4"
+            className="rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm"
           >
             {isEditing ? (
               renderForm(row.id, (e) => handleEdit(e, row.id), true)
@@ -467,7 +467,7 @@ export function TasksTab({ lineId, projectId, canCrud, canEditOwn }: TasksTabPro
       })}
 
       {adding ? (
-        <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-5">
           {renderForm('new', handleAdd, false)}
         </div>
       ) : (
@@ -475,7 +475,7 @@ export function TasksTab({ lineId, projectId, canCrud, canEditOwn }: TasksTabPro
           <button
             type="button"
             onClick={startAdd}
-            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 border border-dashed border-primary/40 rounded-lg py-2.5 flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 border border-dashed border-primary/40 rounded-2xl py-3 flex items-center justify-center gap-1.5 transition-colors"
           >
             <Plus className="w-4 h-4" />
             {t('workspace.tasks.add')}

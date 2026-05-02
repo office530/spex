@@ -76,27 +76,29 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
 
   if (collapsed) {
     return (
-      <aside className="w-12 shrink-0 bg-slate-100 border-e border-slate-200 overflow-hidden flex flex-col items-center py-3">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0 text-slate-600"
-          onClick={() => setCollapsed(false)}
-          aria-label={t('workspace.docrail.expand')}
-        >
-          <PanelLeftOpen className="w-4 h-4" />
-        </Button>
+      <aside className="w-14 shrink-0 bg-slate-50 overflow-hidden flex flex-col items-center p-3">
+        <div className="bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)] w-full flex justify-center py-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-slate-600"
+            onClick={() => setCollapsed(false)}
+            aria-label={t('workspace.docrail.expand')}
+          >
+            <PanelLeftOpen className="w-4 h-4" />
+          </Button>
+        </div>
       </aside>
     );
   }
 
   return (
     <aside
-      className="w-72 shrink-0 bg-slate-100 border-e border-slate-200 overflow-y-auto"
+      className="w-72 shrink-0 bg-slate-50 overflow-y-auto p-3"
       aria-label={t('workspace.docrail.title')}
     >
-      <div className="px-3 py-3 sticky top-0 bg-slate-100/95 backdrop-blur z-10 border-b border-slate-200">
+      <div className="bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)] sticky top-0 z-10 px-3 py-3 mb-2">
         <div className="flex items-center justify-between gap-2">
           <Button
             type="button"
@@ -117,10 +119,11 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
         </div>
       </div>
 
+      <div className="bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.03)] p-2">
       {docs === null ? (
         <SkeletonRows count={4} />
       ) : docs.length === 0 ? (
-        <div className="px-4 py-8">
+        <div className="px-2 py-6">
           <EmptyState
             icon={FileText}
             title={t('workspace.docrail.empty')}
@@ -128,7 +131,7 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
           />
         </div>
       ) : (
-        <div className="px-2 py-2 space-y-3">
+        <div className="space-y-3">
           <div className="space-y-0.5">
             <button
               type="button"
@@ -204,6 +207,7 @@ export function ChapterDocumentRail({ projectId, chapterId, chapterName }: Chapt
           </button>
         </div>
       )}
+      </div>
     </aside>
   );
 }
@@ -215,7 +219,7 @@ function DocCard({ doc }: { doc: DocRow }) {
     [i18n.language],
   );
   return (
-    <article className="bg-white rounded-md border border-slate-200 p-2.5 hover:border-slate-300">
+    <article className="bg-slate-50/60 rounded-xl border border-slate-200/70 p-2.5 hover:border-slate-300 hover:bg-white transition-colors">
       <div className="flex items-start gap-2">
         <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
         <div className="min-w-0 flex-1">
