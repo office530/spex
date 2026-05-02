@@ -251,7 +251,7 @@ export function QcTab({ lineId, canCrud, canComment }: QcTabProps) {
         return (
           <article
             key={check.id}
-            className={`rounded-lg border p-4 ${
+            className={`rounded-2xl border p-5 transition-shadow hover:shadow-sm ${
               check.status === 'failed' ? 'border-rose-200 bg-rose-50/40' : 'border-slate-200 bg-white'
             }`}
           >
@@ -426,7 +426,7 @@ export function QcTab({ lineId, canCrud, canComment }: QcTabProps) {
       {adding ? (
         <form
           onSubmit={handleAdd}
-          className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-3"
+          className="rounded-2xl border border-primary/30 bg-primary/5 p-5 space-y-3"
         >
           <div>
             <Label htmlFor="qc-new-desc">{t('qc.field.description')} *</Label>
@@ -474,7 +474,7 @@ export function QcTab({ lineId, canCrud, canComment }: QcTabProps) {
               setAdding(true);
               setEditingId(null);
             }}
-            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 border border-dashed border-primary/40 rounded-lg py-2.5 flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full text-sm font-medium text-primary hover:text-primary/80 hover:bg-primary/5 border border-dashed border-primary/40 rounded-2xl py-3 flex items-center justify-center gap-1.5 transition-colors"
           >
             <Plus className="w-4 h-4" />
             {t('qc.add')}
