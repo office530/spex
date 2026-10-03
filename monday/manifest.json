@@ -1,0 +1,223 @@
+{
+  "account": {
+    "id": "5630219",
+    "slug": "rnvt",
+    "tier": "pro"
+  },
+  "workspaces": {
+    "w00": 17849205,
+    "w10": 17849206,
+    "w20": 17849207,
+    "w30": 17849209,
+    "w50": 17849208
+  },
+  "boards": {
+    "clients": {
+      "id": 18433850026,
+      "groups": {
+        "לקוחות פעילים": "group_mm7sc77h",
+        "פוטנציאליים": "group_mm7s8trq",
+        "אדריכלים ומעצבים": "group_mm7s55wp",
+        "אחרים": "group_mm7sajkx"
+      },
+      "reflections": {
+        "contacts": "board_relation_mm7sr94h",
+        "leads": "board_relation_mm7stdzs",
+        "projects": "board_relation_mm7sy0he"
+      }
+    },
+    "contacts": {
+      "id": 18433850028,
+      "groups": {
+        "פעילים": "group_mm7smb8v",
+        "ארכיון": "group_mm7sgcgy"
+      }
+    },
+    "vendors": {
+      "id": 18433850029,
+      "groups": {
+        "קבלני משנה": "group_mm7sd25e",
+        "ספקי חומרים": "group_mm7sxfa8",
+        "קבלני כוח אדם": "group_mm7s30fe",
+        "שירותים": "group_mm7sj9jd"
+      },
+      "reflections": {
+        "orders": "board_relation_mm7sdrk7"
+      }
+    },
+    "leads": {
+      "id": 18433850030,
+      "groups": {
+        "לידים חדשים": "group_mm7s2zq8",
+        "בבירור וסיור": "group_mm7scqt2",
+        "תמחור והצעה": "group_mm7svvvn",
+        "משא ומתן": "group_mm7srx94",
+        "זכייה וחוזה": "group_mm7shkrx",
+        "הפסד / לא מתאים": "group_mm7s1nvv"
+      }
+    },
+    "projects": {
+      "id": 18433850032,
+      "groups": {
+        "הקמה": "group_mm7sktdt",
+        "התנעה": "group_mm7sjy5m",
+        "ביצוע": "group_mm7s6117",
+        "מסירה": "group_mm7s764k",
+        "אחריות": "group_mm7sp1jq",
+        "סגור": "group_mm7sqg5j",
+        "מוקפא": "group_mm7sy72f"
+      },
+      "reflections": {
+        "lead": "board_relation_mm7s6nn0"
+      }
+    },
+    "changes": {
+      "id": 18433850033,
+      "groups": {
+        "פתוחים": "group_mm7sjg9g",
+        "אושרו": "group_mm7snjr3",
+        "נסגרו": "group_mm7sbty4"
+      }
+    },
+    "journals": {
+      "id": 18433850034,
+      "subitemsBoardId": 18433850323,
+      "groups": {
+        "החודש": "group_mm7sqyqv",
+        "ארכיון": "group_mm7sagae"
+      },
+      "subitemsColumn": "subtasks_mm7sa5w0"
+    },
+    "defects": {
+      "id": 18433850035,
+      "groups": {
+        "פתוחים": "group_mm7skmta",
+        "בתיקון": "group_mm7sx7gm",
+        "נסגרו": "group_mm7skaas"
+      }
+    },
+    "safety": {
+      "id": 18433850036,
+      "groups": {
+        "הדרכות": "group_mm7s2skv",
+        "סיורים": "group_mm7swwm9",
+        "ממצאים": "group_mm7sp9tb",
+        "אירועים": "group_mm7sv8s6",
+        "הודעות": "group_mm7s70d7"
+      }
+    },
+    "budget": {
+      "id": 18433850037,
+      "groups": {
+        "פרויקטים פעילים": "group_mm7s5e6",
+        "פרויקטים סגורים": "group_mm7srtps"
+      },
+      "reflections": {
+        "changes": "board_relation_mm7sx2be",
+        "orders": "board_relation_mm7sk241"
+      }
+    },
+    "orders": {
+      "id": 18433850038,
+      "groups": {
+        "טיוטות": "group_mm7sqk6e",
+        "באישור": "group_mm7sghvc",
+        "מאושרות": "group_mm7s7h27",
+        "סגורות": "group_mm7s5tj7"
+      },
+      "reflections": {
+        "vinvoices": "board_relation_mm7s4f44"
+      }
+    },
+    "vinvoices": {
+      "id": 18433850039,
+      "groups": {
+        "נקלטו": "group_mm7szzyn",
+        "באישור": "group_mm7sycgk",
+        "מוכן לתשלום": "group_mm7smgck",
+        "שולם": "group_mm7se6z0"
+      }
+    },
+    "billing": {
+      "id": 18433850040,
+      "groups": {
+        "בהכנה": "group_mm7ssj6c",
+        "אצל מפקח": "group_mm7szrp1",
+        "הופק": "group_mm7sc30f",
+        "נגבה": "group_mm7skewy"
+      },
+      "reflections": {
+        "changes": "board_relation_mm7s8keg"
+      }
+    },
+    "guarantees": {
+      "id": 18433850041,
+      "groups": {
+        "בתוקף": "group_mm7s425g",
+        "לחידוש": "group_mm7stmxz",
+        "הושבו": "group_mm7sgw6j"
+      }
+    },
+    "tasks": {
+      "id": 18433850042,
+      "groups": {
+        "השבוע": "group_mm7s21et",
+        "בהמשך": "group_mm7srcpt",
+        "שגרות": "group_mm7s3sf0",
+        "הושלם": "group_mm7ssnbn"
+      }
+    },
+    "renewals": {
+      "id": 18433850043,
+      "groups": {
+        "ביטוח": "group_mm7sb766",
+        "רישוי": "group_mm7ss5xp",
+        "רכבים": "group_mm7s6byg",
+        "משרד": "group_mm7s7y04",
+        "תוכנה ודומיין": "group_mm7s3ctv",
+        "בנק": "group_mm7sna9e",
+        "הסמכות": "group_mm7snk71"
+      }
+    },
+    "sensitive": {
+      "id": 18433850044,
+      "groups": {
+        "פתוחות": "group_mm7sen8q",
+        "הושלמו": "group_mm7sb8b0"
+      }
+    },
+    "snapshot": {
+      "id": 18433850045,
+      "groups": {
+        "2026": "group_mm7sk2cm",
+        "2027": "group_mm7sk2ga"
+      }
+    },
+    "intlog": {
+      "id": 18433850046,
+      "groups": {
+        "נכשל": "group_mm7sq3hb",
+        "הצליח (סיכום יומי)": "group_mm7sa2kj",
+        "טופל": "group_mm7s8d57"
+      }
+    }
+  },
+  "users": {
+    "ceo": {
+      "id": 12547623,
+      "name": "שי ביטון"
+    },
+    "office_manager": {
+      "id": 54370287,
+      "name": "אורטל חייט"
+    },
+    "emil": {
+      "id": 67840293,
+      "name": "אמיל ביטון"
+    }
+  },
+  "make": {
+    "graphqlRunnerScenarioId": 9566772
+  },
+  "builtAt": "2026-10-03"
+}
