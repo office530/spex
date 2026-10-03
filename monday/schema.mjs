@@ -535,12 +535,13 @@ export const boards = [
 
 // ───────────────────── צבעי סטטוס ─────────────────────
 // מזהה התווית ב-monday נגזר מהצבע, לכן בכל עמודה כל תווית מקבלת צבע שונה.
+// explosive (#c4c4c4) = מזהה 5 = תווית ה"ריק" של monday — אסור להשתמש בו, אחרת כל פריט ריק מוצג עם התווית.
 const GREEN = ['הושלם', 'נסגר', 'שולם', 'מאושר', 'אושר', 'תקין', 'בתוקף', 'חודש', 'תואם', 'הצליח', 'זכייה', 'בוצע', 'כן', 'מאומת', 'תוקן', 'הושב', 'בזמן', 'חויב', 'לקוח', 'ליד'];
 const DARK_GREEN = ['חוזה נחתם', 'נבדק', 'נגבה', 'הופק מסמך', 'נשלח לספק'];
 const ORANGE = ['בטיפול', 'בתהליך', 'בתמחור', 'ממתין', 'ממתין לאימות', 'הוגש', 'הוגש לאישור', 'הוגש למפקח', 'ממתין סמנכ״ל', 'פג בעוד 30', 'מעל 90%', 'בינוני', 'בינונית', 'סופק חלקית', 'שולם חלקית', 'לחידוש', '7 תזכורת', 'גבוה'];
 const RED = ['חריגה', 'נדחה', 'פג תוקף', 'נכשל', 'הוסלם', 'בוצע ללא אישור', 'הפסד', 'קריטי', 'דחוף', 'שגיאת אינטגרציה', 'חסר', 'שונה', '45 עו״ד', 'גבוהה', 'ממתין מנכ״ל', 'פג בעוד 7', 'פער מחיר', 'פער כמות', 'ללא מספר הקצאה', 'ללא הזמנה', 'פתוח', 'לא', 'ממתין להחלטה', 'דרוש תיקון', 'הערות מפקח'];
 const GRAY = ['טיוטה', 'לא נבדק', 'לא הוגש', 'ללא', 'טרם', 'לא נדרש', 'לא מתאים', 'בוטל', 'מוקפא', 'סגור', 'לא בוצע', 'לא לחדש', 'נמוך', 'נמוכה', 'דולג', 'בהכנה', 'פוטנציאלי', 'חדש', 'ליד חדש'];
-const PALETTE = ['bright_blue', 'purple', 'dark_blue', 'saladish', 'egg_yolk', 'sofia_pink', 'chili_blue', 'dark_purple', 'brown', 'lipstick', 'dark_orange', 'bright_green', 'blackish', 'dark_red', 'grass_green', 'explosive', 'american_gray', 'done_green', 'working_orange', 'stuck_red'];
+const PALETTE = ['bright_blue', 'purple', 'dark_blue', 'saladish', 'egg_yolk', 'sofia_pink', 'chili_blue', 'dark_purple', 'brown', 'lipstick', 'dark_orange', 'bright_green', 'blackish', 'dark_red', 'grass_green', 'american_gray', 'done_green', 'working_orange', 'stuck_red'];
 export const DONE_LABELS = new Set(['הושלם', 'נסגר', 'שולם', 'הושב', 'נגבה', 'חוזה נחתם', 'טופל']);
 
 export function statusColors(labels) {
@@ -555,7 +556,7 @@ export function statusColors(labels) {
     if (DARK_GREEN.includes(label)) return pick(['grass_green', 'bright_green', 'saladish', 'done_green']);
     if (ORANGE.includes(label)) return pick(['working_orange', 'egg_yolk', 'dark_orange']);
     if (RED.includes(label)) return pick(['stuck_red', 'dark_red', 'lipstick', 'sofia_pink']);
-    if (GRAY.includes(label)) return pick(['american_gray', 'explosive', 'blackish']);
+    if (GRAY.includes(label)) return pick(['american_gray', 'blackish', 'brown']);
     return pick(PALETTE);
   });
 }
