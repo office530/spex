@@ -72,13 +72,15 @@ test('A17: no weekly tour since Sunday → one task per project per week (idempo
 
 test('M16: all daily rows present → ok; missing M07 + open failure → alert', async () => {
   const row = (code, when, result = 'הצליח', handled = '') => ({ id: code + when, name: code, column_values: [col('scenario', code), col('run_time', when), col('result', result), col('handled', handled)] });
-  const good = page([row('M09b', '2026-10-06 02:00'), row('M07', '2026-10-06 06:00'), row('M08', '2026-10-06 07:00'), row('M11b', '2026-10-05 17:00')]);
+  const good = page([row('M09b', '2026-10-06 02:00'), row('A12', '2026-10-06 05:30'), row('M07', '2026-10-06 06:00'), row('M08', '2026-10-06 07:00'), row('M11b', '2026-10-05 17:00')]);
   const ok = await runCode('M16_heartbeat.js', { data: { log: good }, today: '2026-10-06' }, 'M16', 'v1.0'); // Tuesday
   assert.equal(ok.ok, true);
-  const bad = page([row('M09b', '2026-10-06 02:00'), row('M08', '2026-10-06 07:00'), row('M11b', '2026-10-05 17:00'), row('M03', '2026-10-06 07:30', 'נכשל')]);
+  const bad = page([row('M09b', '2026-10-06 02:00'), row('A12', '2026-10-06 05:30'), row('M08', '2026-10-06 07:00'), row('M11b', '2026-10-05 17:00'), row('M03', '2026-10-06 07:30', 'נכשל')]);
   const r = await runCode('M16_heartbeat.js', { data: { log: bad }, today: '2026-10-06' }, 'M16', 'v1.0');
   assertGql(r.query);
   assert.equal(r.ok, false);
   assert.deepEqual(r.missing, ['M07 (2026-10-06)']);
   assert.equal(r.openFailures, 1);
+  const own = await runCode('M16_heartbeat.js', { data: { log: page([...good[0].items_page.items, row('M16', '2026-10-05 08:00', 'הוסלם')]) }, today: '2026-10-06' }, 'M16', 'v1.0');
+  assert.equal(own.ok, true); // yesterday's own alert row does not re-trigger
 });

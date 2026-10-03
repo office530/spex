@@ -3,8 +3,8 @@
 // Usage: node monday/make/scenarios.mjs <code>   → prints {name, blueprint, scheduling, interface?}
 import { readFileSync } from 'node:fs';
 import {
-  B, G, USERS, NOW_DATE, NOW_TIME, gql, router, setVars, iterator, webhook, challenge,
-  filter, eq, neq, exists, scenarioMeta, onError, resetDesigner, codeModule,
+  manifest, B, G, USERS, NOW_DATE, NOW_TIME, gql, router, setVars, iterator, webhook, challenge,
+  filter, eq, neq, exists, scenarioMeta, onError, resetDesigner, codeModule, LBL,
 } from './lib.mjs';
 
 const ids = JSON.parse(readFileSync(new URL('./ids.json', import.meta.url), 'utf8')); // scenario + hook ids once created
@@ -48,6 +48,24 @@ function M17() {
   };
 }
 
+// Pre-filters on the webhook event: only changes that can move a number pass to the fetch (2 ops instead of 5–7 for
+// every echo of our own writes and every irrelevant status move — the bulk of Make credits, §8.6).
+const ev = { id: '{{1.event.pulseId}}', col: '{{1.event.columnId}}', label: '{{1.event.value.label.text}}', prev: '{{1.event.previousValue.label.text}}', board: '{{1.event.boardId}}' };
+const real = exists(ev.id);
+// M09a: amounts and links always; approval only into/out of "מאושר"; status only into/out of the labels the sums use
+// (orders "בוטל"; changes "אושר" / "חויב" / "בוצע ללא אישור").
+const M09A_RELEVANT = [
+  ...['amount', 'budget_line', 'cost'].map((c) => [real, eq(ev.col, c)]),
+  [real, eq(ev.col, 'approval'), eq(ev.label, 'מאושר')], [real, eq(ev.col, 'approval'), eq(ev.prev, 'מאושר')],
+  ...['בוטל', 'אושר', 'חויב', 'בוצע ללא אישור'].flatMap((l) => [[real, eq(ev.col, 'status'), eq(ev.label, l)], [real, eq(ev.col, 'status'), eq(ev.prev, l)]]),
+];
+// M03: exactly the transitions M03_decide.js acts on. Waiting labels only on leads (on orders they are M03's own echo).
+const M03_RELEVANT = (leads) => [
+  [real, eq(ev.label, 'הוגש לאישור')], [real, eq(ev.label, 'הוגש')], [real, eq(ev.label, 'אושר')],
+  [real, eq(ev.col, 'approval'), eq(ev.label, 'מאושר')], [real, eq(ev.col, 'approval'), eq(ev.label, 'נדחה')],
+  [real, eq(ev.board, String(leads)), eq(ev.label, 'ממתין סמנכ״ל')], [real, eq(ev.board, String(leads)), eq(ev.label, 'ממתין מנכ״ל')],
+];
+
 // ───────────────────────── M09a · budget line recompute (instant) ─────────────────────────
 // monday webhooks: orders(approval,status,amount,budget_line) + changes(status,cost,amount,budget_line) → hook.
 function M09a() {
@@ -58,7 +76,7 @@ function M09a() {
     webhook(1, ids.hooks.M09a),
     challenge(2, 1),
     gql(3, 'query { items(ids: [{{1.event.pulseId}}]) { id bl: column_values(ids: ["budget_line"]) { ... on BoardRelationValue { linked_item_ids } } pr: column_values(ids: ["project"]) { ... on BoardRelationValue { linked_item_ids } } } }', [],
-      { filter: filter('אירוע אמיתי (לא אימות)', [exists('{{1.event.pulseId}}')]), onerror: onError(3, { code, version, sourceBoard: '{{1.event.boardId}}', sourceItem: '{{1.event.pulseId}}' }) }),
+      { filter: filter('שינוי שמשפיע על התקציב', ...M09A_RELEVANT), onerror: onError(3, { code, version, sourceBoard: '{{1.event.boardId}}', sourceItem: '{{1.event.pulseId}}' }) }),
     codeModule(4, 'M09a_plan.js', code, version, {
       items: '{{3.body.data.items}}', boardId: '{{1.event.boardId}}', columnId: '{{1.event.columnId}}',
       prev: '{{1.event.previousValue}}', changedAt: '{{1.event.changedAt}}',
@@ -85,7 +103,7 @@ function M03() {
     webhook(1, ids.hooks.M03),
     challenge(2, 1),
     gql(3, 'query { items(ids: [{{1.event.pulseId}}]) { id name board { id } column_values { id text value ... on BoardRelationValue { linked_items { id name column_values { id text value } } } } } u: users(ids: [{{ifempty(1.event.userId; 0)}}]) { id name } }', [],
-      { filter: filter('אירוע אמיתי (לא אימות)', [exists('{{1.event.pulseId}}')]), onerror: err(3) }),
+      { filter: filter('מעבר שדורש החלטה', ...M03_RELEVANT(B.leads)), onerror: err(3) }),
     codeModule(4, 'M03_decide.js', code, version, {
       items: '{{3.body.data.items}}', users: '{{3.body.data.u}}', boardId: '{{1.event.boardId}}', columnId: '{{1.event.columnId}}',
       label: '{{1.event.value.label.text}}', prevLabel: '{{1.event.previousValue.label.text}}', userId: '{{1.event.userId}}', changedAt: '{{1.event.changedAt}}',
@@ -121,7 +139,7 @@ const M07 = () => scheduled('M07', 'ספקים_ציות-יומי', 'v1.0', 'M07_
   [pageQ('vendors', 'vendors', ['vendor_type', 'insurance_exp', 'wht_exp', 'books_exp', 'manpower_exp', 'compliance', 'pay_block'])],
   { type: 'daily', time: '06:00' }, 'ספקים וקבלני משנה');
 const M08 = () => scheduled('M08', 'כספים_סולם-גבייה', 'v1.0', 'M08_collection.js',
-  [pageQ('bills', 'billing', ['approved_amt', 'paid', 'due', 'collection'])],
+  [pageQ('bills', 'billing', ['approved_amt', 'paid', 'due', 'collection', 'project']), pageQ('projects', 'projects', ['pm'])],
   { type: 'daily', time: '07:00' }, 'חשבונות חלקיים וגבייה');
 const M09b = () => scheduled('M09b', 'כספים_התאמה-לילית', 'v1.0', 'M09b_reconcile.js', [
   pageQ('lines', 'budget', ['commitments', 'approved_changes']),
@@ -139,11 +157,47 @@ const A17 = () => scheduled('A17', 'בטיחות_סיור-שבועי-חסר', 'v
   pageQ('safety', 'safety', ['rec_type', 'date', 'project'], '{ order_by: [{ column_id: "date", direction: desc }] }'),
   pageQ('tasks', 'tasks', ['int_key'], '{ rules: [{ column_id: "int_key", compare_value: ["A17:"], operator: contains_text }] }'),
 ], { type: 'weekly', days: [4], time: '12:00' }, 'בטיחות');
+const rules = (...r) => `{ rules: [${r.join(', ')}], operator: and }`;
+const rl = (col, op, vals = []) => `{ column_id: "${col}", compare_value: ${JSON.stringify(vals)}, operator: ${op} }`;
+const A12 = () => scheduled('A12', 'בקרה_שגרות-ותאריכים', 'v1.0', 'A12_daily.js', [
+  pageQ('keyed', 'tasks', ['int_key'], `{ rules: [${rl('int_key', 'is_not_empty')}], order_by: [{ column_id: "created", direction: desc }] }`),
+  pageQ('decisions', 'tasks', ['owner', 'decision_helper'], rules(rl('status', 'any_of', [LBL.taskDecision]))),
+  pageQ('helpers', 'tasks', ['decision_helper'], rules(rl('decision_helper', 'is_not_empty'), rl('status', 'not_any_of', [LBL.taskDecision]))),
+  pageQ('renewals', 'renewals', ['r_type', 'expiry', 'owner', 'renewal_status']),
+  pageQ('guarantees', 'guarantees', ['g_type', 'expiry', 'status']),
+  pageQ('defects', 'defects', ['due', 'owner', 'status', 'project'], rules(rl('status', 'any_of', LBL.defectOpen))),
+  pageQ('findings', 'safety', ['close_due', 'finding_status', 'project'], rules(rl('finding_status', 'any_of', LBL.findingOpen))),
+  pageQ('notices', 'safety', ['notice_due', 'notice_ref', 'performer', 'project'], rules(rl('rec_type', 'any_of', [LBL.noticeRequired]))),
+  pageQ('urgent', 'changes', ['urgent_date', 'approval_file', 'owner', 'status', 'project'], rules(rl('urgent_date', 'is_not_empty'))),
+  pageQ('projects', 'projects', ['pm', 'site_mgr']),
+], { type: 'daily', time: '05:30' }, 'משימות ותפעול שוטף');
 const M16 = () => scheduled('M16', 'בקרה_בדיקת-דופק', 'v1.0', 'M16_heartbeat.js',
   [pageQ('log', 'intlog', ['scenario', 'run_time', 'result', 'handled'], '{ order_by: [{ column_id: "created", direction: desc }] }')],
   { type: 'daily', time: '08:00' }, 'יומן אינטגרציות');
 
-const builders = { M17, M09a, M03, M07, M08, M09b, M11b, A17, M16 };
+// ───────────────────────── M02 · win → project (instant) ─────────────────────────
+// monday webhook: leads(stage) → hook. Only "זכייה" / "חוזה נחתם" pass the filter, so other stage moves cost 2 ops.
+function M02() {
+  resetDesigner();
+  const code = 'M02', version = 'v1.0';
+  const err = (m) => onError(m, { code, version, sourceBoard: 'לידים והזדמנויות', sourceItem: '{{1.event.pulseId}}' });
+  const won = (label) => [exists('{{1.event.pulseId}}'), eq('{{1.event.value.label.text}}', label)];
+  const flow = [
+    webhook(1, ids.hooks.M02),
+    challenge(2, 1),
+    gql(3, `query { lead: items(ids: [{{1.event.pulseId}}]) { id name ${relCols(['rec_id', 'company', 'price', 'expected_value', 'project'])} } ` +
+      `${pageQ('projects', 'projects', ['project_code', 'int_key', manifest.boards.projects.reflections.lead], '{ order_by: [{ column_id: "created", direction: desc }] }')} }`, [],
+      { filter: filter('זכייה / חוזה נחתם', won('זכייה'), won('חוזה נחתם')), onerror: err(3) }),
+    codeModule(4, 'M02_win.js', code, version, { data: '{{3.body.data}}' }),
+    gql(5, '{{4.result.query}}', [], { filter: filter('יש מה לעשות', [neq('{{4.result.skip}}', 'true')]), onerror: err(5) }),
+  ];
+  flow[4].mapper.variablesDataSource = 'object';
+  flow[4].mapper.variables = '{{4.result.vars}}';
+  const name = `${code}_מכירות_זכייה-לפרויקט_${version}`;
+  return { name, scheduling: { type: 'immediately' }, blueprint: { name, flow, metadata: scenarioMeta({ instant: true, dlq: true }) } };
+}
+
+const builders = { M17, M09a, M03, M02, M07, M08, M09b, M11b, A17, A12, M16 };
 const code = process.argv[2];
 if (!builders[code]) { console.error(`unknown scenario ${code}; one of ${Object.keys(builders).join(', ')}`); process.exit(1); }
 process.stdout.write(JSON.stringify(builders[code](), null, 1) + '\n');

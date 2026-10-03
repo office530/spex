@@ -9,13 +9,14 @@ const dow = new Date(`${today}T12:00:00Z`).getUTCDay(); // 0 = Sunday … 6 = Sa
 const yesterday = new Date(Date.parse(`${today}T12:00:00Z`) - 86400000).toISOString().slice(0, 10);
 const ranOn = (code, date) => rows.some((r) => cvText(r, 'scenario') === code && cvText(r, 'run_time').startsWith(date));
 
-// Expected cadence (Israel time): M09b 02:00, M07 06:00, M08 07:00 daily; M11b 17:00 Sun–Thu (checked for yesterday);
+// Expected cadence (Israel time): M09b 02:00, A12 05:30, M07 06:00, M08 07:00 daily; M11b 17:00 Sun–Thu (checked for yesterday);
 // A17 Thursday 12:00 (checked on Friday).
-const expected = [['M09b', today], ['M07', today], ['M08', today]];
+const expected = [['M09b', today], ['A12', today], ['M07', today], ['M08', today]];
 if (dow >= 1 && dow <= 5) expected.push(['M11b', yesterday]); // yesterday was Sun–Thu
 if (dow === 5) expected.push(['A17', yesterday]);
 const missing = expected.filter(([code, date]) => !ranOn(code, date)).map(([code, date]) => `${code} (${date})`);
-const openFailures = rows.filter((r) => ['נכשל', 'הוסלם'].includes(cvText(r, 'result')) && cvText(r, 'handled') !== 'v');
+// M16's own alert rows are excluded, otherwise one unhandled alert would re-alert every morning forever.
+const openFailures = rows.filter((r) => cvText(r, 'scenario') !== 'M16' && ['נכשל', 'הוסלם'].includes(cvText(r, 'result')) && cvText(r, 'handled') !== 'v');
 
 const ok = missing.length === 0 && openFailures.length === 0;
 if (!ok) {

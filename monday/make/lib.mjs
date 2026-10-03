@@ -94,25 +94,46 @@ export const LBL = {
   orderApproved: 1, orderCancelled: 10, // orders.approval "מאושר", orders.status "בוטל" (moved off id 5 = monday's empty label)
   changeApproved: [1, 6], changeUnapproved: 11, // changes.status "אושר","חויב" / "בוצע ללא אישור"
   subClaim: 4, clientChange: 7, // changes.change_type
+  taskDecision: 2, defectOpen: [2, 0], findingOpen: [2, 0], noticeRequired: 9, // tasks.status, defects.status, safety.finding_status / rec_type
 };
 
 export function consts(code, version) {
   return {
     code, version,
     board: B,
-    group: { logOk: G.intlog['הצליח (סיכום יומי)'], logFail: G.intlog['נכשל'], tasksWeek: G.tasks['השבוע'], projectsSetup: G.projects['הקמה'] },
+    group: { logOk: G.intlog['הצליח (סיכום יומי)'], logFail: G.intlog['נכשל'], tasksWeek: G.tasks['השבוע'], tasksRoutine: G.tasks['שגרות'], projectsSetup: G.projects['הקמה'] },
     lbl: LBL,
+    col: { projectLead: manifest.boards.projects.reflections.lead },
     users: USERS,
   };
 }
 
 const codeDir = new URL('./code/', import.meta.url);
+/** Keep only the prelude helpers the step actually calls (transitively) — each blueprint stays as small as possible. */
+function usedPrelude(prelude, body) {
+  const chunks = [];
+  for (const line of prelude.split('\n')) {
+    const m = /^(?:const|function)\s+(\w+)/.exec(line);
+    if (m || !chunks.length) chunks.push({ name: m?.[1] ?? '', lines: [] });
+    chunks[chunks.length - 1].lines.push(line);
+  }
+  const calls = (src, name) => new RegExp(`\\b${name}\\s*\\(`).test(src);
+  const keep = new Set();
+  let grew = true;
+  while (grew) {
+    grew = false;
+    const pool = body + chunks.filter((c) => keep.has(c.name)).map((c) => c.lines.join('\n')).join('\n');
+    for (const c of chunks) if (c.name && !keep.has(c.name) && calls(pool, c.name)) { keep.add(c.name); grew = true; }
+  }
+  return chunks.filter((c) => keep.has(c.name)).map((c) => c.lines.join('\n')).join('\n');
+}
+
 export function codeSource(file, code, version) {
   const prelude = readFileSync(new URL('_prelude.js', codeDir), 'utf8');
   const body = readFileSync(new URL(file, codeDir), 'utf8');
   // Full-line comments and indentation are stripped to keep blueprints small; the repo copy stays readable.
-  const slim = (src) => src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('//')).join('\n');
-  return `// ${code} ${version} · ${file} · generated from monday/make/code (do not edit in Make)\nconst C = ${JSON.stringify(consts(code, version))};\n${slim(prelude)}\n${slim(body)}`;
+  const slim = (src) => src.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('//') && !/^\/\*\*.*\*\/$/.test(l)).join('\n');
+  return `// ${code} ${version} · ${file} · generated from monday/make/code (do not edit in Make)\nconst C = ${JSON.stringify(consts(code, version))};\n${slim(usedPrelude(prelude, body))}\n${slim(body)}`;
 }
 
 export function codeModule(id, file, code, version, input, extra = {}) {
