@@ -86,7 +86,13 @@
         "החודש": "group_mm7sqyqv",
         "ארכיון": "group_mm7sagae"
       },
-      "subitemsColumn": "subtasks_mm7sa5w0"
+      "subitemsColumn": "subtasks_mm7sa5w0",
+      "forms": {
+        "daily_journal": {
+          "view": "284396747",
+          "token": "c55d7c2ee842ff2a90f6a39840f9da4c"
+        }
+      }
     },
     "defects": {
       "id": 18433850035,
@@ -94,6 +100,12 @@
         "פתוחים": "group_mm7skmta",
         "בתיקון": "group_mm7sx7gm",
         "נסגרו": "group_mm7skaas"
+      },
+      "forms": {
+        "defect_report": {
+          "view": "284396480",
+          "token": "a89187e00bfc633a3551969f8c4a1897"
+        }
       }
     },
     "safety": {
@@ -104,6 +116,12 @@
         "ממצאים": "group_mm7sp9tb",
         "אירועים": "group_mm7sv8s6",
         "הודעות": "group_mm7s70d7"
+      },
+      "forms": {
+        "safety_report": {
+          "view": "284396746",
+          "token": "47476de467fa6c251247f55417addace"
+        }
       }
     },
     "budget": {
@@ -164,7 +182,14 @@
         "השבוע": "group_mm7s21et",
         "בהמשך": "group_mm7srcpt",
         "שגרות": "group_mm7s3sf0",
-        "הושלם": "group_mm7ssnbn"
+        "הושלם": "group_mm7ssnbn",
+        "בקשות מהצוות": "group_mm7tdxvj"
+      },
+      "forms": {
+        "office_request": {
+          "view": "284396748",
+          "token": "0145fabac7262df88bfb81a4434edb89"
+        }
       }
     },
     "renewals": {
@@ -219,5 +244,20 @@
   "make": {
     "graphqlRunnerScenarioId": 9566772
   },
-  "builtAt": "2026-10-03"
+  "builtAt": "2026-10-03",
+  "builtins": {
+    "bank_change": "7924189055",
+    "A04": "7924189354",
+    "A13": "7924189334",
+    "A16": "7924189339",
+    "A20_defect_notify": "7924189314",
+    "A20_defect_open": "7924189431",
+    "A20_safety_incident": "7924189340",
+    "A20_safety_finding_open": "7924189499",
+    "A21_office_request": "7924189512",
+    "A23_onboarding": "7924189372",
+    "A23_year_open": "7924189379",
+    "A23_project_close": "7924189387",
+    "lead_loss": "7924189306"
+  }
 }
