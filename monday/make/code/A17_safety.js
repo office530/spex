@@ -8,7 +8,7 @@ const mb = mutationBuilder();
 const dow = new Date(`${today}T12:00:00Z`).getUTCDay(); // 0 = Sunday
 const weekStart = new Date(Date.parse(`${today}T12:00:00Z`) - dow * 86400000).toISOString().slice(0, 10);
 const ACTIVE = ['התנעה', 'ביצוע', 'מסירה'];
-const projects = pageItems(d, 'projects').filter((p) => ACTIVE.includes(cvText(p, 'phase')));
+const projects = pageItems(d, 'projects').filter((p) => ACTIVE.includes(cvText(p, 'phase')) && !isDemo(p));
 const toured = new Set(
   pageItems(d, 'safety')
     .filter((s) => cvText(s, 'rec_type') === 'סיור שבועי' && cvText(s, 'date') >= weekStart && cvText(s, 'date') <= today)

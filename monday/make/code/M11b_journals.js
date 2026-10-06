@@ -5,7 +5,7 @@ const d = input.data || {};
 const today = input.today || todayIL();
 const mb = mutationBuilder();
 const ACTIVE = ['התנעה', 'ביצוע', 'מסירה'];
-const projects = pageItems(d, 'projects').filter((p) => ACTIVE.includes(cvText(p, 'phase')));
+const projects = pageItems(d, 'projects').filter((p) => ACTIVE.includes(cvText(p, 'phase')) && !isDemo(p));
 const withJournal = new Set(
   pageItems(d, 'journals').filter((j) => cvText(j, 'date') === today).flatMap((j) => relIds(j, 'project')),
 );

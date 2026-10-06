@@ -148,12 +148,12 @@ const M09b = () => scheduled('M09b', 'כספים_התאמה-לילית', 'v1.0',
   pageQ('defects', 'defects', ['project', 'status']),
   pageQ('projects', 'projects', ['open_defects', 'unapproved_changes', 'approved_changes']),
 ], { type: 'daily', time: '02:00' }, 'שורות תקציב');
-const M11b = () => scheduled('M11b', 'שטח_יומן-חסר', 'v1.0', 'M11b_journals.js', [
-  pageQ('projects', 'projects', ['phase', 'missing_journals', 'site_mgr', 'pm']),
+const M11b = () => scheduled('M11b', 'שטח_יומן-חסר', 'v1.1', 'M11b_journals.js', [
+  pageQ('projects', 'projects', ['phase', 'missing_journals', 'site_mgr', 'pm', 'int_key']),
   pageQ('journals', 'journals', ['date', 'project'], '{ order_by: [{ column_id: "date", direction: desc }] }'),
 ], { type: 'weekly', days: [0, 1, 2, 3, 4], time: '17:00' }, 'יומני עבודה');
-const A17 = () => scheduled('A17', 'בטיחות_סיור-שבועי-חסר', 'v1.0', 'A17_safety.js', [
-  pageQ('projects', 'projects', ['phase', 'site_mgr', 'pm']),
+const A17 = () => scheduled('A17', 'בטיחות_סיור-שבועי-חסר', 'v1.1', 'A17_safety.js', [
+  pageQ('projects', 'projects', ['phase', 'site_mgr', 'pm', 'int_key']),
   pageQ('safety', 'safety', ['rec_type', 'date', 'project'], '{ order_by: [{ column_id: "date", direction: desc }] }'),
   pageQ('tasks', 'tasks', ['int_key'], '{ rules: [{ column_id: "int_key", compare_value: ["A17:"], operator: contains_text }] }'),
 ], { type: 'weekly', days: [4], time: '12:00' }, 'בטיחות');

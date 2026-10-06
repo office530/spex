@@ -1,0 +1,20 @@
+{
+  "_note": "Demo items created 2026-10-06 by seed.py. delete.py finds them by int_key (DEMO:*), so this file is for reference only.",
+  "client": 13216201760, "architect": 13216201771, "prospect": 13216201774,
+  "c_dana": 13216213836, "c_uri": 13216213837,
+  "v_elec": 13216201775, "v_paint": 13216201776, "v_carp": 13216201777,
+  "project": 13216213857,
+  "lead_won": 13216235133, "lead_quote": 13216235136, "lead_new": 13216235137,
+  "bl_elec": 13216235138, "bl_paint": 13216235139, "bl_carp": 13216235150,
+  "po_elec": 13216200793, "po_paint": 13216200795, "po_carp": 13216200797,
+  "vi_elec": 13216233247, "vi_paint": 13216233267,
+  "bill_1": 13216235155, "bill_2": 13216235157,
+  "g_perf": 13216235176, "g_ins": 13216235178,
+  "ch_client": 13216214090, "ch_sub": 13216214101, "ch_unapproved": 13216214106,
+  "d_crack": 13216235208, "d_socket": 13216235209,
+  "s_train": 13216235179, "s_tour": 13216235195, "s_find": 13216235200,
+  "j_1": 13216235203, "j_2": 13216235206,
+  "t_handover": 13216235210, "t_follow": 13216235239, "t_done": 13216235240,
+  "r_policy": 13216235242, "r_car": 13216235243,
+  "sens": 13216235245, "snap": 13216235246
+}

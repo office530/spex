@@ -43,6 +43,7 @@ test('M11b: active project without a journal today → +1 missing day and a noti
       { id: '1', name: 'עם יומן', column_values: [col('phase', 'ביצוע'), col('missing_journals', '0')] },
       { id: '2', name: 'בלי יומן', column_values: [col('phase', 'ביצוע'), col('missing_journals', '2'), ppl('site_mgr', 555)] },
       { id: '3', name: 'סגור', column_values: [col('phase', 'סגור')] },
+      { id: '4', name: 'דמו', column_values: [col('phase', 'ביצוע'), col('int_key', 'DEMO:projects:1')] },
     ]),
     journals: page([{ id: '9', column_values: [col('date', '2026-10-04'), rel('project', [1])] }, { id: '8', column_values: [col('date', '2026-10-03'), rel('project', [2])] }]),
   };
@@ -51,6 +52,7 @@ test('M11b: active project without a journal today → +1 missing day and a noti
   assert.equal(r.missing, 1);
   assert.equal(jsonVars(r)[0].missing_journals, '3');
   assert.match(r.query, /create_notification\(user_id: 555/);
+  assert.doesNotMatch(r.query, /דמו/); // demo rows are skipped
 });
 
 test('A17: no weekly tour since Sunday → one task per project per week (idempotent)', async () => {
@@ -58,6 +60,7 @@ test('A17: no weekly tour since Sunday → one task per project per week (idempo
     projects: page([
       { id: '1', name: 'A', column_values: [col('phase', 'ביצוע'), ppl('site_mgr', 555)] },
       { id: '2', name: 'B', column_values: [col('phase', 'ביצוע')] },
+      { id: '3', name: 'דמו', column_values: [col('phase', 'ביצוע'), col('int_key', 'DEMO:projects:1')] },
     ]),
     safety: page([{ id: '7', column_values: [col('rec_type', 'סיור שבועי'), col('date', '2026-10-05'), rel('project', [2])] }]),
     tasks: page([]),
@@ -65,7 +68,7 @@ test('A17: no weekly tour since Sunday → one task per project per week (idempo
   const r = await runCode('A17_safety.js', { data, today: '2026-10-08' }, 'A17', 'v1.0'); // Thursday
   assertGql(r.query);
   assert.equal(r.weekStart, '2026-10-04');
-  assert.equal(r.created, 1);
+  assert.equal(r.created, 1); // the demo project is skipped
   const again = await runCode('A17_safety.js', { data: { ...data, tasks: page([{ id: 't', column_values: [col('int_key', 'A17:1:2026-10-04')] }]) }, today: '2026-10-08' }, 'A17', 'v1.0');
   assert.equal(again.created, 0);
 });

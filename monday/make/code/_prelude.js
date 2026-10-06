@@ -8,6 +8,7 @@ const num = (v) => {
 };
 const round2 = (n) => Math.round(n * 100) / 100;
 const cvText = (item, id) => (item?.column_values ?? []).find((c) => c.id === id)?.text ?? '';
+const isDemo = (item) => cvText(item, 'int_key').startsWith('DEMO'); // demo/sandbox rows (monday/demo) — scheduled checks skip them
 const cvValue = (item, id) => {
   const raw = (item?.column_values ?? []).find((c) => c.id === id)?.value;
   if (!raw) return null;
