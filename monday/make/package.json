@@ -1,0 +1,12 @@
+{
+  "name": "rnvt-monday-make",
+  "private": true,
+  "type": "module",
+  "description": "Make blueprints + Run-code logic for the monday Work OS (spec v2). Not part of the Spex workspace.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "graphql": "^16.9.0"
+  }
+}
